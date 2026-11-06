@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Design system Vuetify – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8}
+button,input{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:20px;height:20px;fill:currentColor;flex:none}
+.wrap{max-width:1360px;margin:0 auto;padding:48px 32px 64px;display:flex;flex-direction:column;gap:32px}
+.sec{background:#fff;border:1px solid #D5DBE7;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px}
+.sec h2{font-size:24px;font-weight:500}
+.lead{color:#5B6478;max-width:760px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.sw{border:1px solid #D5DBE7;border-radius:12px;overflow:hidden}
+.sw .c{height:72px}
+.sw .t{padding:8px 10px;display:flex;flex-direction:column}
+.mono{font-family:'Roboto Mono',monospace;font-size:12px;color:#5B6478}
+.type-row{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;align-items:baseline;padding:10px 0;border-bottom:1px solid #EEF2FA}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;background:transparent}
+.v-btn .i{width:18px;height:18px}
+.flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.tonal{background:#E3EBFB;color:#1E4FB8}.out{border-color:#1E4FB8;color:#1E4FB8}.txt{color:#1E4FB8;padding:0 10px}.err{background:#C62828;color:#fff}
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500}
+.av{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;color:#fff;font-weight:500}
+.field{position:relative;width:300px;max-width:100%}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:#fff;font-size:12px;color:#5B6478}
+.control{display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;border:1px solid #8A93A6;border-radius:4px;color:#5B6478}
+.control input{border:0;outline:0;flex:1;min-width:0;font-size:16px;color:#1C2333;background:transparent}
+.f-focus .control{border:2px solid #1E4FB8;color:#1E4FB8}.f-focus label{color:#1E4FB8}
+.f-err .control{border:2px solid #C62828;color:#C62828}.f-err label,.f-err .msg{color:#C62828}
+.msg{font-size:12px;padding:4px 16px 0;color:#5B6478}
+.alert{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:4px;flex:1 1 280px}
+.tabs{display:flex;border-bottom:1px solid #D5DBE7}
+.tab{height:48px;padding:0 16px;display:flex;align-items:center;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;color:#5B6478;border-bottom:2px solid transparent}
+.tab.on{color:#1E4FB8;border-color:#1E4FB8}
+.nav{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;width:264px}
+.nav.on{background:#E3EBFB;color:#1E4FB8;font-weight:500}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#1E4FB8;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center;margin-left:auto}
+.bp{width:100%;border-collapse:collapse;min-width:720px}
+.bp th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#5B6478;font-weight:500;padding:10px 12px;border-bottom:1px solid #D5DBE7}
+.bp td{padding:10px 12px;border-bottom:1px solid #EEF2FA;vertical-align:top}
+pre{margin:0;background:#1C2333;color:#E6EAF2;border-radius:12px;padding:20px;overflow:auto;font-family:'Roboto Mono',monospace;font-size:13px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}.type-row{grid-template-columns:minmax(0,1fr);gap:2px}.wrap{padding:24px 16px}.sec{padding:18px}}
+</style>
+</helmet>
+<main class="wrap">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:10px;background:#1E4FB8;color:#fff;display:grid;place-items:center"><svg class="i" style="width:28px;height:28px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span><span style="font-size:22px;font-weight:700;color:#1E4FB8">UniConnect</span></div>
+    <h1 style="font-size:34px;line-height:40px;font-weight:500">Design system · Vuetify 3</h1>
+    <p class="lead">Thème, typographie et composants utilisés dans toutes les maquettes. Les noms correspondent aux tokens et composants Vuetify (Material Design), pour un passage direct au code Vue.</p>
+  </header>
+
+  <section class="sec" aria-labelledby="s1">
+    <h2 id="s1">Couleurs du thème « uniconnectLight »</h2>
+    <p class="lead">Bleu universitaire en couleur principale, teal en secondaire. Chaque couleur d'état possède une variante tonale pour les chips et alertes ; les textes sur fond tonal utilisent une teinte assombrie pour garder un contraste d'au moins 4,5:1.</p>
+    <div class="swatches">
+      <sc-for list="{{colors}}" as="c" hint-placeholder-count="12">
+        <div class="sw"><div class="c" style="{{c.bg}}"></div><div class="t"><strong>{{c.name}}</strong><span class="mono">{{c.hex}}</span><span class="mono">{{c.use}}</span></div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section class="sec" aria-labelledby="s2">
+      <h2 id="s2">Typographie · Roboto</h2>
+      <div>
+        <div class="type-row"><span class="mono">text-h4 · 34/40</span><span style="font-size:34px;line-height:40px">Bases de données</span></div>
+        <div class="type-row"><span class="mono">text-h5 · 24/32 · 500</span><span style="font-size:24px;line-height:32px;font-weight:500">Bonjour Yassine</span></div>
+        <div class="type-row"><span class="mono">text-h6 · 20/28 · 500</span><span style="font-size:20px;font-weight:500">Dernières annonces</span></div>
+        <div class="type-row"><span class="mono">text-subtitle-1 · 16</span><span style="font-size:16px">Report de la séance de TP</span></div>
+        <div class="type-row"><span class="mono">text-body-2 · 14/20</span><span>Le support du chapitre 3 est disponible.</span></div>
+        <div class="type-row"><span class="mono">text-button · 14 · 500</span><span style="font-size:14px;font-weight:500;letter-spacing:.09em;text-transform:uppercase">Envoyer</span></div>
+        <div class="type-row"><span class="mono">text-caption · 12/16</span><span style="font-size:12px;color:#5B6478">Expire le 11/11 à 16:05</span></div>
+        <div class="type-row"><span class="mono">text-overline · 12 · 500</span><span style="font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478">Mes groupes privés</span></div>
+      </div>
+    </section>
+    <section class="sec" aria-labelledby="s3">
+      <h2 id="s3">Icônes · Material Design Icons</h2>
+      <p class="lead">Jeu d'icônes par défaut de Vuetify (<span class="mono">mdi-*</span>), 20 à 24 px, couleur héritée du texte.</p>
+      <div class="row" style="gap:16px">
+        <sc-for list="{{icons}}" as="x" hint-placeholder-count="12"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;width:92px;color:#4A5366"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{x.d}}"></path></svg><span class="mono" style="font-size:11px;text-align:center">{{x.n}}</span></span></sc-for>
+      </div>
+    </section>
+  </div>
+
+  <section class="sec" aria-labelledby="s4">
+    <h2 id="s4">Composants</h2>
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div><div class="mono" style="margin-bottom:8px">v-btn · variant flat / tonal / outlined / text</div>
+        <div class="row"><button class="v-btn flat" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.plus}}"></path></svg>Créer un espace</button><button class="v-btn tonal" type="button">Ouvrir</button><button class="v-btn out" type="button">Refuser</button><button class="v-btn txt" type="button">Tout voir</button><button class="v-btn err" type="button">Supprimer</button><button class="v-btn flat" type="button" disabled style="background:#D5DBE7;color:#5B6478;box-shadow:none">Désactivé</button></div></div>
+      <div><div class="mono" style="margin-bottom:8px">v-chip · size small, variant tonal</div>
+        <div class="row"><span class="chip" style="background:#E3EBFB;color:#1E4FB8">Groupe organisationnel</span><span class="chip" style="background:#DDF2EF;color:#00695C">Enseignant</span><span class="chip" style="background:#E3F1E4;color:#1B5E20">Actif</span><span class="chip" style="background:#FDEBD9;color:#8A4100">Visibles 30 jours</span><span class="chip" style="background:#FBE4E4;color:#B71C1C">Nouveau signalement</span><span class="chip" style="background:#EEF2FA;color:#4A5366">Désactivé</span></div></div>
+      <div><div class="mono" style="margin-bottom:8px">v-avatar · 40 px, initiales</div>
+        <div class="row"><span class="av" style="background:#1E4FB8">YB</span><span class="av" style="background:#00796B">SB</span><span class="av" style="background:#01579B">KM</span><span class="av" style="background:#F59E0B;color:#1C2333">NK</span><span class="av" style="background:#C62828">MH</span><span class="av" style="background:#E3EBFB;color:#1E4FB8">LH</span></div></div>
+      <div><div class="mono" style="margin-bottom:14px">v-text-field · variant outlined · normal / focus / erreur</div>
+        <div class="row" style="align-items:flex-start;gap:20px">
+          <div class="field"><label for="a">Nom</label><div class="control"><input id="a" value="Ben Salah"></div></div>
+          <div class="field f-focus"><label for="b">Adresse électronique</label><div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.email}}"></path></svg><input id="b" value="yassine.bensalah@univ.tn"></div></div>
+          <div class="field f-err"><label for="c">Adresse électronique</label><div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.email}}"></path></svg><input id="c" value="y.bensalah@gmail.com"></div><div class="msg">Adresse absente de la liste des comptes autorisés.</div></div>
+        </div></div>
+      <div><div class="mono" style="margin-bottom:8px">v-alert · variant tonal</div>
+        <div class="row">
+          <div class="alert" style="background:#E1F2FB"><svg class="i" style="color:#01579B" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.info}}"></path></svg>Information</div>
+          <div class="alert" style="background:#FDEBD9"><svg class="i" style="color:#8A4100" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.alert}}"></path></svg>Avertissement</div>
+          <div class="alert" style="background:#FBE4E4"><svg class="i" style="color:#B71C1C" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.alert}}"></path></svg>Erreur</div>
+          <div class="alert" style="background:#E3F1E4"><svg class="i" style="color:#1B5E20" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.check}}"></path></svg>Succès</div>
+        </div></div>
+      <div class="row" style="align-items:flex-start;gap:40px">
+        <div><div class="mono" style="margin-bottom:8px">v-tabs · color primary</div><div class="tabs"><span class="tab on">Discussion</span><span class="tab">Ressources</span><span class="tab">Membres</span></div></div>
+        <div><div class="mono" style="margin-bottom:8px">v-list-item · nav, rounded lg</div><div class="nav on"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.home}}"></path></svg>Accueil</div><div class="nav"><svg class="i" style="color:#5B6478" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.lock}}"></path></svg>Projet intégration<span class="badge">1</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="s5">
+    <h2 id="s5">Responsive · points de rupture Vuetify</h2>
+    <div style="overflow-x:auto">
+      <table class="bp">
+        <thead><tr><th scope="col">Breakpoint</th><th scope="col">Largeur</th><th scope="col">Navigation</th><th scope="col">Mise en page</th></tr></thead>
+        <tbody>
+          <tr><td><strong>xs</strong></td><td class="mono">&lt; 600 px</td><td>v-bottom-navigation (5 entrées) + v-app-bar compacte</td><td>Une colonne, onglets défilants, bulles de discussion, FAB « Créer »</td></tr>
+          <tr><td><strong>sm</strong></td><td class="mono">600 – 959 px</td><td>v-navigation-drawer en mode rail (80 px)</td><td>Liste des espaces + discussion côte à côte (tablette)</td></tr>
+          <tr><td><strong>md</strong></td><td class="mono">960 – 1279 px</td><td>v-navigation-drawer permanent (288 px)</td><td>Panneau latéral « Épinglés / membres » masqué</td></tr>
+          <tr><td><strong>lg / xl</strong></td><td class="mono">≥ 1280 px</td><td>Drawer permanent + barre de recherche centrale</td><td>Grilles à 2–4 colonnes, panneau latéral visible</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="s6">
+    <h2 id="s6">Configuration Vuetify</h2>
+    <pre><code>{{code}}</code></pre>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1640}}'>
+const IC = {
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  plus: "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",
+  email: "M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z",
+  info: "M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z",
+  alert: "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z",
+  check: "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
+  home: "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound: "M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  bullhorn: "M12,8H4A2,2 0 0,0 2,10V14A2,2 0 0,0 4,16H5V20A1,1 0 0,0 6,21H8A1,1 0 0,0 9,20V16H12L17,20V4L12,8M21.5,12C21.5,13.71 20.54,15.26 19,16V8C20.53,8.75 21.5,10.3 21.5,12Z",
+  timer: "M6,2H18V8L14,12L18,16V22H6V16L10,12L6,8V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5Z",
+  send: "M2,21L23,12L2,3V10L17,12L2,14V21Z",
+  clip: "M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z",
+  flag: "M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  pin: "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z",
+  download: "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"
+};
+const COLORS = [
+  ["primary", "#1E4FB8", "Actions, liens, actif"], ["secondary", "#00796B", "Profil enseignant"], ["accent", "#F59E0B", "Mise en avant"],
+  ["error", "#C62828", "Suppression, erreurs"], ["warning", "#ED6C02", "Expiration (icônes)"], ["info", "#0288D1", "Information"], ["success", "#2E7D32", "Validation"],
+  ["background", "#F4F6FB", "Fond de page"], ["surface", "#FFFFFF", "Cartes, barres"], ["surface-variant", "#EEF2FA", "Recherche, survol"],
+  ["on-surface", "#1C2333", "Texte principal"], ["on-surface-medium", "#5B6478", "Texte secondaire"], ["outline", "#D5DBE7", "Bordures"],
+  ["primary-tonal", "#E3EBFB", "Chips, élément actif"], ["warning-tonal", "#FDEBD9", "Bandeaux expiration"], ["error-tonal", "#FBE4E4", "Signalements"]
+];
+const CODE = [
+  "// plugins/vuetify.js",
+  "import { createVuetify } from 'vuetify'",
+  "import { aliases, mdi } from 'vuetify/iconsets/mdi'",
+  "",
+  "export default createVuetify({",
+  "  icons: { defaultSet: 'mdi', aliases, sets: { mdi } },",
+  "  theme: {",
+  "    defaultTheme: 'uniconnectLight',",
+  "    themes: {",
+  "      uniconnectLight: {",
+  "        dark: false,",
+  "        colors: {",
+  "          primary: '#1E4FB8', secondary: '#00796B', accent: '#F59E0B',",
+  "          error: '#C62828', warning: '#ED6C02', info: '#0288D1', success: '#2E7D32',",
+  "          background: '#F4F6FB', surface: '#FFFFFF', 'surface-variant': '#EEF2FA',",
+  "          'on-surface': '#1C2333',",
+  "        },",
+  "      },",
+  "    },",
+  "  },",
+  "  defaults: {",
+  "    VBtn: { variant: 'flat', rounded: 'sm' },",
+  "    VTextField: { variant: 'outlined', density: 'comfortable' },",
+  "    VChip: { size: 'small', variant: 'tonal' },",
+  "    VCard: { rounded: 'lg', variant: 'outlined' },",
+  "    VListItem: { rounded: 'lg' },",
+  "  },",
+  "})"
+].join("\n");
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      ic: IC,
+      colors: COLORS.map(([name, hex, use]) => ({ name, hex, use, bg: "background:" + hex + (hex === "#FFFFFF" ? ";border-bottom:1px solid #D5DBE7" : "") })),
+      icons: [["mdi-school","school"],["mdi-home","home"],["mdi-lock","lock"],["mdi-pound","pound"],["mdi-bullhorn","bullhorn"],["mdi-timer-sand","timer"],["mdi-send","send"],["mdi-paperclip","clip"],["mdi-flag","flag"],["mdi-pin","pin"],["mdi-download","download"],["mdi-alert","alert"]].map(([n, k]) => ({ n, d: IC[k] })),
+      code: CODE
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mobile – Assistant IA</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#fff}
+a{color:#1E4FB8;text-decoration:none}
+button,textarea{font:inherit;color:inherit}
+p,h1,h2,h3{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.bar{display:flex;align-items:center;gap:4px;height:56px;padding:0 4px;background:#1E4FB8;color:#fff;flex:none}
+.ib{width:48px;height:48px;border:0;border-radius:999px;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
+.tabs{display:flex;overflow-x:auto;border-bottom:1px solid #D5DBE7;background:#fff;flex:none}
+.tab{display:flex;align-items:center;height:48px;padding:0 16px;font-weight:500;font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:#5B6478;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:#1E4FB8;border-color:#1E4FB8}
+.msgs{flex:1;overflow:auto;padding:8px 0;background:#F4F6FB;display:flex;flex-direction:column}
+.banner{margin:4px 12px 8px;padding:8px 12px;border-radius:8px;background:#FDEBD9;color:#8A4100;font-size:12px;display:flex;gap:8px;align-items:center}
+.msg{display:flex;gap:10px;padding:8px 12px}
+.msg.own{flex-direction:row-reverse}
+.bubble{background:#fff;border:1px solid #D5DBE7;border-radius:4px 16px 16px 16px;padding:8px 12px;max-width:290px;display:flex;flex-direction:column;gap:4px}
+.msg.own .bubble{background:#E3EBFB;border-color:#C9D7F5;border-radius:16px 4px 16px 16px}
+.av{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:500;flex:none}
+.caption{font-size:11px;line-height:14px;color:#5B6478}
+.exp{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#8A4100}
+.file{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #D5DBE7;border-radius:8px;background:#fff}
+.role{display:inline-flex;height:20px;padding:0 8px;border-radius:999px;background:#E3EBFB;color:#1E4FB8;font-size:11px;font-weight:500;align-items:center}
+.composer{display:flex;align-items:flex-end;gap:4px;padding:8px;border-top:1px solid #D5DBE7;background:#fff;flex:none}
+.box{flex:1;min-width:0;border:1px solid #8A93A6;border-radius:24px;padding:10px 14px;display:flex;align-items:center;gap:6px}
+.box textarea{border:0;outline:0;resize:none;flex:1;min-height:22px;background:transparent;font-size:15px}
+.send{width:48px;height:48px;border:0;border-radius:999px;background:#1E4FB8;color:#fff;display:grid;place-items:center;cursor:pointer;flex:none}
+
+.ai-av{width:30px;height:30px;border-radius:9px;background:#B45309;color:#fff;display:grid;place-items:center;flex:none}
+.scroll{flex:1;overflow:auto;background:#F4F6FB;padding:12px;display:flex;flex-direction:column;gap:12px}
+.q{align-self:flex-end;background:#1E4FB8;color:#fff;border-radius:16px 16px 4px 16px;padding:8px 12px;max-width:85%}
+.a{display:flex;gap:8px;align-items:flex-start}
+.a-body{background:#fff;border:1px solid #D5DBE7;border-radius:4px 16px 16px 16px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.a-body ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.srcs{display:flex;gap:6px;flex-wrap:wrap}
+.src{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:2px 8px;border-radius:999px;border:1px solid #D5DBE7;background:#F7F9FE;font-size:11px;color:#1C2333}
+.src b{color:#B45309}
+.fbrow{display:flex;align-items:center;gap:2px;border-top:1px solid #EEF2FA;padding-top:4px}
+.fbb{width:40px;height:40px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:grid;place-items:center;cursor:pointer}
+.fbb.on{background:#FFF1DC;color:#B45309}
+.sugg{display:flex;gap:8px;overflow-x:auto;padding:8px 12px;background:#fff;border-top:1px solid #EEF2FA;flex:none}
+.sugg button{flex:none;min-height:36px;max-width:260px;padding:4px 12px;border-radius:999px;border:1px solid #E7C8A0;background:#FFF7EB;color:#7A3E00;cursor:pointer;font-size:12px;text-align:left}
+.sumcard{background:#FFF7EB;border:1px solid #E7C8A0;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.sumcard ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.typing{display:inline-flex;gap:4px;align-items:center;height:18px}
+.typing span{width:6px;height:6px;border-radius:999px;background:#B45309;opacity:.35;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.typing span{animation:none;opacity:.7}}
+.send{background:#B45309}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;overflow:hidden;background:#fff">
+  <header class="bar">
+    <a class="ib" href="M-Discussion.dc.html" aria-label="Retour" style="color:#fff"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.back}}"></path></svg></a>
+    <div style="flex:1;min-width:0"><h1 style="font-size:17px;font-weight:500">Assistant du cours</h1><p style="font-size:12px;opacity:.85">Bases de données · L2 A · 6 sources</p></div>
+    <button class="ib" type="button" aria-label="Résumer la discussion" aria-pressed="{{showSum}}" onClick="{{toggleSum}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.summary}}"></path></svg></button>
+    <button class="ib" type="button" aria-label="Nouvelle conversation" onClick="{{reset}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.refresh}}"></path></svg></button>
+  </header>
+  <nav class="tabs" aria-label="Onglets de l'espace">
+    <a class="tab" href="M-Discussion.dc.html">Discussion</a>
+    <a class="tab active" href="M-AssistantIA.dc.html" aria-current="page" style="gap:6px"><svg class="i" style="width:16px;height:16px;color:#B45309" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.spark}}"></path></svg>Assistant IA</a>
+    <a class="tab" href="M-Annonces.dc.html">Annonces</a>
+    <a class="tab" href="M-Ressources.dc.html">Ressources</a>
+    <a class="tab" href="M-Fichiers.dc.html">Fichiers</a>
+    <a class="tab" href="M-Epingles.dc.html">Épinglés</a>
+    <a class="tab" href="M-Membres.dc.html">Membres</a>
+  </nav>
+  <main class="scroll" aria-live="polite">
+    <sc-if value="{{showSum}}" hint-placeholder-val="{{false}}">
+      <section class="sumcard" aria-label="Résumé de la discussion">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:500;color:#7A3E00"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.spark}}"></path></svg>Résumé des 14 nouveaux messages</div>
+        <sc-if value="{{sumLoading}}" hint-placeholder-val="{{false}}"><div class="caption" style="display:flex;gap:8px;align-items:center"><span class="typing" aria-hidden="true"><span></span><span></span><span></span></span>Lecture des messages…</div></sc-if>
+        <sc-if value="{{sumDone}}" hint-placeholder-val="{{true}}"><ul><sc-for list="{{summary}}" as="m" hint-placeholder-count="4"><li>{{m.t}}</li></sc-for></ul><span class="caption">Généré par IA · peut contenir des erreurs</span></sc-if>
+      </section>
+    </sc-if>
+    <div class="a"><span class="ai-av"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.spark}}"></path></svg></span><div class="a-body"><p>Bonjour Yassine. Posez-moi une question sur le cours : je réponds à partir des supports de Mme Ben Ali, en citant les sources.</p></div></div>
+    <sc-for list="{{exchanges}}" as="x" hint-placeholder-count="1">
+      <div class="q">{{x.q}}</div>
+      <div class="a">
+        <span class="ai-av"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.spark}}"></path></svg></span>
+        <div class="a-body">
+          <sc-if value="{{x.pending}}" hint-placeholder-val="{{false}}"><div class="caption" style="display:flex;gap:8px;align-items:center"><span class="typing" aria-hidden="true"><span></span><span></span><span></span></span>Recherche dans le cours…</div></sc-if>
+          <sc-if value="{{x.done}}" hint-placeholder-val="{{true}}">
+            <p style="font-weight:500">{{x.intro}}</p>
+            <ul><sc-for list="{{x.points}}" as="p" hint-placeholder-count="3"><li>{{p.t}}</li></sc-for></ul>
+            <sc-if value="{{x.hasOutro}}" hint-placeholder-val="{{true}}"><p>{{x.outro}}</p></sc-if>
+            <sc-if value="{{x.hasSources}}" hint-placeholder-val="{{true}}"><div class="srcs"><sc-for list="{{x.sources}}" as="s" hint-placeholder-count="2"><a class="src" href="M-Ressources.dc.html"><b>[{{s.n}}]</b>{{s.f}} · {{s.p}}</a></sc-for></div></sc-if>
+            <div class="fbrow"><span class="caption" style="flex:1">{{x.fbText}}</span><button class="{{x.upCls}}" type="button" aria-label="Réponse utile" onClick="{{x.up}}"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.up}}"></path></svg></button><button class="{{x.downCls}}" type="button" aria-label="Réponse pas utile" onClick="{{x.down}}"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.down}}"></path></svg></button></div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </main>
+  <sc-if value="{{hasSugg}}" hint-placeholder-val="{{true}}"><div class="sugg" role="group" aria-label="Questions suggérées"><sc-for list="{{suggestions}}" as="g" hint-placeholder-count="3"><button type="button" onClick="{{g.pick}}">{{g.label}}</button></sc-for></div></sc-if>
+  <form class="composer" onSubmit="{{submit}}">
+    <label class="box"><span style="position:absolute;left:-9999px">Votre question</span><textarea rows="1" placeholder="Posez une question sur le cours…" value="{{draft}}" onInput="{{onDraft}}"></textarea></label>
+    <button class="send" type="submit" aria-label="Demander à l'assistant"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{aic.sendq}}"></path></svg></button>
+  </form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+const IC = { back: "M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" };
+const SPARK = "M19,1L17.74,3.75L15,5L17.74,6.26L19,9L20.25,6.26L23,5L20.25,3.75M9,4L6.5,9.5L1,12L6.5,14.5L9,20L11.5,14.5L17,12L11.5,9.5M19,15L17.74,17.74L15,19L17.74,20.25L19,23L20.25,20.25L23,19L20.25,17.74";
+const AIIC = {
+  spark: SPARK,
+  up: "M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z",
+  down: "M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.35,20.57C8.33,20.67 8.32,20.77 8.32,20.88C8.32,21.3 8.5,21.67 8.76,21.94L9.82,23L16.4,16.41C16.77,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z",
+  summary: "M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z",
+  refresh: "M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z",
+  shield: "M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z",
+  checkc: "M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.91,10.59L6.5,12L11,16.5Z",
+  pdf: "M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M9.5 11.5C9.5 12.3 8.8 13 8 13H7V15H5.5V9H8C8.8 9 9.5 9.7 9.5 10.5V11.5M14.5 13.5C14.5 14.3 13.8 15 13 15H10.5V9H13C13.8 9 14.5 9.7 14.5 10.5V13.5M18.5 10.5H17V11.5H18.5V13H17V15H15.5V9H18.5V10.5M12 10.5H13V13.5H12V10.5M7 10.5H8V11.5H7V10.5Z",
+  sendq: "M2,21L23,12L2,3V10L17,12L2,14V21Z"
+};
+const QA = {
+  fn: { q: "Quelle est la différence entre la 2FN et la 3FN ?", intro: "D'après le chapitre 3 du cours :",
+    points: ["2FN : la relation est en 1FN et chaque attribut non clé dépend de toute la clé primaire, sans dépendance partielle [1].",
+      "3FN : la relation est en 2FN et aucun attribut non clé ne dépend d'un autre attribut non clé, sans dépendance transitive [1].",
+      "Exemple du cours : dans Etudiant(num, nom, codeFiliere, libelleFiliere), libelleFiliere dépend de codeFiliere ; on crée une table Filiere pour passer en 3FN [2]."],
+    outro: "Dans la discussion, Mme Ben Ali a précisé que la 3FN est au programme du contrôle, mais pas la BCNF.",
+    sources: [["1", "Chapitre 3 – Normalisation.pdf", "p. 12-14"], ["2", "TD2 – Exercices corrigés.pdf", "ex. 3"]] },
+  tp: { q: "Le TP2 est à rendre quand et sous quelle forme ?", intro: "Selon l'énoncé du TP2 :",
+    points: ["Date limite : vendredi 24/10 à 23 h 59, dépôt dans l'onglet Ressources [1].", "Travail en binôme : un seul fichier .sql commenté par binôme [1].", "Barème : 10 requêtes notées sur 2 points chacune [1]."],
+    outro: "", sources: [["1", "TP2 – Requêtes SQL.docx", "consignes"]] },
+  dep: { q: "Explique-moi les dépendances fonctionnelles avec un exemple", intro: "Voici l'explication du cours :",
+    points: ["Une dépendance fonctionnelle X → Y signifie qu'une valeur de X détermine une seule valeur de Y [1].", "Exemple : numEtudiant → nom, prénom et codeMatiere → libelle [1].", "Elles servent à trouver la clé d'une relation puis à la normaliser [2]."],
+    outro: "", sources: [["1", "Cours 2 – Algèbre relationnelle.pdf", "p. 21"], ["2", "Chapitre 3 – Normalisation.pdf", "p. 4"]] },
+  quiz: { q: "Fais-moi un quiz de 3 questions sur la normalisation", intro: "Quiz d'entraînement (réponses en bas) :",
+    points: ["Q1. Une relation en 2FN peut-elle contenir une dépendance transitive ?", "Q2. Quelle forme normale interdit les dépendances partielles vis-à-vis de la clé ?", "Q3. Dans R(A, B, C) avec A → B et B → C, R est-elle en 3FN ?"],
+    outro: "Réponses : Q1 oui · Q2 la 2FN · Q3 non, car C dépend transitivement de A [1].", sources: [["1", "Chapitre 3 – Normalisation.pdf", "p. 12-16"]] },
+  none: { q: "", intro: "Je n'ai pas trouvé de réponse fiable dans les ressources de cet espace.",
+    points: ["Essayez de reformuler votre question avec les termes du cours.", "Vous pouvez aussi la poser dans l'onglet Discussion : l'enseignante ou vos camarades pourront répondre."],
+    outro: "", sources: [] }
+};
+const SUGG = ["tp", "dep", "quiz"];
+const SUMMARY = [
+  "Mme Ben Ali a publié le support du chapitre 3 (normalisation), à lire avant jeudi.",
+  "La 3FN est au programme du contrôle du 05/11 ; la BCNF ne sera pas évaluée.",
+  "Le TP du 16/10 est reporté au lundi 20/10, de 10 h à 12 h, salle B12.",
+  "Question sans réponse : le TP2 est-il à rendre en binôme ?"
+];
+const SOURCES = ["Cours 1 – Concepts fondamentaux.pdf", "Fiche de révision – Vocabulaire", "Cours 2 – Algèbre relationnelle.pdf", "TD2 – Exercices corrigés.pdf", "Chapitre 3 – Normalisation.pdf", "TP2 – Requêtes SQL.docx"];
+function matchQ(t) {
+  const s = t.toLowerCase();
+  if (/fn|forme normale|normalis/.test(s) && !/quiz/.test(s)) return "fn";
+  if (/quiz|qcm|entra/.test(s)) return "quiz";
+  if (/tp ?2|rendre|binôme|binome/.test(s)) return "tp";
+  if (/dépendance|dependance|df/.test(s)) return "dep";
+  return "none";
+}
+class AIBase extends DCLogic {
+  constructor(p) { super(p); this.state = { ex: [{ k: "fn", q: QA.fn.q, done: true, fb: "" }], draft: "", sum: "idle", showSum: false }; }
+  ask(text, key) {
+    const q = (text || "").trim(); if (!q) return;
+    const k = key || matchQ(q);
+    const idx = this.state.ex.length;
+    this.setState({ ex: this.state.ex.concat([{ k, q, done: false, fb: "" }]), draft: "" });
+    setTimeout(() => { const ex = this.state.ex.slice(); if (ex[idx]) { ex[idx] = Object.assign({}, ex[idx], { done: true }); this.setState({ ex }); } }, 1400);
+  }
+  aiVals() {
+    const s = this.state;
+    const asked = {}; s.ex.forEach((e) => { asked[e.k] = true; });
+    return {
+      aic: AIIC,
+      exchanges: s.ex.map((e, i) => { const a = QA[e.k];
+        return { q: e.q, done: e.done, pending: !e.done, intro: a.intro, points: a.points.map((t) => ({ t })), outro: a.outro, hasOutro: !!a.outro,
+          sources: a.sources.map(([n, f, p]) => ({ n, f, p })), hasSources: a.sources.length > 0,
+          upCls: e.fb === "up" ? "fbb on" : "fbb", downCls: e.fb === "down" ? "fbb on" : "fbb", thanks: !!e.fb,
+          up: () => { const ex = s.ex.slice(); ex[i] = Object.assign({}, e, { fb: e.fb === "up" ? "" : "up" }); this.setState({ ex }); },
+          down: () => { const ex = s.ex.slice(); ex[i] = Object.assign({}, e, { fb: e.fb === "down" ? "" : "down" }); this.setState({ ex }); } }; }),
+      suggestions: SUGG.filter((k) => !asked[k]).map((k) => ({ label: QA[k].q, pick: () => this.ask(QA[k].q, k) })),
+      hasSugg: SUGG.some((k) => !asked[k]),
+      draft: s.draft, onDraft: (e) => this.setState({ draft: e.target.value }),
+      submit: (e) => { e.preventDefault(); this.ask(s.draft); },
+      reset: () => this.setState({ ex: [], draft: "" }),
+      empty: s.ex.length === 0,
+      sumIdle: s.sum === "idle", sumLoading: s.sum === "loading", sumDone: s.sum === "done",
+      summary: SUMMARY.map((t) => ({ t })),
+      summarize: () => { this.setState({ sum: "loading", showSum: true }); setTimeout(() => this.setState({ sum: "done" }), 1500); },
+      showSum: s.showSum, toggleSum: () => { if (s.sum === "idle") { this.setState({ sum: "loading", showSum: true }); setTimeout(() => this.setState({ sum: "done" }), 1500); } else this.setState({ showSum: !s.showSum }); },
+      sources: SOURCES.map((t) => ({ t }))
+    };
+  }
+}
+class Component extends AIBase {
+  renderVals() {
+    const v = this.aiVals();
+    v.exchanges = v.exchanges.map((x) => Object.assign({}, x, { fbText: x.thanks ? "Merci pour votre retour" : "Généré par IA, à vérifier" }));
+    return Object.assign(v, { ic: IC });
+  }
+}
+</script>
+</body>
+</html>

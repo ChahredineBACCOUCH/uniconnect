@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mot de passe oublié – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input{font:inherit}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.auth{min-height:100vh;display:flex;flex-wrap:wrap}
+.brand-panel{flex:0 0 50%;max-width:50%;background:#1E4FB8;color:#fff;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.form-area{flex:0 0 50%;max-width:50%;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.v-card{width:100%;max-width:480px;background:#fff;border:1px solid #D5DBE7;border-radius:16px;box-shadow:0 8px 24px rgba(26,38,77,.08);padding:40px;display:flex;flex-direction:column;gap:20px}
+.field{position:relative;display:flex;flex-direction:column;gap:4px}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:#fff;font-size:12px;line-height:16px;color:#1E4FB8}
+.control{display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;border:2px solid #1E4FB8;border-radius:4px;background:#fff;color:#1E4FB8}
+.control input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:16px;color:#1C2333}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}
+.v-btn--flat:hover{background:#163C8C;color:#fff;text-decoration:none}
+.v-btn--text{color:#1E4FB8;padding:0 8px}
+.v-btn--off{background:#D5DBE7;color:#5B6478;cursor:not-allowed}
+.meter{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.meter span{height:4px;border-radius:2px;background:#D5DBE7}
+.rule{display:flex;align-items:center;gap:8px;font-size:13px}
+.ok{width:64px;height:64px;border-radius:999px;background:#E3F1E4;color:#1B5E20;display:grid;place-items:center;align-self:center}
+@media (max-width:720px){.form-area{flex-basis:100%;max-width:none}.brand-panel{flex-basis:100%;max-width:none;padding:28px 20px;gap:16px}.brand-panel .hide-sm{display:none}.v-card{padding:24px;border:0;box-shadow:none}}
+</style>
+</helmet>
+<main class="auth">
+  <section class="brand-panel" aria-label="Présentation">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center"><svg class="i" style="width:28px;height:28px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>
+      <span style="font-size:24px;font-weight:700">UniConnect</span>
+    </div>
+    <h1 style="margin:0;font-size:34px;line-height:40px;font-weight:500;max-width:470px">Récupérez l'accès à votre compte.</h1>
+    <div class="hide-sm" style="font-size:12px;opacity:.8">Le lien de réinitialisation est valable 1 heure.</div>
+  </section>
+  <section class="form-area">
+    <form class="v-card" aria-labelledby="t" onSubmit="{{send}}">
+      <a class="v-btn v-btn--text" href="Main.dc.html" style="align-self:flex-start;padding-left:0"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.back}}"></path></svg>Retour à la connexion</a>
+      <sc-if value="{{form}}" hint-placeholder-val="{{true}}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:6px"><h2 id="t" style="margin:0;font-size:24px;line-height:32px;font-weight:500">Mot de passe oublié</h2><p style="margin:0;color:#5B6478">Saisissez votre adresse institutionnelle : nous vous enverrons un lien pour choisir un nouveau mot de passe.</p></div>
+          <div class="field"><label for="m">Adresse électronique institutionnelle</label><div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.email}}"></path></svg><input id="m" type="email" value="yassine.bensalah@univ.tn"></div></div>
+          <button class="v-btn v-btn--flat" type="submit">Envoyer le lien</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;flex-direction:column;gap:16px;text-align:center">
+          <span class="ok"><svg class="i" style="width:32px;height:32px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.email}}"></path></svg></span>
+          <h2 style="margin:0;font-size:22px;font-weight:500">Vérifiez votre boîte de réception</h2>
+          <p style="margin:0;color:#5B6478">Si un compte existe pour cette adresse, un e-mail de réinitialisation vient d'être envoyé.</p>
+          <button class="v-btn v-btn--flat" type="button" onClick="{{openLink}}">Ouvrir le lien reçu (démo)</button>
+          <button class="v-btn v-btn--text" type="button" onClick="{{again}}">Renvoyer l'e-mail</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{reset}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:6px"><h2 style="margin:0;font-size:24px;line-height:32px;font-weight:500">Nouveau mot de passe</h2><p style="margin:0;color:#5B6478">Choisissez un nouveau mot de passe pour <strong style="color:#1C2333">yassine.bensalah@univ.tn</strong>. Vous serez déconnecté de tous vos appareils.</p></div>
+          <div class="field"><label for="np1">Nouveau mot de passe</label><div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.lock}}"></path></svg><input id="np1" type="password" value="{{pwd}}" onInput="{{onPwd}}" aria-describedby="np-rules"></div></div>
+          <div class="meter" aria-hidden="true"><sc-for list="{{bars}}" as="b" hint-placeholder-count="4"><span style="{{b.st}}"></span></sc-for></div>
+          <div id="np-rules" style="display:flex;flex-direction:column;gap:4px"><sc-for list="{{rules}}" as="r" hint-placeholder-count="4"><span class="rule" style="{{r.st}}"><svg class="i" style="width:16px;height:16px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{r.d}}"></path></svg>{{r.label}}</span></sc-for></div>
+          <div class="field"><label for="np2">Confirmer le mot de passe</label><div class="control" style="border:1px solid #8A93A6;color:#5B6478"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.lock}}"></path></svg><input id="np2" type="password" value="{{pwd}}"></div></div>
+          <button class="{{btnCls}}" type="button" disabled="{{notOk}}" onClick="{{save}}">Enregistrer le mot de passe</button>
+          <p class="caption" style="margin:0;color:#5B6478;font-size:12px;text-align:center">Lien expiré (plus d'une heure) ? Refaites une demande depuis l'écran précédent.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{done}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;flex-direction:column;gap:16px;text-align:center">
+          <span class="ok"><svg class="i" style="width:32px;height:32px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.check}}"></path></svg></span>
+          <h2 style="margin:0;font-size:22px;font-weight:500">Mot de passe modifié</h2>
+          <p style="margin:0;color:#5B6478">Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.</p>
+          <a class="v-btn v-btn--flat" href="Main.dc.html">Se connecter</a>
+        </div>
+      </sc-if>
+    </form>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { step: "form", pwd: "nouveau" }; }
+  renderVals() {
+    const s = this.state, p = s.pwd;
+    const CHECK = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z";
+    const CLOSE = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z";
+    const checks = [["8 caractères minimum", p.length >= 8], ["Une majuscule", /[A-Z]/.test(p)], ["Une minuscule", /[a-z]/.test(p)], ["Un chiffre", /[0-9]/.test(p)]];
+    const n = checks.filter((c) => c[1]).length;
+    const col = n === 4 ? "#2E7D32" : n >= 2 ? "#ED6C02" : "#C62828";
+    return {
+      ic: {
+        school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+        email: "M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z",
+        back: "M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z",
+        lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+        check: CHECK
+      },
+      form: s.step === "form", sent: s.step === "sent", reset: s.step === "reset", done: s.step === "done",
+      send: (e) => { e.preventDefault(); this.setState({ step: "sent" }); },
+      again: () => this.setState({ step: "form" }),
+      openLink: () => this.setState({ step: "reset" }),
+      pwd: p, onPwd: (e) => this.setState({ pwd: e.target.value }),
+      bars: [0, 1, 2, 3].map((i) => ({ st: i < n ? "background:" + col : "" })),
+      rules: checks.map(([label, ok]) => ({ label, d: ok ? CHECK : CLOSE, st: ok ? "color:#1B5E20" : "color:#5B6478" })),
+      notOk: n < 4, btnCls: n === 4 ? "v-btn v-btn--flat" : "v-btn v-btn--off",
+      save: () => { if (n === 4) this.setState({ step: "done" }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

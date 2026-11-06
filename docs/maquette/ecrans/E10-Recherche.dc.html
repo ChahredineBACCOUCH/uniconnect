@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Recherche – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.search{flex:0 1 560px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#fff;border:2px solid #1E4FB8;color:#1E4FB8}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333;font-size:15px}
+.spacer{flex:1}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}.user:hover{text-decoration:none;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#1E4FB8;flex:none}
+.layout{display:flex;flex:1}
+.v-main{flex:1 1 auto;min-width:0;padding:24px 32px 40px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;max-width:1280px;margin:0 auto;width:100%}
+.filters{flex:0 0 260px;background:#fff;border:1px solid #D5DBE7;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.filters h2{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478}
+.field{display:flex;align-items:center;height:44px;padding:0 12px;border:1px solid #8A93A6;border-radius:4px;background:#fff}
+.field select{border:0;outline:0;background:transparent;flex:1}
+.results{flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.v-tabs{display:flex;border-bottom:1px solid #D5DBE7;overflow-x:auto;background:#fff;border-radius:12px 12px 0 0}
+.v-tab{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 16px;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;color:#5B6478;border:0;border-bottom:2px solid transparent;background:transparent;cursor:pointer;white-space:nowrap}
+.v-tab.active{color:#1E4FB8;border-color:#1E4FB8}
+.cnt{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#EEF2FA;color:#4A5366;font-size:12px;line-height:20px;text-align:center}
+.group{background:#fff;border:1px solid #D5DBE7;border-radius:12px;overflow:hidden}
+.group h3{font-size:16px;font-weight:500;padding:14px 20px 6px}
+.row{display:flex;align-items:center;gap:14px;padding:12px 20px;border-top:1px solid #EEF2FA;color:#1C2333}
+.row:hover{background:#F7F9FE;text-decoration:none;color:#1C2333}
+.ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex:none}
+mark{background:#FEF3DC;color:inherit;border-radius:2px;padding:0 1px}
+.caption{font-size:12px;line-height:16px;color:#5B6478}
+.muted{color:#5B6478}
+.v-chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500;background:#E3EBFB;color:#1E4FB8}
+.empty{background:#fff;border:1px solid #D5DBE7;border-radius:12px;padding:40px;text-align:center;color:#5B6478}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.user-text{display:none}.filters{flex-basis:100%}.v-main{padding:16px}.brand span.t{display:none}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <a class="icon-btn" href="E04-Accueil.dc.html" aria-label="Retour à l'accueil"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.back}}"></path></svg></a>
+    <a class="brand" href="E04-Accueil.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span><span class="t">UniConnect</span></a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" value="{{q}}" onInput="{{onQ}}"><button class="icon-btn" type="button" aria-label="Effacer" style="width:32px;height:32px" onClick="{{clear}}"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.close}}"></path></svg></button></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="E09-Notifications.dc.html" aria-label="Notifications, 4 non lues"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><span class="dot">4</span></a>
+    <a class="user" href="E11-Profil.dc.html"><span class="v-avatar">YB</span><span class="user-text"><span style="display:block;font-weight:500">Yassine Ben Salah</span><span class="caption">Étudiant · L2 Informatique</span></span></a>
+  </header>
+  <main class="v-main">
+    <aside class="filters" aria-label="Filtres">
+      <h2>Filtres</h2>
+      <label class="field"><span style="position:absolute;left:-9999px">Espace</span><select><option>Tous mes espaces</option><option>Bases de données · L2 A</option><option>Projet intégration – Éq. 4</option></select></label>
+      <label class="field"><span style="position:absolute;left:-9999px">Auteur</span><select><option>Tous les auteurs</option><option>Mme Sarra Ben Ali</option></select></label>
+      <label class="field"><span style="position:absolute;left:-9999px">Période</span><select><option>Toute période</option><option>7 derniers jours</option><option>30 derniers jours</option></select></label>
+      <label class="field"><span style="position:absolute;left:-9999px">Type de fichier</span><select><option>Tous les types</option><option>PDF</option><option>Word</option><option>Images</option></select></label>
+      <p class="caption">La recherche porte uniquement sur vos espaces et sur les contenus non expirés.</p>
+    </aside>
+    <section class="results" aria-label="Résultats">
+      <div>
+        <h1 style="font-size:22px;font-weight:500">{{headline}}</h1>
+      </div>
+      <div class="v-tabs" role="tablist">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5"><button class="{{t.cls}}" type="button" role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}">{{t.label}}<span class="cnt">{{t.n}}</span></button></sc-for>
+      </div>
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+        <section class="group">
+          <h3>{{g.title}}</h3>
+          <sc-for list="{{g.items}}" as="r" hint-placeholder-count="2">
+            <a class="row" href="{{r.href}}"><span class="ico" style="{{r.tone}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{r.d}}"></path></svg></span><span style="flex:1;min-width:0"><span style="display:block;font-weight:500">{{r.title}}</span><span class="caption">{{r.meta}}</span></span><sc-if value="{{r.chip}}" hint-placeholder-val="{{false}}"><span class="v-chip">{{r.chip}}</span></sc-if></a>
+          </sc-for>
+        </section>
+      </sc-for>
+      <sc-if value="{{none}}" hint-placeholder-val="{{false}}"><div class="empty">Aucun résultat pour « {{q}} » dans vos espaces.</div></sc-if>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+const IC = {
+  back: "M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  close: "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  book: "M12 21.5C10.65 20.65 8.2 20 6.5 20C4.85 20 3.15 20.3 1.75 21.05C1.65 21.1 1.6 21.1 1.5 21.1C1.25 21.1 1 20.85 1 20.6V6C1.6 5.55 2.25 5.25 3 5C4.11 4.65 5.33 4.5 6.5 4.5C8.45 4.5 10.55 4.9 12 6C13.45 4.9 15.55 4.5 17.5 4.5C18.67 4.5 19.89 4.65 21 5C21.75 5.25 22.4 5.55 23 6V20.6C23 20.85 22.75 21.1 22.5 21.1C22.4 21.1 22.35 21.1 22.25 21.05C20.85 20.3 19.15 20 17.5 20C15.8 20 13.35 20.65 12 21.5M12 8V19.5C13.35 18.65 15.8 18 17.5 18C18.7 18 19.9 18.15 21 18.5V7C19.9 6.65 18.7 6.5 17.5 6.5C15.8 6.5 13.35 7.15 12 8Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  account: "M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z",
+  message: "M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6M14,14H6V12H14M18,8H6V6H18",
+  pdf: "M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M9.5 11.5C9.5 12.3 8.8 13 8 13H7V15H5.5V9H8C8.8 9 9.5 9.7 9.5 10.5V11.5M14.5 13.5C14.5 14.3 13.8 15 13 15H10.5V9H13C13.8 9 14.5 9.7 14.5 10.5V13.5M18.5 10.5H17V11.5H18.5V13H17V15H15.5V9H18.5V10.5M12 10.5H13V13.5H12V10.5M7 10.5H8V11.5H7V10.5Z",
+  word: "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.2,20H13.8L12,13.2L10.2,20H8.8L6.6,11H8.1L9.5,17.8L11.3,11H12.6L14.4,17.8L15.8,11H17.3L15.2,20M13,9V3.5L18.5,9H13Z"
+};
+const DATA = [
+  { cat: "Espaces", title: "Bases de données · L2 Info A", meta: "Groupe organisationnel · 48 membres", d: "book", tone: "background:#E3EBFB;color:#1E4FB8", href: "E05-Discussion.dc.html", chip: "Membre" },
+  { cat: "Espaces", title: "Révisions BD", meta: "Groupe privé · 6 membres", d: "lock", tone: "background:#EEF2FA;color:#4A5366", href: "E05-Discussion.dc.html", chip: "Membre" },
+  { cat: "Personnes", title: "Mme Sarra Ben Ali", meta: "Enseignante · Bases de données", d: "account", tone: "background:#DDF2EF;color:#00695C", href: "E07-Membres.dc.html", chip: "" },
+  { cat: "Messages", title: "« Oui, jusqu'à la 3FN incluse. La BCNF ne sera pas évaluée. »", meta: "Mme Sarra Ben Ali · Bases de données · hier 17:42", d: "message", tone: "background:#E1F2FB;color:#01579B", href: "E05-Discussion.dc.html", chip: "" },
+  { cat: "Messages", title: "« Qui veut réviser la normalisation à la BU jeudi ? »", meta: "Nour Kallel · Révisions BD · 10/10", d: "message", tone: "background:#E1F2FB;color:#01579B", href: "E05-Discussion.dc.html", chip: "" },
+  { cat: "Fichiers", title: "Chapitre 3 – Normalisation.pdf", meta: "PDF · 2,4 Mo · Bases de données · expire dans 29 jours", d: "pdf", tone: "background:#FBE4E4;color:#B71C1C", href: "E05-Fichiers.dc.html", chip: "" },
+  { cat: "Fichiers", title: "TP2 – Requêtes SQL.docx", meta: "Word · 380 Ko · Bases de données", d: "word", tone: "background:#E3EBFB;color:#1E4FB8", href: "E05-Fichiers.dc.html", chip: "" }
+];
+const CATS = ["Espaces", "Personnes", "Messages", "Fichiers"];
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { q: "base", tab: "Tout" }; }
+  renderVals() {
+    const s = this.state, q = norm(s.q.trim());
+    const words = q ? q.split(/\s+/) : [];
+    const hit = DATA.filter((r) => words.every((w) => norm(r.title + " " + r.meta).includes(w) || (w.length >= 3 && norm(r.title + r.meta).includes(w.slice(0, 3)))));
+    const shown = hit.filter((r) => s.tab === "Tout" || r.cat === s.tab);
+    return {
+      ic: IC, q: s.q,
+      onQ: (e) => this.setState({ q: e.target.value }), clear: () => this.setState({ q: "" }),
+      headline: q ? hit.length + " résultat" + (hit.length > 1 ? "s" : "") + " pour « " + s.q + " »" : "Saisissez un mot-clé",
+      tabs: ["Tout"].concat(CATS).map((label) => ({ label, n: String(label === "Tout" ? hit.length : hit.filter((r) => r.cat === label).length), on: label === s.tab ? "true" : "false", cls: label === s.tab ? "v-tab active" : "v-tab", pick: () => this.setState({ tab: label }) })),
+      groups: CATS.map((c) => ({ title: c, items: shown.filter((r) => r.cat === c).map((r) => ({ ...r, d: IC[r.d] })) })).filter((g) => g.items.length),
+      none: !!q && hit.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

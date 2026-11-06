@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Création de compte – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input{font:inherit}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.auth{min-height:100vh;display:flex;flex-wrap:wrap}
+.brand-panel{flex:0 0 50%;max-width:50%;background:#1E4FB8;color:#fff;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.form-area{flex:0 0 50%;max-width:50%;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.v-card{width:100%;max-width:520px;background:#fff;border:1px solid #D5DBE7;border-radius:16px;box-shadow:0 8px 24px rgba(26,38,77,.08);padding:40px;display:flex;flex-direction:column;gap:22px}
+.field{position:relative;display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:#fff;font-size:12px;line-height:16px;color:#5B6478}
+.control{display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;border:1px solid #8A93A6;border-radius:4px;background:#fff;color:#5B6478}
+.control input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:16px;color:#1C2333}
+.field.error .control{border:2px solid #D32F2F;color:#D32F2F}.field.error label,.msg.err{color:#C62828}
+.msg{font-size:12px;line-height:16px;color:#5B6478;padding:0 16px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}
+.v-btn--flat:hover{background:#163C8C;color:#fff;text-decoration:none}
+.v-btn--text{background:transparent;color:#1E4FB8;padding:0 8px}
+.v-btn--text:hover{background:#E3EBFB;text-decoration:none}
+.v-alert{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:4px;background:#E1F2FB}
+.v-alert--warn{background:#FFF4E5;color:#663C00}
+.v-btn--off{background:#D5DBE7;color:#5B6478;cursor:not-allowed;box-shadow:none}
+.ok{width:64px;height:64px;border-radius:999px;background:#E3F1E4;color:#1B5E20;display:grid;place-items:center;align-self:center}
+.chk{display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:#1E4FB8;margin:0}
+.steps{display:flex;gap:8px;align-items:center;font-size:12px;color:#5B6478}
+.step{display:inline-flex;align-items:center;gap:6px}
+.step b{width:22px;height:22px;border-radius:999px;display:grid;place-items:center;font-size:12px;background:#EEF2FA;color:#4A5366}
+.step.on b{background:#1E4FB8;color:#fff}.step.on{color:#1E4FB8;font-weight:500}
+@media (max-width:720px){.form-area{flex-basis:100%;max-width:none}.brand-panel{flex-basis:100%;max-width:none;padding:28px 20px;gap:16px}.brand-panel .hide-sm{display:none}.v-card{padding:24px;border:0;box-shadow:none}.two{grid-template-columns:minmax(0,1fr)}}
+</style>
+</helmet>
+<main class="auth">
+  <section class="brand-panel" aria-label="Présentation">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center"><svg class="i" style="width:28px;height:28px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>
+      <span style="font-size:24px;font-weight:700">UniConnect</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <h1 style="margin:0;font-size:34px;line-height:40px;font-weight:500;max-width:470px">Rejoignez les espaces de votre université.</h1>
+      <p class="hide-sm" style="margin:0;font-size:16px;line-height:24px;opacity:.88;max-width:470px">Votre compte est rattaché à votre profil (étudiant, enseignant ou administration). À l'activation, vous rejoignez automatiquement les groupes de votre classe et de vos matières.</p>
+    </div>
+    <div class="hide-sm" style="font-size:12px;opacity:.8">Université · Année universitaire 2026/2027</div>
+  </section>
+  <section class="form-area">
+    <form class="v-card" aria-labelledby="t-signup" onSubmit="{{send}}">
+      <sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;flex-direction:column;gap:16px;text-align:center">
+          <div class="steps" aria-label="Étapes" style="justify-content:center"><span class="step"><b>✓</b>Éligibilité</span><span aria-hidden="true">—</span><span class="step on"><b>2</b>Activation par e-mail</span></div>
+          <span class="ok"><svg class="i" style="width:32px;height:32px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.email}}"></path></svg></span>
+          <h2 style="margin:0;font-size:22px;font-weight:500">Vérifiez votre boîte de réception</h2>
+          <p style="margin:0;color:#5B6478">Un e-mail d'activation a été envoyé à <strong style="color:#1C2333">yassine.bensalah@univ.tn</strong>. Cliquez sur le lien qu'il contient pour choisir votre mot de passe. Le lien est valable 48 heures.</p>
+          <a class="v-btn v-btn--flat" href="E03-Activation.dc.html">Ouvrir le lien reçu (démo)</a>
+          <button class="v-btn v-btn--text" type="button" onClick="{{back}}">Je n'ai rien reçu : renvoyer l'e-mail</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{form}}" hint-placeholder-val="{{true}}">
+      <div style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="steps" aria-label="Étapes"><span class="step on"><b>1</b>Éligibilité</span><span aria-hidden="true">—</span><span class="step"><b>2</b>Activation par e-mail</span></div>
+        <h2 id="t-signup" style="margin:0;font-size:24px;line-height:32px;font-weight:500">Créer mon compte</h2>
+      </div>
+      <sc-if value="{{closed}}" hint-placeholder-val="{{false}}">
+        <div class="v-alert v-alert--warn" role="alert"><svg class="i" style="color:#B45309" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.warn}}"></path></svg><span><strong>La plateforme n'est pas encore ouverte pour cette année universitaire.</strong><br>Aucune année n'est active : la création de compte est temporairement impossible. Réessayez après l'ouverture annoncée par l'administration.</span></div>
+      </sc-if>
+      <div class="v-alert" role="note"><svg class="i" style="color:#01579B" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.info}}"></path></svg><span>Seules les personnes figurant sur la liste des comptes autorisés de l'année active peuvent créer un compte.</span></div>
+      <div class="field">
+        <label for="mat">Identifiant universitaire (matricule)</label>
+        <div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.key}}"></path></svg><input id="mat" value="LI2-2026-0457"></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="nom">Nom</label><div class="control"><input id="nom" value="Ben Salah"></div></div>
+        <div class="field"><label for="prenom">Prénom</label><div class="control"><input id="prenom" value="Yassine"></div></div>
+      </div>
+      <div class="field error">
+        <label for="mail">Adresse électronique institutionnelle</label>
+        <div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.email}}"></path></svg><input id="mail" type="email" value="y.bensalah@gmail.com" aria-invalid="true" aria-describedby="mail-err"></div>
+        <span id="mail-err" class="msg err">Cette adresse ne correspond pas à la liste des comptes autorisés. Utilisez votre adresse @univ.tn.</span>
+      </div>
+      <label class="chk"><input type="checkbox" checked="">J'accepte la <a href="#">charte d'utilisation</a> de la plateforme</label>
+      <button class="{{btnCls}}" type="submit" disabled="{{closed}}">Créer mon compte</button>
+      <div style="display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap">
+        <span style="color:#5B6478">Déjà un compte ?</span>
+        <a class="v-btn v-btn--text" href="Main.dc.html">Se connecter</a>
+      </div>
+      </div>
+      </sc-if>
+    </form>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"plateformeOuverte":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sent: false }; }
+  renderVals() {
+    const closed = (this.props.plateformeOuverte ?? true) === false;
+    return {
+      closed, sent: this.state.sent, form: !this.state.sent,
+      btnCls: closed ? "v-btn v-btn--off" : "v-btn v-btn--flat",
+      send: (e) => { e.preventDefault(); if (!closed) this.setState({ sent: true }); },
+      back: () => this.setState({ sent: false }),
+      ic: {
+      warn: "M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z",
+      school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+      info: "M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z",
+      key: "M11 10V12H9V14H7V12H5.8C5.4 13.2 4.3 14 3 14C1.3 14 0 12.7 0 11S1.3 8 3 8C4.3 8 5.4 8.8 5.8 10H11M3 10C2.4 10 2 10.4 2 11S2.4 12 3 12 4 11.6 4 11 3.6 10 3 10M16 14C18.7 14 24 15.3 24 18V20H8V18C8 15.3 13.3 14 16 14M16 12C13.8 12 12 10.2 12 8S13.8 4 16 4 20 5.8 20 8 18.2 12 16 12Z",
+      email: "M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"
+    } };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Espace · Ressources – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:40px;height:40px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}.user:hover{text-decoration:none;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#00796B;flex:none}
+.layout{display:flex;flex:1}
+.v-navigation-drawer{width:288px;flex:none;background:#fff;border-right:1px solid #D5DBE7;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.subheader{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478;padding:16px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;color:#1C2333}
+.nav-item:hover{background:#EEF2FA;text-decoration:none;color:#1C2333}
+.nav-item .i{color:#5B6478}
+.nav-item.active{background:#E3EBFB;color:#1E4FB8;font-weight:500}.nav-item.active .i{color:#1E4FB8}
+.grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#1E4FB8;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center}
+.v-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--outlined{border-color:#1E4FB8;color:#1E4FB8}.v-btn--outlined:hover{background:#E3EBFB}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.v-chip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap;border:1px solid transparent;cursor:pointer;background:transparent}
+.v-chip .i{width:14px;height:14px}
+.c-primary{background:#E3EBFB;color:#1E4FB8}.c-warning{background:#FDEBD9;color:#8A4100}.c-outline{border-color:#D5DBE7;color:#4A5366}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.head-wrap{background:#fff}
+.space-head{display:flex;align-items:center;gap:16px;padding:16px 24px 12px;flex-wrap:wrap}
+.space-ico{width:48px;height:48px;border-radius:12px;background:#E3EBFB;color:#1E4FB8;display:grid;place-items:center;flex:none}
+.v-tabs{display:flex;border-bottom:1px solid #D5DBE7;overflow-x:auto;padding:0 12px}
+.v-tab{display:inline-flex;align-items:center;height:48px;padding:0 16px;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;color:#5B6478;border-bottom:2px solid transparent;white-space:nowrap}
+.v-tab:hover{background:#F4F6FB;text-decoration:none;color:#1C2333}
+.v-tab.active{color:#1E4FB8;border-color:#1E4FB8}
+.content{padding:24px 32px 40px;display:flex;flex-direction:column;gap:16px}
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.field{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid #8A93A6;border-radius:4px;background:#fff;color:#5B6478;flex:0 1 360px;min-width:200px}
+.field input{border:0;outline:0;background:transparent;flex:1;min-width:0;color:#1C2333}
+.panel{background:#fff;border:1px solid #D5DBE7;border-radius:12px;overflow:hidden}
+.panel-head{display:flex;align-items:center;gap:12px;padding:14px 16px 14px 20px;width:100%;border:0;background:transparent;text-align:left;cursor:pointer}
+.panel-head:hover{background:#F4F6FB}
+.scroll-x{overflow-x:auto;border-top:1px solid #D5DBE7}
+.v-table{width:100%;border-collapse:collapse;min-width:720px}
+.v-table th{text-align:left;font-weight:500;color:#5B6478;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:10px 16px;border-bottom:1px solid #D5DBE7;white-space:nowrap}
+.v-table td{padding:10px 16px;border-bottom:1px solid #EEF2FA;vertical-align:middle}
+.v-table tr:last-child td{border-bottom:0}
+.v-menu{position:absolute;right:0;top:100%;z-index:10;min-width:240px;background:#fff;border-radius:4px;box-shadow:0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14);padding:8px 0;display:flex;flex-direction:column;text-align:left}
+.v-menu-item{display:flex;align-items:center;gap:12px;padding:0 16px;height:44px;border:0;background:transparent;cursor:pointer;color:#1C2333;font-size:14px;text-align:left}
+.v-menu-item:hover{background:#F4F6FB}.v-menu-item .i{width:20px;height:20px}
+.overlay{position:fixed;inset:0;background:rgba(15,20,32,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.dialog{background:#fff;border-radius:12px;max-width:480px;width:100%;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.dlg-actions{display:flex;justify-content:flex-end;gap:8px}
+.pick-row{display:flex;align-items:center;gap:12px;padding:8px 4px;border-radius:4px;cursor:pointer}.pick-row input{accent-color:#1E4FB8;width:18px;height:18px;margin:0}
+.snackbar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:16px;background:#2B3140;color:#fff;border-radius:4px;padding:6px 8px 6px 16px;box-shadow:0 3px 5px -1px rgba(0,0,0,.2)}
+@media (min-width:961px){.panel,.scroll-x{overflow:visible}.panel-head{border-radius:12px 12px 0 0}}
+.bnav{display:none}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.v-navigation-drawer{display:none}.search{display:none}.user-text{display:none}.content{padding:16px 16px 96px}.space-head{padding:12px 16px}
+.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid #D5DBE7;z-index:6}
+.bnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;color:#5B6478}.bnav a.active{color:#1E4FB8;font-weight:500}.bnav a:hover{text-decoration:none}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="E04-Accueil.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect</a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un espace, une personne, un fichier…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="E09-Notifications.dc.html" aria-label="Notifications, 2 non lues"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><span class="dot">2</span></a>
+    <a class="user" href="E11-Profil.dc.html"><span class="v-avatar">SB</span><span class="user-text"><span style="display:block;font-weight:500">Mme Sarra Ben Ali</span><span class="caption">Enseignante · Informatique</span></span></a>
+  </header>
+  <div class="layout">
+    <nav class="v-navigation-drawer" aria-label="Navigation principale">
+      <a class="v-btn v-btn--flat" href="E06-Creer-espace.dc.html" style="margin-bottom:8px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.plus}}"></path></svg>Créer un espace</a>
+      <sc-for list="{{nav}}" as="sec" hint-placeholder-count="4">
+        <sc-if value="{{sec.title}}" hint-placeholder-val="{{true}}"><div class="subheader">{{sec.title}}</div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3">
+          <a class="{{it.cls}}" href="{{it.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{it.d}}"></path></svg><span class="grow">{{it.label}}</span><sc-if value="{{it.badge}}" hint-placeholder-val="{{false}}"><span class="badge">{{it.badge}}</span></sc-if></a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <main class="v-main">
+      <div class="head-wrap">
+        <div class="space-head">
+          <span class="space-ico"><svg class="i" style="width:28px;height:28px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.book}}"></path></svg></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+            <h1 style="font-size:22px;line-height:28px;font-weight:500">Bases de données · L2 Info A</h1>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <span class="v-chip c-primary" style="height:24px;font-size:12px;padding:0 10px">Groupe organisationnel</span>
+              <span class="caption">48 membres · Vous êtes propriétaire</span>
+            </div>
+          </div>
+          <a class="icon-btn" href="E05-Parametres.dc.html" aria-label="Paramètres de l'espace"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.cog}}"></path></svg></a>
+        </div>
+        <nav class="v-tabs" aria-label="Onglets de l'espace">
+          <a class="v-tab" href="E05-Discussion.dc.html">Discussion</a>
+          <a class="v-tab" href="E05-AssistantIA.dc.html" style="gap:6px"><svg class="i" style="width:16px;height:16px;color:#B45309" viewBox="0 0 24 24" aria-hidden="true"><path d="M19,1L17.74,3.75L15,5L17.74,6.26L19,9L20.25,6.26L23,5L20.25,3.75M9,4L6.5,9.5L1,12L6.5,14.5L9,20L11.5,14.5L17,12L11.5,9.5M19,15L17.74,17.74L15,19L17.74,20.25L19,23L20.25,20.25L23,19L20.25,17.74"></path></svg>Assistant IA</a>
+          <a class="v-tab" href="E05-Annonces.dc.html">Annonces</a>
+          <a class="v-tab active" href="E05-Ressources.dc.html" aria-current="page">Ressources</a>
+          <a class="v-tab" href="E05-Fichiers.dc.html">Fichiers</a>
+          <a class="v-tab" href="E05-Epingles.dc.html">Épinglés</a>
+          <a class="v-tab" href="E07-Membres.dc.html">Membres</a>
+          <a class="v-tab" href="E05-Parametres.dc.html">Paramètres</a>
+        </nav>
+      </div>
+      <div class="content">
+        <div class="toolbar">
+          <label class="field"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher une ressource" placeholder="Rechercher une ressource"></label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Filtrer par type">
+            <sc-for list="{{filters}}" as="f" hint-placeholder-count="4"><button class="{{f.cls}}" type="button" onClick="{{f.pick}}" aria-pressed="{{f.on}}">{{f.label}}</button></sc-for>
+          </div>
+          <span class="spacer"></span>
+          <button class="v-btn v-btn--outlined" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.folder}}"></path></svg>Nouveau chapitre</button>
+          <button class="v-btn v-btn--flat" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.upload}}"></path></svg>Ajouter une ressource</button>
+        </div>
+        <p class="caption">Les ressources ne sont pas soumises à l'expiration des messages. Les étudiants les consultent en lecture seule.</p>
+        <sc-for list="{{chapters}}" as="c" hint-placeholder-count="3">
+          <section class="panel">
+            <button class="panel-head" type="button" onClick="{{c.toggle}}" aria-expanded="{{c.open}}">
+              <svg class="i" style="color:#1E4FB8" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.folder}}"></path></svg>
+              <span style="flex:1;min-width:0"><span style="display:block;font-size:16px;font-weight:500">{{c.title}}</span><span class="caption">{{c.count}}</span></span>
+              <svg class="i" style="{{c.chev}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.chevron}}"></path></svg>
+            </button>
+            <sc-if value="{{c.open}}" hint-placeholder-val="{{true}}">
+              <div class="scroll-x">
+                <table class="v-table">
+                  <thead><tr><th scope="col">Ressource</th><th scope="col">Type</th><th scope="col">Ajoutée le</th><th scope="col">Consultations</th><th scope="col"><span style="position:absolute;left:-9999px">Actions</span></th></tr></thead>
+                  <tbody>
+                    <sc-for list="{{c.items}}" as="r" hint-placeholder-count="3">
+                      <tr>
+                        <td><div style="display:flex;align-items:center;gap:12px"><svg class="i" style="{{r.color}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{r.d}}"></path></svg><div style="min-width:0"><div style="font-weight:500">{{r.name}}</div><div class="caption">{{r.desc}}</div></div></div></td>
+                        <td class="muted">{{r.type}}</td>
+                        <td class="muted">{{r.date}}</td>
+                        <td class="muted">{{r.views}}</td>
+                        <td style="white-space:nowrap;text-align:right">
+                          <button class="icon-btn" type="button" aria-label="Télécharger"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.download}}"></path></svg></button>
+                          <span style="position:relative;display:inline-block">
+                            <button class="icon-btn" type="button" aria-label="Plus d'actions" aria-haspopup="menu" aria-expanded="{{r.menuOpen}}" onClick="{{r.toggleMenu}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.dots}}"></path></svg></button>
+                            <sc-if value="{{r.menuOpen}}" hint-placeholder-val="{{false}}">
+                              <div class="v-menu" role="menu">
+                                <button class="v-menu-item" type="button" role="menuitem" onClick="{{r.rename}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.pencil}}"></path></svg>Renommer</button>
+                                <button class="v-menu-item" type="button" role="menuitem" onClick="{{r.move}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.folderMove}}"></path></svg>Déplacer vers un chapitre</button>
+                                <button class="v-menu-item" type="button" role="menuitem" onClick="{{r.remove}}" style="color:#C62828"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.del}}"></path></svg>Supprimer</button>
+                              </div>
+                            </sc-if>
+                          </span>
+                        </td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </sc-if>
+          </section>
+        </sc-for>
+      </div>
+    </main>
+  </div>
+  <sc-if value="{{dlgRename}}" hint-placeholder-val="{{false}}">
+    <div class="overlay"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="t-ren">
+      <h2 id="t-ren" style="font-size:20px;font-weight:500">Renommer la ressource</h2>
+      <label class="field" style="flex:none;max-width:none"><input aria-label="Nouveau nom" value="{{dlgName}}"></label>
+      <p class="caption" style="margin:0">Le fichier n'est pas modifié : seul son nom affiché change pour les membres.</p>
+      <div class="dlg-actions"><button class="v-btn v-btn--text" type="button" onClick="{{closeDlg}}">Annuler</button><button class="v-btn v-btn--flat" type="button" onClick="{{confirmDlg}}">Enregistrer</button></div>
+    </div></div>
+  </sc-if>
+  <sc-if value="{{dlgMove}}" hint-placeholder-val="{{false}}">
+    <div class="overlay"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="t-mov">
+      <h2 id="t-mov" style="font-size:20px;font-weight:500">Déplacer « {{dlgName}} »</h2>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{moveTargets}}" as="t" hint-placeholder-count="3"><label class="pick-row"><input type="radio" name="dest" checked="{{t.checked}}" disabled="{{t.current}}"><span class="grow" style="white-space:normal">{{t.title}}</span><sc-if value="{{t.current}}" hint-placeholder-val="{{false}}"><span class="caption">Chapitre actuel</span></sc-if></label></sc-for>
+      </div>
+      <div class="dlg-actions"><button class="v-btn v-btn--text" type="button" onClick="{{closeDlg}}">Annuler</button><button class="v-btn v-btn--flat" type="button" onClick="{{confirmDlg}}">Déplacer</button></div>
+    </div></div>
+  </sc-if>
+  <sc-if value="{{dlgDelete}}" hint-placeholder-val="{{false}}">
+    <div class="overlay"><div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="t-del">
+      <h2 id="t-del" style="font-size:20px;font-weight:500">Supprimer « {{dlgName}} » ?</h2>
+      <p class="muted" style="margin:0">Les étudiants ne pourront plus consulter ni télécharger cette ressource. Les réponses de l'Assistant IA ne la citeront plus.</p>
+      <div class="dlg-actions"><button class="v-btn v-btn--text" type="button" onClick="{{closeDlg}}">Annuler</button><button class="v-btn v-btn--flat" type="button" style="background:#C62828" onClick="{{confirmDlg}}">Supprimer</button></div>
+    </div></div>
+  </sc-if>
+  <sc-if value="{{toast}}" hint-placeholder-val="{{false}}">
+    <div class="snackbar" role="status">{{toast}}<button class="v-btn v-btn--text" type="button" style="color:#9DB8F2" onClick="{{hideToast}}">OK</button></div>
+  </sc-if>
+  <nav class="bnav" aria-label="Navigation mobile">
+    <sc-for list="{{bnav}}" as="b" hint-placeholder-count="5"><a class="{{b.cls}}" href="{{b.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{b.d}}"></path></svg>{{b.label}}</a></sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+const IC = {
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  plus: "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",
+  home: "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  inbox: "M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z",
+  book: "M12 21.5C10.65 20.65 8.2 20 6.5 20C4.85 20 3.15 20.3 1.75 21.05C1.65 21.1 1.6 21.1 1.5 21.1C1.25 21.1 1 20.85 1 20.6V6C1.6 5.55 2.25 5.25 3 5C4.11 4.65 5.33 4.5 6.5 4.5C8.45 4.5 10.55 4.9 12 6C13.45 4.9 15.55 4.5 17.5 4.5C18.67 4.5 19.89 4.65 21 5C21.75 5.25 22.4 5.55 23 6V20.6C23 20.85 22.75 21.1 22.5 21.1C22.4 21.1 22.35 21.1 22.25 21.05C20.85 20.3 19.15 20 17.5 20C15.8 20 13.35 20.65 12 21.5M12 8V19.5C13.35 18.65 15.8 18 17.5 18C18.7 18 19.9 18.15 21 18.5V7C19.9 6.65 18.7 6.5 17.5 6.5C15.8 6.5 13.35 7.15 12 8Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound: "M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  compass: "M14.19,14.19L6,18L9.81,9.81L18,6M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,10.9A1.1,1.1 0 0,0 10.9,12A1.1,1.1 0 0,0 12,13.1A1.1,1.1 0 0,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z",
+  account: "M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z",
+  group: "M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  cog: "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  folder: "M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z",
+  upload: "M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z",
+  chevron: "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",
+  download: "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z",
+  pencil: "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z",
+  del: "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z",
+  pdf: "M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M9.5 11.5C9.5 12.3 8.8 13 8 13H7V15H5.5V9H8C8.8 9 9.5 9.7 9.5 10.5V11.5M14.5 13.5C14.5 14.3 13.8 15 13 15H10.5V9H13C13.8 9 14.5 9.7 14.5 10.5V13.5M18.5 10.5H17V11.5H18.5V13H17V15H15.5V9H18.5V10.5M12 10.5H13V13.5H12V10.5M7 10.5H8V11.5H7V10.5Z",
+  word: "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.2,20H13.8L12,13.2L10.2,20H8.8L6.6,11H8.1L9.5,17.8L11.3,11H12.6L14.4,17.8L15.8,11H17.3L15.2,20M13,9V3.5L18.5,9H13Z",
+  dots: "M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z",
+  folderMove: "M14,18V15H10V11H14V8L19,13M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z",
+  link: "M3.9,12C3.9,10.29 5.29,8.9 7,8.9H11V7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H11V15.1H7C5.29,15.1 3.9,13.71 3.9,12M8,13H16V11H8V13M17,7H13V8.9H17C18.71,8.9 20.1,10.29 20.1,12C20.1,13.71 18.71,15.1 17,15.1H13V17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7Z"
+};
+const NAV = [
+  [null, [["Accueil","home","E04-Accueil.dc.html"],["Notifications","inbox","E09-Notifications.dc.html","2"]]],
+  ["Mes matières", [["Bases de données · L2 A","book","E05-Ressources.dc.html"],["Bases de données · L2 B","book","E05-Ressources.dc.html","3"],["SGBD avancés · M1","book","E05-Ressources.dc.html"]]],
+  ["Mes groupes privés", [["Équipe pédagogique Info","lock","E05-Discussion.dc.html"]]],
+  ["Mes channels", [["Club Informatique","pound","E05-Discussion.dc.html"]]],
+  [null, [["Explorer les channels","compass","E08-Channels.dc.html"],["Mon profil","account","E11-Profil.dc.html"]]]
+];
+const BNAV = [["Accueil","home","E04-Accueil.dc.html"],["Espaces","group","E05-Discussion.dc.html"],["Channels","compass","E08-Channels.dc.html"],["Notifs","inbox","E09-Notifications.dc.html"],["Profil","account","E11-Profil.dc.html"]];
+const PDF = "color:#C62828", WORD = "color:#1E4FB8", LINK = "color:#00796B";
+const CH = [
+  { title: "Chapitre 1 – Introduction aux bases de données", items: [
+    { name: "Cours 1 – Concepts fondamentaux.pdf", desc: "Support de cours", type: "PDF · 1,8 Mo", date: "15/09/2026", views: "46", d: IC.pdf, color: PDF, kind: "PDF" },
+    { name: "Fiche de révision – Vocabulaire", desc: "À lire avant le TD1", type: "Word · 120 Ko", date: "18/09/2026", views: "39", d: IC.word, color: WORD, kind: "Documents" }
+  ]},
+  { title: "Chapitre 2 – Modèle relationnel", items: [
+    { name: "Cours 2 – Algèbre relationnelle.pdf", desc: "Support de cours", type: "PDF · 2,1 Mo", date: "29/09/2026", views: "44", d: IC.pdf, color: PDF, kind: "PDF" },
+    { name: "TD2 – Exercices corrigés.pdf", desc: "Correction publiée", type: "PDF · 640 Ko", date: "06/10/2026", views: "41", d: IC.pdf, color: PDF, kind: "PDF" },
+    { name: "Simulateur d'algèbre relationnelle", desc: "Outil en ligne", type: "Lien", date: "06/10/2026", views: "27", d: IC.link, color: LINK, kind: "Liens" }
+  ]},
+  { title: "Chapitre 3 – Normalisation", items: [
+    { name: "Chapitre 3 – Normalisation.pdf", desc: "Support de cours", type: "PDF · 2,4 Mo", date: "12/10/2026", views: "31", d: IC.pdf, color: PDF, kind: "PDF" },
+    { name: "TP2 – Requêtes SQL.docx", desc: "Énoncé du TP, à rendre le 24/10", type: "Word · 380 Ko", date: "12/10/2026", views: "29", d: IC.word, color: WORD, kind: "Documents" }
+  ]}
+];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { open: { 0: false, 1: false, 2: true }, filter: "Tout", menu: null, dlg: null, toast: "" }; }
+  renderVals() {
+    const active = "Bases de données · L2 A", bActive = "Espaces", f = this.state.filter, s = this.state;
+    const dlg = s.dlg, MSG = { rename: "Ressource renommée", move: "Ressource déplacée", del: "Ressource supprimée" };
+    const openDlg = (kind, name, ch) => this.setState({ menu: null, dlg: { kind, name, ch } });
+    return {
+      ic: IC,
+      dlgRename: !!dlg && dlg.kind === "rename", dlgMove: !!dlg && dlg.kind === "move", dlgDelete: !!dlg && dlg.kind === "del",
+      dlgName: dlg ? dlg.name : "",
+      moveTargets: CH.map((c, i) => ({ title: c.title, current: !!dlg && dlg.ch === i, checked: !!dlg && i === (dlg.ch === 0 ? 1 : 0) })),
+      closeDlg: () => this.setState({ dlg: null }),
+      confirmDlg: () => this.setState({ dlg: null, toast: dlg ? MSG[dlg.kind] + " (démo)" : "" }),
+      toast: s.toast, hideToast: () => this.setState({ toast: "" }),
+      nav: NAV.map(([title, items]) => ({ title, items: items.map(([label, icon, href, badge]) => ({ label, href, badge: badge || "", d: IC[icon], cls: label === active ? "nav-item active" : "nav-item" })) })),
+      bnav: BNAV.map(([label, icon, href]) => ({ label, href, d: IC[icon], cls: label === bActive ? "active" : "" })),
+      filters: ["Tout", "PDF", "Documents", "Liens"].map((label) => ({ label, on: label === f ? "true" : "false", cls: label === f ? "v-chip c-primary" : "v-chip c-outline", pick: () => this.setState({ filter: label }) })),
+      chapters: CH.map((c, i) => {
+        const items = c.items.filter((r) => f === "Tout" || r.kind === f).map((r) => {
+          const key = i + ":" + r.name, menuOpen = s.menu === key;
+          return { ...r, menuOpen, toggleMenu: () => this.setState({ menu: menuOpen ? null : key }),
+            rename: () => openDlg("rename", r.name, i), move: () => openDlg("move", r.name, i), remove: () => openDlg("del", r.name, i) };
+        });
+        const open = !!this.state.open[i];
+        return { title: c.title, count: items.length + " ressource" + (items.length > 1 ? "s" : ""), items, open, chev: open ? "transform:rotate(90deg);color:#5B6478" : "color:#5B6478",
+          toggle: () => this.setState({ open: Object.assign({}, this.state.open, { [i]: !open }) }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

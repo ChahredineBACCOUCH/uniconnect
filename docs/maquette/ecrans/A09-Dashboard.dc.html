@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Administration · Tableau de bord – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.admin-tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#FEF3DC;color:#7A4A00;border-radius:4px;padding:2px 6px}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}.user:hover{text-decoration:none;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#01579B;flex:none}
+.layout{display:flex;flex:1}
+.v-navigation-drawer{width:288px;flex:none;background:#fff;border-right:1px solid #D5DBE7;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.subheader{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478;padding:16px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;color:#1C2333}
+.nav-item:hover{background:#EEF2FA;text-decoration:none;color:#1C2333}
+.nav-item .i{color:#5B6478}
+.nav-item.active{background:#E3EBFB;color:#1E4FB8;font-weight:500}.nav-item.active .i{color:#1E4FB8}
+.grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#C62828;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center}
+.v-main{flex:1 1 auto;min-width:0;padding:28px 32px 40px;display:flex;flex-direction:column;gap:20px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--outlined{border-color:#1E4FB8;color:#1E4FB8}.v-btn--outlined:hover{background:#E3EBFB}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.v-card{background:#fff;border:1px solid #D5DBE7;border-radius:12px;min-width:0}
+.v-card-title{display:flex;align-items:center;gap:10px;padding:16px 20px 4px;font-size:18px;font-weight:500}
+.field{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:1px solid #8A93A6;border-radius:4px;background:#fff}
+.field select{border:0;outline:0;background:transparent}
+.seg{display:inline-flex;border:1px solid #1E4FB8;border-radius:4px;overflow:hidden}
+.seg button{border:0;background:#fff;color:#1E4FB8;font-weight:500;padding:0 14px;height:38px;cursor:pointer;font-size:13px}
+.seg button.on{background:#1E4FB8;color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.kpi .n{font-size:28px;line-height:36px;font-weight:500}
+.kpis2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.kpi-row{flex-direction:row;align-items:center;gap:16px;flex-wrap:wrap}
+@media (max-width:960px){.kpis2{grid-template-columns:minmax(0,1fr)}}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.vbars{display:flex;align-items:flex-end;gap:10px;height:200px;padding:16px 20px 0;border-bottom:1px solid #D5DBE7;margin:0 20px;padding-left:0;padding-right:0}
+.vbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;position:relative;cursor:default}
+.vbar .b{width:70%;max-width:40px;background:#1E4FB8;border-radius:4px 4px 0 0}
+.vbar:hover .b{background:#163C8C}
+.vbar .tip{position:absolute;bottom:calc(100% - 4px);display:none;background:#1C2333;color:#fff;font-size:12px;padding:4px 8px;border-radius:4px;white-space:nowrap}
+.vbar:hover .tip{display:block}
+.xlab{display:flex;gap:10px;margin:6px 20px 16px}
+.xlab span{flex:1;text-align:center;font-size:12px;color:#5B6478}
+.hbars{display:flex;flex-direction:column;gap:12px;padding:12px 20px 20px}
+.hrow{display:grid;grid-template-columns:150px minmax(0,1fr) 56px;gap:12px;align-items:center}
+.htrack{height:14px;background:#EEF2FA;border-radius:0 4px 4px 0}
+.hfill{height:100%;background:#1E4FB8;border-radius:0 4px 4px 0}
+.alert-row{display:flex;gap:12px;align-items:center;padding:12px 20px;border-top:1px solid #EEF2FA}
+.alert-ico{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;flex:none}
+@media (max-width:1200px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.brand{width:auto}}
+@media (max-width:960px){.v-navigation-drawer{display:none}.v-main{padding:20px 16px 40px}.search{display:none}.user-text{display:none}.charts{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.kpis{grid-template-columns:minmax(0,1fr)}.hrow{grid-template-columns:100px minmax(0,1fr) 48px}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="A09-Dashboard.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect<span class="admin-tag">Admin</span></a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un utilisateur, un espace…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="A07-Moderation.dc.html" aria-label="3 signalements en attente"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><span class="dot">3</span></a>
+    <span class="user"><span class="v-avatar">LH</span><span class="user-text"><span style="display:block;font-weight:500">Leila Haddad</span><span class="caption">Administration · Scolarité</span></span></span>
+  </header>
+  <div class="layout">
+    <nav class="v-navigation-drawer" aria-label="Navigation administration">
+      <sc-for list="{{nav}}" as="sec" hint-placeholder-count="6">
+        <sc-if value="{{sec.title}}" hint-placeholder-val="{{true}}"><div class="subheader">{{sec.title}}</div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="2">
+          <a class="{{it.cls}}" href="{{it.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{it.d}}"></path></svg><span class="grow">{{it.label}}</span><sc-if value="{{it.badge}}" hint-placeholder-val="{{false}}"><span class="badge">{{it.badge}}</span></sc-if></a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <main class="v-main">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px"><h1 style="font-size:24px;line-height:32px;font-weight:500">Tableau de bord</h1><p class="muted">Année universitaire active : 2026/2027</p></div>
+        <div class="seg" role="group" aria-label="Période">
+          <sc-for list="{{periods}}" as="p" hint-placeholder-count="3"><button class="{{p.cls}}" type="button" aria-pressed="{{p.on}}" onClick="{{p.pick}}">{{p.label}}</button></sc-for>
+        </div>
+        <label class="field"><span style="position:absolute;left:-9999px">Département</span><select><option>Tous les départements</option><option>Informatique</option><option>Mathématiques</option><option>Gestion</option></select></label>
+      </div>
+      <section class="kpis" aria-label="Indicateurs">
+        <div class="v-card kpi"><span class="caption">Utilisateurs actifs</span><span class="n">2 846</span><span class="caption">Étudiants 2 610 · Enseignants 184 · Admin. 52</span></div>
+        <div class="v-card kpi"><span class="caption">Espaces actifs</span><span class="n">412</span><span class="caption">286 organisationnels · 94 privés · 32 channels</span></div>
+        <div class="v-card kpi"><span class="caption">{{msgLabel}}</span><span class="n">{{msgTotal}}</span><span class="caption">dont 1 932 fichiers partagés</span></div>
+        <div class="v-card kpi"><span class="caption">Stockage utilisé</span><span class="n">148 Go</span><span class="caption">sur 500 Go alloués (30 %)</span></div>
+      </section>
+      <section class="kpis2" aria-label="Indicateurs d'activation">
+        <div class="v-card kpi kpi-row">
+          <span class="alert-ico" style="background:#FDEBD9;color:#8A4100;width:44px;height:44px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.accountMultiple}}"></path></svg></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+            <span class="caption">Comptes autorisés non activés</span>
+            <span class="n">214 <span class="caption" style="font-size:13px">sur 3 060 autorisés</span></span>
+            <div class="htrack" style="height:8px;border-radius:4px" role="img" aria-label="Taux d'activation : 93 %"><div class="hfill" style="width:93%;border-radius:4px;background:#2E7D32"></div></div>
+            <span class="caption">Taux d'activation 93 % · Étudiants 198 · Enseignants 12 · Admin. 4</span>
+          </div>
+          <a class="v-btn v-btn--outlined" href="A03-Comptes.dc.html">Relancer</a>
+        </div>
+        <div class="v-card kpi kpi-row">
+          <span class="alert-ico" style="background:#E3EBFB;color:#1E4FB8;width:44px;height:44px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.mailClock}}"></path></svg></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+            <span class="caption">Invitations en attente</span>
+            <span class="n">37 <span class="caption" style="font-size:13px">dans 21 espaces</span></span>
+            <span class="caption">9 expirent dans moins de 48 h · 112 acceptées ce mois-ci · 6 refusées</span>
+          </div>
+          <a class="v-btn v-btn--text" href="A06-Groupes.dc.html">Voir les espaces</a>
+        </div>
+      </section>
+      <div class="charts">
+        <section class="v-card" aria-labelledby="c1">
+          <h2 id="c1" class="v-card-title">Messages envoyés par semaine</h2>
+          <p class="caption" style="padding:0 20px">Survolez une barre pour la valeur exacte.</p>
+          <div class="vbars" role="img" aria-label="{{weeksAria}}">
+            <sc-for list="{{weeks}}" as="w" hint-placeholder-count="8"><div class="vbar"><span class="tip">{{w.tip}}</span><div class="b" style="{{w.h}}"></div></div></sc-for>
+          </div>
+          <div class="xlab" aria-hidden="true"><sc-for list="{{weeks}}" as="w" hint-placeholder-count="8"><span>{{w.label}}</span></sc-for></div>
+        </section>
+        <section class="v-card" aria-labelledby="c2">
+          <h2 id="c2" class="v-card-title">Utilisateurs actifs par profil</h2>
+          <div class="hbars">
+            <sc-for list="{{profiles}}" as="r" hint-placeholder-count="3"><div class="hrow" title="{{r.tip}}"><span>{{r.label}}</span><div class="htrack"><div class="hfill" style="{{r.w}}"></div></div><span style="text-align:right;font-weight:500">{{r.v}}</span></div></sc-for>
+          </div>
+          <h2 class="v-card-title" style="padding-top:0">Stockage par type de fichier</h2>
+          <div class="hbars">
+            <sc-for list="{{storage}}" as="r" hint-placeholder-count="4"><div class="hrow" title="{{r.tip}}"><span>{{r.label}}</span><div class="htrack"><div class="hfill" style="{{r.w}}"></div></div><span style="text-align:right;font-weight:500">{{r.v}}</span></div></sc-for>
+          </div>
+        </section>
+      </div>
+      <section class="v-card" aria-labelledby="c3">
+        <h2 id="c3" class="v-card-title">Alertes</h2>
+        <div style="padding-top:8px">
+          <div class="alert-row"><span class="alert-ico" style="background:#FBE4E4;color:#B71C1C"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.flag}}"></path></svg></span><div style="flex:1"><div style="font-weight:500">3 signalements en attente de traitement</div><div class="caption">Le plus ancien date d'hier, 18:40</div></div><a class="v-btn v-btn--outlined" href="A07-Moderation.dc.html">Traiter</a></div>
+          <div class="alert-row"><span class="alert-ico" style="background:#FDEBD9;color:#8A4100"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.accountMultiple}}"></path></svg></span><div style="flex:1"><div style="font-weight:500">214 comptes autorisés pas encore activés</div><div class="caption">Liste de l'année 2026/2027 · relance possible par e-mail</div></div><a class="v-btn v-btn--outlined" href="A03-Comptes.dc.html">Voir la liste</a></div>
+          <div class="alert-row"><span class="alert-ico" style="background:#E1F2FB;color:#01579B"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.timer}}"></path></svg></span><div style="flex:1"><div style="font-weight:500">Purge des contenus expirés exécutée cette nuit</div><div class="caption">03:00 · 1 284 messages et 96 fichiers supprimés définitivement</div></div><a class="v-btn v-btn--text" href="A05-Visibilite.dc.html">Détails</a></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+const IC = {
+  mailClock: "M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6M20 6L12 11L4 6H20M20 18H4V8L12 13L20 8V18Z",
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  dashboard: "M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z",
+  calendar: "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z",
+  cog: "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  accountMultiple: "M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  accountKey: "M11 10V12H9V14H7V12H5.8C5.4 13.2 4.3 14 3 14C1.3 14 0 12.7 0 11S1.3 8 3 8C4.3 8 5.4 8.8 5.8 10H11M3 10C2.4 10 2 10.4 2 11S2.4 12 3 12 4 11.6 4 11 3.6 10 3 10M16 14C18.7 14 24 15.3 24 18V20H8V18C8 15.3 13.3 14 16 14M16 12C13.8 12 12 10.2 12 8S13.8 4 16 4 20 5.8 20 8 18.2 12 16 12Z",
+  group: "M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z",
+  flag: "M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  history: "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3",
+  message: "M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6M14,14H6V12H14M18,8H6V6H18",
+  timer: "M6,2H18V8L14,12L18,16V22H6V16L10,12L6,8V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5Z"
+};
+const NAV = [
+  [null, [["Tableau de bord","dashboard","A09-Dashboard.dc.html"]]],
+  ["Paramétrage", [["Années universitaires","calendar","A01-Annees.dc.html"],["Référentiels académiques","school","A02-Referentiels.dc.html"],["Règles de visibilité","cog","A05-Visibilite.dc.html"]]],
+  ["Utilisateurs", [["Comptes autorisés","accountMultiple","A03-Comptes.dc.html"],["Utilisateurs et droits","accountKey","A04-Droits.dc.html"]]],
+  ["Espaces", [["Groupes organisationnels","group","A06-Groupes.dc.html"]]],
+  ["Supervision", [["Modération","flag","A07-Moderation.dc.html","3"],["Historique","history","A08-Historique.dc.html"]]],
+  [null, [["Retour à la messagerie","message","E04-Accueil.dc.html"]]]
+];
+const DATA = {
+  "4 semaines": [["S37", 7820], ["S38", 9140], ["S39", 10260], ["S40", 11480]],
+  "8 semaines": [["S33", 1240], ["S34", 1980], ["S35", 2860], ["S36", 5410], ["S37", 7820], ["S38", 9140], ["S39", 10260], ["S40", 11480]],
+  "Semestre": [["Sept.", 18300], ["Oct.", 38700], ["Nov.", 0], ["Déc.", 0]]
+};
+const fmt = (n) => n.toLocaleString("fr-FR");
+const bars = (rows, max, unit) => rows.map(([label, v, txt]) => ({ label, v: txt, w: "width:" + Math.max(2, Math.round(v / max * 100)) + "%", tip: label + " : " + txt + (unit || "") }));
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { period: "8 semaines" }; }
+  renderVals() {
+    const per = this.state.period, d = DATA[per];
+    const max = Math.max.apply(null, d.map((x) => x[1]));
+    const total = d.reduce((a, x) => a + x[1], 0);
+    return {
+      ic: IC,
+      nav: NAV.map(([title, items]) => ({ title, items: items.map(([label, icon, href, badge]) => ({ label, href, badge: badge || "", d: IC[icon], cls: label === "Tableau de bord" ? "nav-item active" : "nav-item" })) })),
+      periods: ["4 semaines", "8 semaines", "Semestre"].map((label) => ({ label, on: label === per ? "true" : "false", cls: label === per ? "on" : "", pick: () => this.setState({ period: label }) })),
+      msgLabel: "Messages (" + per.toLowerCase() + ")", msgTotal: fmt(total),
+      weeks: d.map(([label, v]) => ({ label, h: "height:" + (v ? Math.max(2, Math.round(v / max * 100)) : 0) + "%", tip: label + " : " + (v ? fmt(v) + " messages" : "à venir") })),
+      weeksAria: "Messages par période : " + d.map(([l, v]) => l + " " + (v ? fmt(v) : "à venir")).join(", "),
+      profiles: bars([["Étudiants", 2610, "2 610"], ["Enseignants", 184, "184"], ["Administration", 52, "52"]], 2610),
+      storage: bars([["PDF", 82, "82 Go"], ["Images", 34, "34 Go"], ["Bureautique", 21, "21 Go"], ["Archives et autres", 11, "11 Go"]], 82)
+    };
+  }
+}
+</script>
+</body>
+</html>

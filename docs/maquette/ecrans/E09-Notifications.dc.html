@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Invitations et notifications – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.icon-btn.on{background:#E3EBFB;color:#1E4FB8}
+.dot{position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}.user:hover{text-decoration:none;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#1E4FB8;flex:none}
+.layout{display:flex;flex:1}
+.v-navigation-drawer{width:288px;flex:none;background:#fff;border-right:1px solid #D5DBE7;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.subheader{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478;padding:16px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;color:#1C2333}
+.nav-item:hover{background:#EEF2FA;text-decoration:none;color:#1C2333}
+.nav-item .i{color:#5B6478}
+.nav-item.active{background:#E3EBFB;color:#1E4FB8;font-weight:500}.nav-item.active .i{color:#1E4FB8}
+.grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#1E4FB8;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center}
+.v-main{flex:1 1 auto;min-width:0;padding:28px 32px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:880px;display:flex;flex-direction:column;gap:16px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--outlined{border-color:#1E4FB8;color:#1E4FB8}.v-btn--outlined:hover{background:#E3EBFB}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.v-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.c-success{background:#E3F1E4;color:#1B5E20}.c-neutral{background:#EEF2FA;color:#4A5366}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.v-card{background:#fff;border:1px solid #D5DBE7;border-radius:12px;overflow:hidden}
+.v-tabs{display:flex;border-bottom:1px solid #D5DBE7;overflow-x:auto;padding:0 8px}
+.v-tab{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 16px;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;color:#5B6478;border:0;border-bottom:2px solid transparent;white-space:nowrap;background:transparent;cursor:pointer}
+.v-tab:hover{background:#F4F6FB}
+.v-tab.active{color:#1E4FB8;border-color:#1E4FB8}
+.item{display:flex;gap:14px;align-items:flex-start;padding:14px 20px;border-bottom:1px solid #EEF2FA}
+.item.unread{background:#F7F9FE}
+.item-ico{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;flex:none}
+.udot{width:10px;height:10px;border-radius:999px;background:#1E4FB8;margin-top:6px;flex:none}
+.field{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:1px solid #8A93A6;border-radius:4px;background:#fff}
+.field select{border:0;outline:0;background:transparent}
+.bnav{display:none}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.v-navigation-drawer{display:none}.v-main{padding:16px 0 96px}.search{display:none}.user-text{display:none}.v-card{border-radius:0;border-left:0;border-right:0}.wrap>.head{padding:0 16px}
+.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid #D5DBE7;z-index:6}
+.bnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;color:#5B6478}.bnav a.active{color:#1E4FB8;font-weight:500}.bnav a:hover{text-decoration:none}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="E04-Accueil.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect</a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un espace, une personne, un fichier…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn on" href="E09-Notifications.dc.html" aria-label="Notifications" aria-current="page"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><sc-if value="{{unread}}" hint-placeholder-val="{{true}}"><span class="dot">{{unread}}</span></sc-if></a>
+    <a class="user" href="E11-Profil.dc.html"><span class="v-avatar">YB</span><span class="user-text"><span style="display:block;font-weight:500">Yassine Ben Salah</span><span class="caption">Étudiant · L2 Informatique</span></span></a>
+  </header>
+  <div class="layout">
+    <nav class="v-navigation-drawer" aria-label="Navigation principale">
+      <a class="v-btn v-btn--flat" href="E06-Creer-espace.dc.html" style="margin-bottom:8px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.plus}}"></path></svg>Créer un espace</a>
+      <sc-for list="{{nav}}" as="sec" hint-placeholder-count="5">
+        <sc-if value="{{sec.title}}" hint-placeholder-val="{{true}}"><div class="subheader">{{sec.title}}</div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3">
+          <a class="{{it.cls}}" href="{{it.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{it.d}}"></path></svg><span class="grow">{{it.label}}</span><sc-if value="{{it.badge}}" hint-placeholder-val="{{false}}"><span class="badge">{{it.badge}}</span></sc-if></a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <main class="v-main">
+      <div class="wrap">
+        <div class="head" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <h1 style="font-size:24px;line-height:32px;font-weight:500;flex:1">Invitations et notifications</h1>
+          <a class="v-btn v-btn--text" href="E11-Profil.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.cog}}"></path></svg>Préférences</a>
+        </div>
+        <section class="v-card">
+          <div class="v-tabs" role="tablist">
+            <button class="{{tabInvCls}}" type="button" role="tab" aria-selected="{{tabInvOn}}" onClick="{{pickInv}}">Invitations<span class="badge">{{pendingCount}}</span></button>
+            <button class="{{tabNotCls}}" type="button" role="tab" aria-selected="{{tabNotOn}}" onClick="{{pickNot}}">Notifications<sc-if value="{{unread}}" hint-placeholder-val="{{true}}"><span class="badge">{{unread}}</span></sc-if></button>
+          </div>
+          <sc-if value="{{showInv}}" hint-placeholder-val="{{false}}">
+            <div>
+              <sc-for list="{{invites}}" as="v" hint-placeholder-count="2">
+                <div class="item" style="flex-wrap:wrap">
+                  <span class="item-ico" style="background:#EEF2FA;color:#4A5366"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{v.d}}"></path></svg></span>
+                  <div style="flex:1;min-width:220px"><div style="font-weight:500;font-size:16px">{{v.name}}</div><div class="muted">{{v.type}} · invité par {{v.by}}</div><div class="caption">{{v.date}}</div></div>
+                  <sc-if value="{{v.pending}}" hint-placeholder-val="{{true}}"><div style="display:flex;gap:8px"><button class="v-btn v-btn--flat" type="button" onClick="{{v.accept}}">Accepter</button><button class="v-btn v-btn--outlined" type="button" onClick="{{v.refuse}}">Refuser</button></div></sc-if>
+                  <sc-if value="{{v.done}}" hint-placeholder-val="{{false}}"><span class="{{v.doneCls}}">{{v.doneLabel}}</span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{showNot}}" hint-placeholder-val="{{true}}">
+            <div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #D5DBE7;flex-wrap:wrap">
+                <label class="field"><span style="position:absolute;left:-9999px">Filtrer par type</span><select><option>Tous les types</option><option>Mentions</option><option>Annonces</option><option>Ressources</option><option>Modération</option></select></label>
+                <span style="flex:1"></span>
+                <button class="v-btn v-btn--text" type="button" onClick="{{markAll}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.checkAll}}"></path></svg>Tout marquer comme lu</button>
+              </div>
+              <sc-for list="{{notifs}}" as="n" hint-placeholder-count="6">
+                <a class="{{n.cls}}" href="{{n.href}}" style="color:#1C2333;text-decoration:none">
+                  <span class="item-ico" style="{{n.tone}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg></span>
+                  <div style="flex:1;min-width:0"><div>{{n.text}}</div><div class="caption">{{n.where}} · {{n.date}}</div></div>
+                  <sc-if value="{{n.isUnread}}" hint-placeholder-val="{{true}}"><span class="udot" aria-label="Non lue"></span></sc-if>
+                </a>
+              </sc-for>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+    </main>
+  </div>
+  <nav class="bnav" aria-label="Navigation mobile">
+    <sc-for list="{{bnav}}" as="b" hint-placeholder-count="5"><a class="{{b.cls}}" href="{{b.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{b.d}}"></path></svg>{{b.label}}</a></sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+const IC = {
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  plus: "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",
+  home: "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  inbox: "M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z",
+  book: "M12 21.5C10.65 20.65 8.2 20 6.5 20C4.85 20 3.15 20.3 1.75 21.05C1.65 21.1 1.6 21.1 1.5 21.1C1.25 21.1 1 20.85 1 20.6V6C1.6 5.55 2.25 5.25 3 5C4.11 4.65 5.33 4.5 6.5 4.5C8.45 4.5 10.55 4.9 12 6C13.45 4.9 15.55 4.5 17.5 4.5C18.67 4.5 19.89 4.65 21 5C21.75 5.25 22.4 5.55 23 6V20.6C23 20.85 22.75 21.1 22.5 21.1C22.4 21.1 22.35 21.1 22.25 21.05C20.85 20.3 19.15 20 17.5 20C15.8 20 13.35 20.65 12 21.5M12 8V19.5C13.35 18.65 15.8 18 17.5 18C18.7 18 19.9 18.15 21 18.5V7C19.9 6.65 18.7 6.5 17.5 6.5C15.8 6.5 13.35 7.15 12 8Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound: "M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  bullhorn: "M12,8H4A2,2 0 0,0 2,10V14A2,2 0 0,0 4,16H5V20A1,1 0 0,0 6,21H8A1,1 0 0,0 9,20V16H12L17,20V4L12,8M21.5,12C21.5,13.71 20.54,15.26 19,16V8C20.53,8.75 21.5,10.3 21.5,12Z",
+  compass: "M14.19,14.19L6,18L9.81,9.81L18,6M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,10.9A1.1,1.1 0 0,0 10.9,12A1.1,1.1 0 0,0 12,13.1A1.1,1.1 0 0,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z",
+  account: "M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z",
+  group: "M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  cog: "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  at: "M12,15C12.81,15 13.5,14.7 14.11,14.11C14.7,13.5 15,12.81 15,12C15,11.19 14.7,10.5 14.11,9.89C13.5,9.3 12.81,9 12,9C11.19,9 10.5,9.3 9.89,9.89C9.3,10.5 9,11.19 9,12C9,12.81 9.3,13.5 9.89,14.11C10.5,14.7 11.19,15 12,15M12,2C14.75,2 17.1,3 19.05,4.95C21,6.9 22,9.25 22,12V13.45C22,14.45 21.65,15.3 21,16C20.3,16.67 19.5,17 18.5,17C17.3,17 16.31,16.5 15.56,15.5C14.56,16.5 13.38,17 12,17C10.63,17 9.45,16.5 8.46,15.54C7.5,14.55 7,13.38 7,12C7,10.63 7.5,9.45 8.46,8.46C9.45,7.5 10.63,7 12,7C13.38,7 14.55,7.5 15.54,8.46C16.5,9.45 17,10.63 17,12V13.45C17,13.86 17.16,14.22 17.46,14.53C17.76,14.84 18.11,15 18.5,15C18.92,15 19.27,14.84 19.57,14.53C19.87,14.22 20,13.86 20,13.45V12C20,9.81 19.23,7.93 17.65,6.35C16.07,4.77 14.19,4 12,4C9.81,4 7.93,4.77 6.35,6.35C4.77,7.93 4,9.81 4,12C4,14.19 4.77,16.07 6.35,17.65C7.93,19.23 9.81,20 12,20H17V22H12C9.25,22 6.9,21 4.95,19.05C3,17.1 2,14.75 2,12C2,9.25 3,6.9 4.95,4.95C6.9,3 9.25,2 12,2Z",
+  folder: "M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z",
+  flag: "M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  accountPlus: "M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z",
+  checkAll: "M0.41,13.41L6,19L7.41,17.58L1.83,12M22.24,5.58L11.66,16.17L7.5,12L6.07,13.41L11.66,19L23.66,7M18,7L16.59,5.58L10.24,11.93L11.66,13.34L18,7Z"
+};
+const NAV = [
+  [null, [["Accueil","home","E04-Accueil.dc.html"],["Notifications","inbox","E09-Notifications.dc.html"]]],
+  ["Mes classes et matières", [["L2 Info – Groupe A","school","E05-Discussion.dc.html","2"],["Bases de données","book","E05-Discussion.dc.html","5"],["Développement Web","book","E05-Ressources.dc.html"],["Réseaux informatiques","book","E05-Discussion.dc.html"]]],
+  ["Mes groupes privés", [["Projet intégration – Éq. 4","lock","E05-Discussion.dc.html","1"],["Révisions BD","lock","E05-Discussion.dc.html"]]],
+  ["Mes channels", [["Vie étudiante","pound","E05-Discussion.dc.html"],["Club Informatique","pound","E05-Discussion.dc.html"],["Scolarité – Annonces","bullhorn","E05-Discussion.dc.html"]]],
+  [null, [["Explorer les channels","compass","E08-Channels.dc.html"],["Mon profil","account","E11-Profil.dc.html"]]]
+];
+const BNAV = [["Accueil","home","E04-Accueil.dc.html"],["Espaces","group","E05-Discussion.dc.html"],["Channels","compass","E08-Channels.dc.html"],["Notifs","inbox","E09-Notifications.dc.html"],["Profil","account","E11-Profil.dc.html"]];
+const INV = [
+  { k: "a", name: "Projet intégration – Équipe 2", type: "Groupe privé", by: "Amine Trabelsi", date: "Reçue hier · expire le 26/10", d: "lock" },
+  { k: "b", name: "Club Robotique", type: "Channel", by: "M. Karim Mansour", date: "Reçue le 10/10 · expire le 24/10", d: "pound" }
+];
+const NOT = [
+  { k: 1, text: "Amine Trabelsi vous a mentionné : « @Yassine tu peux relire la maquette ? »", where: "Projet intégration – Éq. 4", date: "Il y a 20 min", d: "at", tone: "background:#E1F2FB;color:#01579B", href: "E05-Discussion.dc.html", u: true },
+  { k: 2, text: "Nouvelle annonce : Report de la séance de TP au lundi 20/10", where: "Bases de données · L2 A", date: "Il y a 2 h", d: "bullhorn", tone: "background:#E3EBFB;color:#1E4FB8", href: "E05-Discussion.dc.html", u: true },
+  { k: 3, text: "Nouvelle ressource : Chapitre 3 – Normalisation.pdf", where: "Bases de données · L2 A", date: "Hier", d: "folder", tone: "background:#FEF3DC;color:#7A4A00", href: "E05-Ressources.dc.html", u: true },
+  { k: 4, text: "Votre signalement a été traité : le message a été supprimé.", where: "Vie étudiante", date: "Hier", d: "flag", tone: "background:#FBE4E4;color:#B71C1C", href: "E05-Discussion.dc.html", u: true },
+  { k: 5, text: "M. Karim Mansour vous a invité au channel Club Robotique", where: "Invitations", date: "10/10", d: "accountPlus", tone: "background:#DDF2EF;color:#00695C", href: "E09-Notifications.dc.html", u: false },
+  { k: 6, text: "Nouvelle ressource : Planning mini-projet.xlsx", where: "Développement Web · L2 A", date: "09/10", d: "folder", tone: "background:#FEF3DC;color:#7A4A00", href: "E05-Ressources.dc.html", u: false }
+];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { tab: "n", read: {}, inv: {} }; }
+  renderVals() {
+    const s = this.state;
+    const isU = (n) => n.u && !s.read[n.k];
+    const unread = NOT.filter(isU).length;
+    const pending = INV.filter((v) => !s.inv[v.k]).length;
+    return {
+      ic: IC,
+      nav: NAV.map(([title, items]) => ({ title, items: items.map(([label, icon, href, badge]) => ({ label, href, badge: label === "Notifications" ? (unread ? String(unread) : "") : (badge || ""), d: IC[icon], cls: label === "Notifications" ? "nav-item active" : "nav-item" })) })),
+      bnav: BNAV.map(([label, icon, href]) => ({ label, href, d: IC[icon], cls: label === "Notifs" ? "active" : "" })),
+      unread: unread ? String(unread) : "",
+      pendingCount: String(pending),
+      tabInvCls: s.tab === "i" ? "v-tab active" : "v-tab", tabNotCls: s.tab === "n" ? "v-tab active" : "v-tab",
+      tabInvOn: s.tab === "i" ? "true" : "false", tabNotOn: s.tab === "n" ? "true" : "false",
+      pickInv: () => this.setState({ tab: "i" }), pickNot: () => this.setState({ tab: "n" }),
+      showInv: s.tab === "i", showNot: s.tab === "n",
+      invites: INV.map((v) => ({ ...v, d: IC[v.d], pending: !s.inv[v.k], done: !!s.inv[v.k],
+        doneLabel: s.inv[v.k] === "ok" ? "Invitation acceptée" : "Invitation refusée", doneCls: s.inv[v.k] === "ok" ? "v-chip c-success" : "v-chip c-neutral",
+        accept: () => this.setState({ inv: Object.assign({}, s.inv, { [v.k]: "ok" }) }), refuse: () => this.setState({ inv: Object.assign({}, s.inv, { [v.k]: "no" }) }) })),
+      notifs: NOT.map((n) => ({ ...n, d: IC[n.d], isUnread: isU(n), cls: isU(n) ? "item unread" : "item" })),
+      markAll: () => { const r = {}; NOT.forEach((n) => { r[n.k] = true; }); this.setState({ read: r }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Annuaire des channels – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}.user:hover{text-decoration:none;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#1E4FB8;flex:none}
+.layout{display:flex;flex:1}
+.v-navigation-drawer{width:288px;flex:none;background:#fff;border-right:1px solid #D5DBE7;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.subheader{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478;padding:16px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;color:#1C2333}
+.nav-item:hover{background:#EEF2FA;text-decoration:none;color:#1C2333}
+.nav-item .i{color:#5B6478}
+.nav-item.active{background:#E3EBFB;color:#1E4FB8;font-weight:500}.nav-item.active .i{color:#1E4FB8}
+.grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#1E4FB8;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center}
+.v-main{flex:1 1 auto;min-width:0;padding:28px 32px 40px;display:flex;flex-direction:column;gap:20px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--tonal{background:#E3EBFB;color:#1E4FB8}.v-btn--tonal:hover{background:#D3E0F8}
+.v-btn--outlined{border-color:#1E4FB8;color:#1E4FB8}.v-btn--outlined:hover{background:#E3EBFB}
+.v-btn--muted{background:#EEF2FA;color:#5B6478;cursor:default}
+.v-chip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap;border:1px solid transparent;background:transparent;cursor:pointer}
+.v-chip .i{width:14px;height:14px}
+.v-chip.sm{height:24px;font-size:12px;padding:0 10px;cursor:default}
+.c-primary{background:#E3EBFB;color:#1E4FB8}.c-secondary{background:#DDF2EF;color:#00695C}.c-warning{background:#FDEBD9;color:#8A4100}.c-neutral{background:#EEF2FA;color:#4A5366}.c-outline{border-color:#D5DBE7;color:#4A5366}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.field{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid #8A93A6;border-radius:4px;background:#fff;color:#5B6478;flex:0 1 380px;min-width:220px}
+.field input,.field select{border:0;outline:0;background:transparent;flex:1;min-width:0;color:#1C2333}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.ch{background:#fff;border:1px solid #D5DBE7;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.ch-ico{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;flex:none}
+.v-alert{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:4px;background:#E1F2FB}
+.bnav{display:none}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.v-navigation-drawer{display:none}.v-main{padding:20px 16px 96px}.search{display:none}.user-text{display:none}
+.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid #D5DBE7;z-index:6}
+.bnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;color:#5B6478}.bnav a.active{color:#1E4FB8;font-weight:500}.bnav a:hover{text-decoration:none}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="E04-Accueil.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect</a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un espace, une personne, un fichier…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="E09-Notifications.dc.html" aria-label="Notifications, 4 non lues"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><span class="dot">4</span></a>
+    <a class="user" href="E11-Profil.dc.html"><span class="v-avatar">YB</span><span class="user-text"><span style="display:block;font-weight:500">Yassine Ben Salah</span><span class="caption">Étudiant · L2 Informatique</span></span></a>
+  </header>
+  <div class="layout">
+    <nav class="v-navigation-drawer" aria-label="Navigation principale">
+      <a class="v-btn v-btn--flat" href="E06-Creer-espace.dc.html" style="margin-bottom:8px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.plus}}"></path></svg>Créer un espace</a>
+      <sc-for list="{{nav}}" as="sec" hint-placeholder-count="5">
+        <sc-if value="{{sec.title}}" hint-placeholder-val="{{true}}"><div class="subheader">{{sec.title}}</div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3">
+          <a class="{{it.cls}}" href="{{it.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{it.d}}"></path></svg><span class="grow">{{it.label}}</span><sc-if value="{{it.badge}}" hint-placeholder-val="{{false}}"><span class="badge">{{it.badge}}</span></sc-if></a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <main class="v-main">
+      <div>
+        <h1 style="font-size:24px;line-height:32px;font-weight:500">Annuaire des channels</h1>
+        <p class="muted">Rejoignez les espaces ouverts de l'université : clubs, événements, documents utiles.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <label class="field"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher un channel" placeholder="Rechercher un channel par nom"></label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Filtrer par mode d'accès">
+          <sc-for list="{{filters}}" as="f" hint-placeholder-count="4"><button class="{{f.cls}}" type="button" aria-pressed="{{f.on}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
+        </div>
+        <span style="flex:1"></span>
+        <label class="field" style="flex:0 1 200px;min-width:160px"><span style="position:absolute;left:-9999px">Thème</span><select><option>Tous les thèmes</option><option>Clubs</option><option>Événements</option><option>Vie étudiante</option><option>Administration</option></select></label>
+      </div>
+      <div class="grid">
+        <sc-for list="{{channels}}" as="c" hint-placeholder-count="6">
+          <article class="ch">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span class="ch-ico" style="{{c.tone}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{c.d}}"></path></svg></span>
+              <div style="flex:1;min-width:0"><h2 style="font-size:16px;font-weight:500;line-height:24px">{{c.name}}</h2><div class="caption">{{c.owner}}</div></div>
+              <span class="{{c.accCls}}">{{c.access}}</span>
+            </div>
+            <p style="flex:1">{{c.desc}}</p>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="muted" style="display:inline-flex;align-items:center;gap:6px;flex:1"><svg class="i" style="width:18px;height:18px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.group}}"></path></svg>{{c.members}} membres</span>
+              <sc-if value="{{c.isLink}}" hint-placeholder-val="{{false}}"><a class="v-btn v-btn--tonal" href="E05-Discussion.dc.html">Ouvrir</a></sc-if>
+              <sc-if value="{{c.isBtn}}" hint-placeholder-val="{{true}}"><button class="{{c.btnCls}}" type="button" onClick="{{c.act}}">{{c.btn}}</button></sc-if>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+      <div class="v-alert" role="note"><svg class="i" style="color:#01579B" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.info}}"></path></svg><span>Les groupes privés n'apparaissent jamais dans cet annuaire : on y entre uniquement sur invitation.</span></div>
+    </main>
+  </div>
+  <nav class="bnav" aria-label="Navigation mobile">
+    <sc-for list="{{bnav}}" as="b" hint-placeholder-count="5"><a class="{{b.cls}}" href="{{b.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{b.d}}"></path></svg>{{b.label}}</a></sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+const IC = {
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  plus: "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",
+  home: "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  inbox: "M19,15H15A3,3 0 0,1 12,18A3,3 0 0,1 9,15H5V5H19M19,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z",
+  book: "M12 21.5C10.65 20.65 8.2 20 6.5 20C4.85 20 3.15 20.3 1.75 21.05C1.65 21.1 1.6 21.1 1.5 21.1C1.25 21.1 1 20.85 1 20.6V6C1.6 5.55 2.25 5.25 3 5C4.11 4.65 5.33 4.5 6.5 4.5C8.45 4.5 10.55 4.9 12 6C13.45 4.9 15.55 4.5 17.5 4.5C18.67 4.5 19.89 4.65 21 5C21.75 5.25 22.4 5.55 23 6V20.6C23 20.85 22.75 21.1 22.5 21.1C22.4 21.1 22.35 21.1 22.25 21.05C20.85 20.3 19.15 20 17.5 20C15.8 20 13.35 20.65 12 21.5M12 8V19.5C13.35 18.65 15.8 18 17.5 18C18.7 18 19.9 18.15 21 18.5V7C19.9 6.65 18.7 6.5 17.5 6.5C15.8 6.5 13.35 7.15 12 8Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound: "M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  bullhorn: "M12,8H4A2,2 0 0,0 2,10V14A2,2 0 0,0 4,16H5V20A1,1 0 0,0 6,21H8A1,1 0 0,0 9,20V16H12L17,20V4L12,8M21.5,12C21.5,13.71 20.54,15.26 19,16V8C20.53,8.75 21.5,10.3 21.5,12Z",
+  compass: "M14.19,14.19L6,18L9.81,9.81L18,6M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,10.9A1.1,1.1 0 0,0 10.9,12A1.1,1.1 0 0,0 12,13.1A1.1,1.1 0 0,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z",
+  account: "M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z",
+  group: "M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  calendar: "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z",
+  folder: "M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z",
+  info: "M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+};
+const NAV = [
+  [null, [["Accueil","home","E04-Accueil.dc.html"],["Notifications","inbox","E09-Notifications.dc.html","4"]]],
+  ["Mes classes et matières", [["L2 Info – Groupe A","school","E05-Discussion.dc.html","2"],["Bases de données","book","E05-Discussion.dc.html","5"],["Développement Web","book","E05-Ressources.dc.html"],["Réseaux informatiques","book","E05-Discussion.dc.html"]]],
+  ["Mes groupes privés", [["Projet intégration – Éq. 4","lock","E05-Discussion.dc.html","1"],["Révisions BD","lock","E05-Discussion.dc.html"]]],
+  ["Mes channels", [["Vie étudiante","pound","E05-Discussion.dc.html"],["Club Informatique","pound","E05-Discussion.dc.html"],["Scolarité – Annonces","bullhorn","E05-Discussion.dc.html"]]],
+  [null, [["Explorer les channels","compass","E08-Channels.dc.html"],["Mon profil","account","E11-Profil.dc.html"]]]
+];
+const BNAV = [["Accueil","home","E04-Accueil.dc.html"],["Espaces","group","E05-Discussion.dc.html"],["Channels","compass","E08-Channels.dc.html"],["Notifs","inbox","E09-Notifications.dc.html"],["Profil","account","E11-Profil.dc.html"]];
+const CH = [
+  { k: "a", name: "Club Informatique", owner: "Par M. Karim Mansour", desc: "Hackathons, ateliers de programmation et entraide entre étudiants.", members: "214", access: "Ouvert", d: "pound", tone: "background:#E3EBFB;color:#1E4FB8", st: "member" },
+  { k: "b", name: "Vie étudiante", owner: "Par le service Vie étudiante", desc: "Associations, sorties, sport et événements du campus.", members: "1 284", access: "Ouvert", d: "pound", tone: "background:#DDF2EF;color:#00695C", st: "member" },
+  { k: "c", name: "Club Robotique", owner: "Par Mme Leila Ben Hmida", desc: "Conception de robots, préparation des compétitions nationales.", members: "86", access: "Sur demande", d: "pound", tone: "background:#FEF3DC;color:#7A4A00", st: "none" },
+  { k: "d", name: "Journée portes ouvertes 2027", owner: "Par la Direction", desc: "Organisation des stands, planning des bénévoles et documents.", members: "132", access: "Ouvert", d: "calendar", tone: "background:#FBE4E4;color:#B71C1C", st: "none" },
+  { k: "e", name: "Bibliothèque universitaire", owner: "Par la Bibliothèque", desc: "Nouvelles acquisitions, horaires et guides de recherche documentaire.", members: "958", access: "Ouvert", d: "folder", tone: "background:#E1F2FB;color:#01579B", st: "none" },
+  { k: "f", name: "Stages et emploi", owner: "Par le Bureau des stages", desc: "Offres de stage, modèles de convention et conseils CV.", members: "1 023", access: "Restreint L3/M", d: "bullhorn", tone: "background:#EEF2FA;color:#4A5366", st: "none" }
+];
+const ACC = { "Ouvert": "v-chip sm c-secondary", "Sur demande": "v-chip sm c-warning", "Restreint L3/M": "v-chip sm c-neutral" };
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { filter: "Tous", st: {} }; }
+  renderVals() {
+    const s = this.state, active = "Explorer les channels";
+    const stOf = (c) => s.st[c.k] || c.st;
+    const list = CH.filter((c) => s.filter === "Tous" || (s.filter === "Mes channels" ? stOf(c) === "member" : c.access === s.filter));
+    return {
+      ic: IC,
+      nav: NAV.map(([title, items]) => ({ title, items: items.map(([label, icon, href, badge]) => ({ label, href, badge: badge || "", d: IC[icon], cls: label === active ? "nav-item active" : "nav-item" })) })),
+      bnav: BNAV.map(([label, icon, href]) => ({ label, href, d: IC[icon], cls: label === "Channels" ? "active" : "" })),
+      filters: ["Tous", "Ouvert", "Sur demande", "Mes channels"].map((label) => ({ label, on: label === s.filter ? "true" : "false", cls: label === s.filter ? "v-chip c-primary" : "v-chip c-outline", pick: () => this.setState({ filter: label }) })),
+      channels: list.map((c) => {
+        const st = stOf(c), restricted = c.access === "Restreint L3/M";
+        const btn = restricted ? "Réservé L3 et master" : st === "pending" ? "Demande envoyée" : c.access === "Sur demande" ? "Demander à rejoindre" : "Rejoindre";
+        return { ...c, d: IC[c.d], accCls: ACC[c.access], isLink: st === "member", isBtn: st !== "member", btn,
+          btnCls: restricted || st === "pending" ? "v-btn v-btn--muted" : c.access === "Sur demande" ? "v-btn v-btn--outlined" : "v-btn v-btn--flat",
+          act: () => { if (restricted || st === "pending") return; this.setState({ st: Object.assign({}, s.st, { [c.k]: c.access === "Sur demande" ? "pending" : "member" }) }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

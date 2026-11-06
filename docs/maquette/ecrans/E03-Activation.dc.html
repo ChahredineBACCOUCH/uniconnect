@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Activation du compte – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input{font:inherit}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.auth{min-height:100vh;display:flex;flex-wrap:wrap}
+.brand-panel{flex:0 0 50%;max-width:50%;background:#1E4FB8;color:#fff;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.form-area{flex:0 0 50%;max-width:50%;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.v-card{width:100%;max-width:500px;background:#fff;border:1px solid #D5DBE7;border-radius:16px;box-shadow:0 8px 24px rgba(26,38,77,.08);padding:40px;display:flex;flex-direction:column;gap:20px}
+.field{position:relative;display:flex;flex-direction:column;gap:4px}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:#fff;font-size:12px;line-height:16px;color:#5B6478}
+.control{display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;border:1px solid #8A93A6;border-radius:4px;background:#fff;color:#5B6478}
+.control input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:16px;color:#1C2333}
+.field.focused .control{border:2px solid #1E4FB8;color:#1E4FB8}.field.focused label{color:#1E4FB8}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}
+.v-btn--flat:hover{background:#163C8C;color:#fff;text-decoration:none}
+.v-btn--off{background:#D5DBE7;color:#5B6478;pointer-events:none}
+.v-btn--text{background:transparent;color:#1E4FB8;padding:0 8px}
+.v-alert{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:4px;background:#E3F1E4}
+.steps{display:flex;gap:8px;align-items:center;font-size:12px;color:#5B6478}
+.step{display:inline-flex;align-items:center;gap:6px}
+.step b{width:22px;height:22px;border-radius:999px;display:grid;place-items:center;font-size:12px;background:#EEF2FA;color:#4A5366}
+.step.on b{background:#1E4FB8;color:#fff}.step.on{color:#1E4FB8;font-weight:500}
+.step.done b{background:#2E7D32;color:#fff}
+.meter{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.meter span{height:4px;border-radius:2px;background:#D5DBE7}
+.rule{display:flex;align-items:center;gap:8px;font-size:13px}
+@media (max-width:720px){.form-area{flex-basis:100%;max-width:none}.brand-panel{flex-basis:100%;max-width:none;padding:28px 20px;gap:16px}.brand-panel .hide-sm{display:none}.v-card{padding:24px;border:0;box-shadow:none}}
+</style>
+</helmet>
+<main class="auth">
+  <section class="brand-panel" aria-label="Présentation">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center"><svg class="i" style="width:28px;height:28px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>
+      <span style="font-size:24px;font-weight:700">UniConnect</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <h1 style="margin:0;font-size:34px;line-height:40px;font-weight:500;max-width:470px">Dernière étape : choisissez votre mot de passe.</h1>
+      <p class="hide-sm" style="margin:0;font-size:16px;line-height:24px;opacity:.88;max-width:470px">À l'activation, vous rejoignez automatiquement les groupes de votre classe et de vos matières pour l'année 2026/2027.</p>
+    </div>
+    <div class="hide-sm" style="font-size:12px;opacity:.8">Lien d'activation valable 48 heures</div>
+  </section>
+  <section class="form-area">
+    <form class="v-card" aria-labelledby="t-act">
+      <sc-if value="{{expired}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;flex-direction:column;gap:16px;text-align:center">
+          <span style="width:64px;height:64px;border-radius:999px;background:#FFF4E5;color:#B45309;display:grid;place-items:center;align-self:center"><svg class="i" style="width:32px;height:32px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.timer}}"></path></svg></span>
+          <h2 style="margin:0;font-size:22px;font-weight:500">Ce lien d'activation a expiré</h2>
+          <p style="margin:0;color:#5B6478">Les liens d'activation sont valables 48 heures. Demandez un nouveau lien : il sera envoyé à votre adresse institutionnelle.</p>
+          <sc-if value="{{resent}}" hint-placeholder-val="{{false}}"><div class="v-alert" role="status" style="text-align:left"><svg class="i" style="color:#1B5E20" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.check}}"></path></svg><span>Un nouvel e-mail d'activation a été envoyé à <strong>yassine.bensalah@univ.tn</strong>.</span></div></sc-if>
+          <button class="v-btn v-btn--flat" type="button" onClick="{{resend}}">Renvoyer un e-mail d'activation</button>
+          <button class="v-btn v-btn--text" type="button" onClick="{{showForm}}">Retour (lien valide, démo)</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{valid}}" hint-placeholder-val="{{true}}">
+      <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="steps" aria-label="Étapes"><span class="step done"><b>✓</b>Éligibilité</span><span aria-hidden="true">—</span><span class="step on"><b>2</b>Activation</span></div>
+        <h2 id="t-act" style="margin:0;font-size:24px;line-height:32px;font-weight:500">Activer mon compte</h2>
+      </div>
+      <div class="v-alert" role="status"><svg class="i" style="color:#1B5E20" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.check}}"></path></svg><span>Adresse <strong>yassine.bensalah@univ.tn</strong> vérifiée. Profil : Étudiant · L2 Informatique A.</span></div>
+      <div class="field focused">
+        <label for="p1">Nouveau mot de passe</label>
+        <div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.lock}}"></path></svg><input id="p1" type="password" value="{{pwd}}" onInput="{{onPwd}}" aria-describedby="rules"></div>
+      </div>
+      <div class="meter" aria-hidden="true"><sc-for list="{{bars}}" as="b" hint-placeholder-count="4"><span style="{{b.st}}"></span></sc-for></div>
+      <div id="rules" style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{rules}}" as="r" hint-placeholder-count="4"><span class="rule" style="{{r.st}}"><svg class="i" style="width:16px;height:16px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{r.d}}"></path></svg>{{r.label}}</span></sc-for>
+      </div>
+      <div class="field">
+        <label for="p2">Confirmer le mot de passe</label>
+        <div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.lock}}"></path></svg><input id="p2" type="password" value="{{pwd}}"></div>
+      </div>
+      <a class="{{btnCls}}" href="E04-Accueil.dc.html" aria-disabled="{{notOk}}">Activer mon compte</a>
+      <p style="margin:0;text-align:center;color:#5B6478;font-size:13px">Lien expiré ? <button type="button" onClick="{{showExpired}}" style="border:0;background:transparent;padding:0;color:#1E4FB8;cursor:pointer;font-size:13px">Voir l'écran « lien expiré »</button></p>
+      </div>
+      </sc-if>
+    </form>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"lienExpire":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":900}}'>
+const IC = {
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  check: "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
+  timer: "M6,2H18V8L14,12L18,16V22H6V16L10,12L6,8V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5Z",
+  close: "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
+};
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { pwd: "Univ2026", expired: null, resent: false }; }
+  renderVals() {
+    const p = this.state.pwd;
+    const expired = this.state.expired ?? ((this.props.lienExpire ?? false) === true);
+    const checks = [["8 caractères minimum", p.length >= 8], ["Une majuscule", /[A-Z]/.test(p)], ["Une minuscule", /[a-z]/.test(p)], ["Un chiffre", /[0-9]/.test(p)]];
+    const n = checks.filter((c) => c[1]).length;
+    const col = n === 4 ? "#2E7D32" : n >= 2 ? "#ED6C02" : "#C62828";
+    return {
+      expired, valid: !expired, resent: this.state.resent,
+      showExpired: () => this.setState({ expired: true, resent: false }),
+      showForm: () => this.setState({ expired: false }),
+      resend: () => this.setState({ resent: true }),
+      ic: IC, pwd: p, onPwd: (e) => this.setState({ pwd: e.target.value }),
+      bars: [0, 1, 2, 3].map((i) => ({ st: i < n ? "background:" + col : "" })),
+      rules: checks.map(([label, ok]) => ({ label, d: ok ? IC.check : IC.close, st: ok ? "color:#1B5E20" : "color:#5B6478" })),
+      notOk: n < 4 ? "true" : "false",
+      btnCls: n === 4 ? "v-btn v-btn--flat" : "v-btn v-btn--off"
+    };
+  }
+}
+</script>
+</body>
+</html>

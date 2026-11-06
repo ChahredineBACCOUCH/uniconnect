@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Administration · Comptes autorisés – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.admin-tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#FEF3DC;color:#7A4A00;border-radius:4px;padding:2px 6px}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:40px;height:40px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#01579B;flex:none}
+.layout{display:flex;flex:1}
+.v-navigation-drawer{width:288px;flex:none;background:#fff;border-right:1px solid #D5DBE7;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.subheader{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478;padding:16px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;color:#1C2333}
+.nav-item:hover{background:#EEF2FA;text-decoration:none;color:#1C2333}
+.nav-item .i{color:#5B6478}
+.nav-item.active{background:#E3EBFB;color:#1E4FB8;font-weight:500}.nav-item.active .i{color:#1E4FB8}
+.grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#C62828;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center}
+.v-main{flex:1 1 auto;min-width:0;padding:28px 32px 40px;display:flex;flex-direction:column;gap:16px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--outlined{border-color:#1E4FB8;color:#1E4FB8}.v-btn--outlined:hover{background:#E3EBFB}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.v-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.c-success{background:#E3F1E4;color:#1B5E20}.c-warning{background:#FDEBD9;color:#8A4100}.c-error{background:#FBE4E4;color:#B71C1C}.c-neutral{background:#EEF2FA;color:#4A5366}.c-primary{background:#E3EBFB;color:#1E4FB8}.c-secondary{background:#DDF2EF;color:#00695C}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.v-card{background:#fff;border:1px solid #D5DBE7;border-radius:12px;overflow:hidden}
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px}
+.field{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid #8A93A6;border-radius:4px;background:#fff;color:#5B6478;min-width:180px}
+.field input,.field select{border:0;outline:0;background:transparent;flex:1;min-width:0;color:#1C2333}
+.scroll-x{overflow-x:auto;border-top:1px solid #D5DBE7}
+.v-table{width:100%;border-collapse:collapse;min-width:900px}
+.v-table th{text-align:left;font-weight:500;color:#5B6478;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:10px 16px;border-bottom:1px solid #D5DBE7;white-space:nowrap}
+.v-table td{padding:10px 16px;border-bottom:1px solid #EEF2FA;vertical-align:middle;white-space:nowrap}
+.v-table tr:hover td{background:#F7F9FE}
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:10px 16px;color:#5B6478;font-size:13px;flex-wrap:wrap}
+.overlay{position:fixed;inset:0;background:rgba(15,20,32,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.dialog{background:#fff;border-radius:12px;max-width:640px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:16px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.drop{border:2px dashed #8A93A6;border-radius:12px;padding:24px;display:flex;align-items:center;gap:16px;background:#F7F9FE}
+.sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sum div{border-radius:8px;padding:12px;display:flex;flex-direction:column}
+.sum b{font-size:24px;font-weight:500}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.v-navigation-drawer{display:none}.v-main{padding:20px 16px 40px}.search{display:none}.user-text{display:none}.sum{grid-template-columns:minmax(0,1fr)}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="A09-Dashboard.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect<span class="admin-tag">Admin</span></a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un utilisateur, un espace…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="A07-Moderation.dc.html" aria-label="3 signalements en attente"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><span class="dot">3</span></a>
+    <span class="user"><span class="v-avatar">LH</span><span class="user-text"><span style="display:block;font-weight:500">Leila Haddad</span><span class="caption">Administration · Scolarité</span></span></span>
+  </header>
+  <div class="layout">
+    <nav class="v-navigation-drawer" aria-label="Navigation administration">
+      <sc-for list="{{nav}}" as="sec" hint-placeholder-count="6">
+        <sc-if value="{{sec.title}}" hint-placeholder-val="{{true}}"><div class="subheader">{{sec.title}}</div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="2">
+          <a class="{{it.cls}}" href="{{it.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{it.d}}"></path></svg><span class="grow">{{it.label}}</span><sc-if value="{{it.badge}}" hint-placeholder-val="{{false}}"><span class="badge">{{it.badge}}</span></sc-if></a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <main class="v-main">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px"><h1 style="font-size:24px;line-height:32px;font-weight:500">Comptes autorisés</h1><p class="muted">Personnes autorisées à créer un compte · 3 214 entrées · année 2026/2027</p></div>
+        <button class="v-btn v-btn--text" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.download}}"></path></svg>Modèle d'import</button>
+        <button class="v-btn v-btn--outlined" type="button" onClick="{{openImport}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.upload}}"></path></svg>Importer</button>
+        <button class="v-btn v-btn--flat" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.accountPlus}}"></path></svg>Ajouter</button>
+      </div>
+      <section class="v-card">
+        <div class="toolbar">
+          <label class="field" style="flex:1 1 280px;max-width:380px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Nom ou identifiant"></label>
+          <label class="field"><span style="position:absolute;left:-9999px">Profil</span><select onChange="{{pickProfile}}"><sc-for list="{{profiles}}" as="o" hint-placeholder-count="4"><option selected="{{o.sel}}">{{o.label}}</option></sc-for></select></label>
+          <label class="field"><span style="position:absolute;left:-9999px">Classe</span><select><option>Toutes les classes</option><option>L2 Info A</option><option>L2 Info B</option><option>L3 Info</option></select></label>
+          <label class="field"><span style="position:absolute;left:-9999px">État du compte</span><select onChange="{{pickState}}"><sc-for list="{{states}}" as="o" hint-placeholder-count="5"><option selected="{{o.sel}}">{{o.label}}</option></sc-for></select></label>
+        </div>
+        <div class="scroll-x">
+          <table class="v-table">
+            <thead><tr><th scope="col">Identifiant</th><th scope="col">Nom et prénom</th><th scope="col">E-mail institutionnel</th><th scope="col">Profil</th><th scope="col">Classe</th><th scope="col">État du compte</th><th scope="col"><span style="position:absolute;left:-9999px">Actions</span></th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+                <tr>
+                  <td style="font-family:'Roboto Mono',monospace,Roboto;font-size:13px">{{r.id}}</td>
+                  <td style="font-weight:500">{{r.name}}</td>
+                  <td class="muted">{{r.mail}}</td>
+                  <td><span class="{{r.profCls}}">{{r.prof}}</span></td>
+                  <td>{{r.cls}}</td>
+                  <td><span class="{{r.stCls}}">{{r.st}}</span></td>
+                  <td style="text-align:right"><button class="icon-btn" type="button" aria-label="Modifier"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.pencil}}"></path></svg></button><button class="icon-btn" type="button" aria-label="Plus d'actions"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.dots}}"></path></svg></button></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div class="pager"><span>Lignes par page : 10</span><span>{{range}}</span><button class="icon-btn" type="button" aria-label="Page précédente"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.left}}"></path></svg></button><button class="icon-btn" type="button" aria-label="Page suivante"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.right}}"></path></svg></button></div>
+      </section>
+    </main>
+  </div>
+  <sc-if value="{{importOpen}}" hint-placeholder-val="{{false}}">
+    <div class="overlay">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="t-imp">
+        <div style="display:flex;align-items:center;gap:8px"><h2 id="t-imp" class="grow" style="font-size:20px;font-weight:500">Importer des comptes autorisés</h2><button class="icon-btn" type="button" aria-label="Fermer" onClick="{{closeImport}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.close}}"></path></svg></button></div>
+        <div class="drop"><svg class="i" style="width:40px;height:40px;color:#2E7D32" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.excel}}"></path></svg><div style="flex:1;min-width:0"><div style="font-weight:500">inscrits_L2_2026-2027.xlsx</div><div class="caption">125 lignes détectées · 48 Ko</div></div><button class="v-btn v-btn--text" type="button">Changer</button></div>
+        <div class="sum">
+          <div style="background:#E3F1E4"><b style="color:#1B5E20">120</b><span>lignes valides</span></div>
+          <div style="background:#FDEBD9"><b style="color:#8A4100">3</b><span>doublons ignorés</span></div>
+          <div style="background:#FBE4E4"><b style="color:#B71C1C">2</b><span>lignes en erreur</span></div>
+        </div>
+        <div>
+          <div style="font-weight:500;margin-bottom:6px">Détail des erreurs</div>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px">
+            <li>Ligne 12 : adresse e-mail invalide (« amine.trabelsi@univ »).</li>
+            <li>Ligne 87 : profil inconnu (« Etd »). Valeurs attendues : Étudiant, Enseignant, Administration.</li>
+          </ul>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap"><button class="v-btn v-btn--text" type="button" onClick="{{closeImport}}">Annuler</button><button class="v-btn v-btn--flat" type="button" onClick="{{closeImport}}">Importer les 120 lignes valides</button></div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+const IC = {
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  dashboard: "M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z",
+  calendar: "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z",
+  cog: "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  accountMultiple: "M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  accountKey: "M11 10V12H9V14H7V12H5.8C5.4 13.2 4.3 14 3 14C1.3 14 0 12.7 0 11S1.3 8 3 8C4.3 8 5.4 8.8 5.8 10H11M3 10C2.4 10 2 10.4 2 11S2.4 12 3 12 4 11.6 4 11 3.6 10 3 10M16 14C18.7 14 24 15.3 24 18V20H8V18C8 15.3 13.3 14 16 14M16 12C13.8 12 12 10.2 12 8S13.8 4 16 4 20 5.8 20 8 18.2 12 16 12Z",
+  group: "M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z",
+  flag: "M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  history: "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3",
+  message: "M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6M14,14H6V12H14M18,8H6V6H18",
+  download: "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z",
+  upload: "M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z",
+  accountPlus: "M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z",
+  pencil: "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z",
+  dots: "M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z",
+  left: "M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z",
+  right: "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",
+  close: "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+  excel: "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.8,20H14L12,16.6L10,20H8.2L11.1,15.5L8.2,11H10L12,14.4L14,11H15.8L12.9,15.5L15.8,20M13,9V3.5L18.5,9H13Z"
+};
+const NAV = [
+  [null, [["Tableau de bord","dashboard","A09-Dashboard.dc.html"]]],
+  ["Paramétrage", [["Années universitaires","calendar","A01-Annees.dc.html"],["Référentiels académiques","school","A02-Referentiels.dc.html"],["Règles de visibilité","cog","A05-Visibilite.dc.html"]]],
+  ["Utilisateurs", [["Comptes autorisés","accountMultiple","A03-Comptes.dc.html"],["Utilisateurs et droits","accountKey","A04-Droits.dc.html"]]],
+  ["Espaces", [["Groupes organisationnels","group","A06-Groupes.dc.html"]]],
+  ["Supervision", [["Modération","flag","A07-Moderation.dc.html","3"],["Historique","history","A08-Historique.dc.html"]]],
+  [null, [["Retour à la messagerie","message","E04-Accueil.dc.html"]]]
+];
+const ST = { "Actif": "v-chip c-success", "En attente d'activation": "v-chip c-warning", "Non créé": "v-chip c-neutral", "Désactivé": "v-chip c-error" };
+const PR = { "Étudiant": "v-chip c-primary", "Enseignant": "v-chip c-secondary", "Administration": "v-chip c-neutral" };
+const ROWS = [
+  ["LI2-2026-0457", "Ben Salah Yassine", "yassine.bensalah@univ.tn", "Étudiant", "L2 Info A", "Actif"],
+  ["LI2-2026-0311", "Trabelsi Amine", "amine.trabelsi@univ.tn", "Étudiant", "L2 Info A", "Actif"],
+  ["LI2-2026-0388", "Kallel Nour", "nour.kallel@univ.tn", "Étudiant", "L2 Info A", "En attente d'activation"],
+  ["LI2-2026-0402", "Haddad Meriem", "meriem.haddad@univ.tn", "Étudiant", "L2 Info A", "Non créé"],
+  ["LI2-2026-0519", "Ben Amor Aya", "aya.benamor@univ.tn", "Étudiant", "L2 Info B", "Actif"],
+  ["LI3-2025-0120", "Ben Youssef Mehdi", "mehdi.benyoussef@univ.tn", "Étudiant", "L3 Info", "Désactivé"],
+  ["ENS-0142", "Ben Ali Sarra", "sarra.benali@univ.tn", "Enseignant", "—", "Actif"],
+  ["ENS-0098", "Mansour Karim", "karim.mansour@univ.tn", "Enseignant", "—", "Actif"],
+  ["ADM-0012", "Haddad Leila", "leila.haddad@univ.tn", "Administration", "—", "Actif"],
+  ["ENS-0201", "Bouzid Hatem", "hatem.bouzid@univ.tn", "Enseignant", "—", "Non créé"]
+];
+const PROFILES = ["Tous les profils", "Étudiant", "Enseignant", "Administration"];
+const STATES = ["Tous les états", "Actif", "En attente d'activation", "Non créé", "Désactivé"];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { prof: "Tous les profils", st: "Tous les états", imp: false }; }
+  renderVals() {
+    const s = this.state;
+    const rows = ROWS.filter((r) => (s.prof === PROFILES[0] || r[3] === s.prof) && (s.st === STATES[0] || r[5] === s.st))
+      .map(([id, name, mail, prof, cls, st]) => ({ id, name, mail, prof, cls, st, profCls: PR[prof], stCls: ST[st] }));
+    return {
+      ic: IC,
+      nav: NAV.map(([title, items]) => ({ title, items: items.map(([label, icon, href, badge]) => ({ label, href, badge: badge || "", d: IC[icon], cls: label === "Comptes autorisés" ? "nav-item active" : "nav-item" })) })),
+      profiles: PROFILES.map((label) => ({ label, sel: label === s.prof })), states: STATES.map((label) => ({ label, sel: label === s.st })),
+      pickProfile: (e) => this.setState({ prof: e.target.value }), pickState: (e) => this.setState({ st: e.target.value }),
+      rows, range: rows.length ? "1–" + rows.length + " sur " + (s.prof === PROFILES[0] && s.st === STATES[0] ? "3 214" : rows.length) : "Aucun résultat",
+      importOpen: s.imp, openImport: () => this.setState({ imp: true }), closeImport: () => this.setState({ imp: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

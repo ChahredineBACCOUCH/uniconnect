@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Accès refusé / Page introuvable – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}.user:hover{text-decoration:none;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#1E4FB8;flex:none}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--outlined{border-color:#1E4FB8;color:#1E4FB8}.v-btn--outlined:hover{background:#E3EBFB}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.err{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 16px}
+.err-card{max-width:560px;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px}
+.err-ico{width:96px;height:96px;border-radius:999px;display:grid;place-items:center}
+.err-ico .i{width:48px;height:48px}
+.code{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.seg{display:inline-flex;border:1px solid #1E4FB8;border-radius:4px;overflow:hidden;margin-top:24px}
+.seg button{border:0;background:#fff;color:#1E4FB8;font-weight:500;padding:0 14px;height:36px;cursor:pointer;font-size:13px}
+.seg button.on{background:#1E4FB8;color:#fff}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.search{display:none}.user-text{display:none}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="E04-Accueil.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect</a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un espace, une personne, un fichier…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="E09-Notifications.dc.html" aria-label="Notifications, 4 non lues"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><span class="dot">4</span></a>
+    <a class="user" href="E11-Profil.dc.html" ><span class="v-avatar">YB</span><span class="user-text"><span style="display:block;font-weight:500">Yassine Ben Salah</span><span class="caption">Étudiant · L2 Informatique</span></span></a>
+  </header>
+  <main class="err">
+    <div class="err-card">
+      <span class="err-ico" style="{{v.icoStyle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{v.d}}"></path></svg></span>
+      <span class="code" style="{{v.codeStyle}}">{{v.code}}</span>
+      <h1 style="font-size:28px;line-height:36px;font-weight:500">{{v.title}}</h1>
+      <p class="muted" style="font-size:16px;line-height:24px">{{v.text}}</p>
+      <p class="caption">{{v.hint}}</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <a class="v-btn v-btn--flat" href="E04-Accueil.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.home}}"></path></svg>Retour à l'accueil</a>
+        <a class="v-btn v-btn--outlined" href="{{v.altHref}}">{{v.alt}}</a>
+      </div>
+      <div class="seg" role="group" aria-label="Variante affichée (démo)"><sc-for list="{{variants}}" as="o" hint-placeholder-count="2"><button class="{{o.cls}}" type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"erreur":{"editor":"enum","options":["403 – Accès refusé","404 – Page introuvable"],"default":"403 – Accès refusé"},"$preview":{"width":1440,"height":900}}'>
+const IC = {
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  home: "M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  shield: "M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z",
+  search404: "M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M13,3V9H19V10.07C18.47,10.03 17.97,10 17.5,10L17,10.03V10H11V3H6V19H9.6C9.86,19.72 10.21,20.39 10.64,21H6A2,2 0 0,1 4,19V3A2,2 0 0,1 6,1H14L20,7V8.5C19.39,8.17 18.73,7.93 18.03,7.8L13,3Z"
+};
+const V = {
+  "403": { code: "Erreur 403 · Accès refusé", title: "Vous n'avez pas accès à cet espace", text: "Cet espace est réservé à ses membres. Vous n'en faites pas partie, ou vous en avez été retiré.", hint: "Si vous pensez qu'il s'agit d'une erreur, demandez une invitation au propriétaire de l'espace.", d: "shield", icoStyle: "background:#FDEBD9;color:#8A4100", codeStyle: "color:#8A4100", alt: "Explorer les channels", altHref: "E08-Channels.dc.html" },
+  "404": { code: "Erreur 404 · Page introuvable", title: "Cette page n'existe pas", text: "Le lien est peut-être incorrect, ou le contenu a été supprimé ou a expiré selon les règles de conservation de l'espace.", hint: "Utilisez la recherche en haut de l'écran pour retrouver un espace, une personne ou un fichier.", d: "search404", icoStyle: "background:#E3EBFB;color:#1E4FB8", codeStyle: "color:#1E4FB8", alt: "Mes notifications", altHref: "E09-Notifications.dc.html" }
+};
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { pick: null }; }
+  renderVals() {
+    const k = this.state.pick ?? ((this.props.erreur ?? "403").indexOf("404") === 0 ? "404" : "403");
+    const v = V[k];
+    return {
+      ic: IC, v: { ...v, d: IC[v.d] },
+      variants: [["403", "403 – Accès refusé"], ["404", "404 – Page introuvable"]].map(([key, label]) => ({ label, on: key === k ? "true" : "false", cls: key === k ? "on" : "", pick: () => this.setState({ pick: key }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>
