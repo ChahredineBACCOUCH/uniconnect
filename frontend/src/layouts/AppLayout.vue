@@ -3,8 +3,11 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
+import { useAuthStore } from '@/stores/auth'
+
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const { mdAndUp, xs } = useDisplay()
 
 /*
@@ -89,6 +92,11 @@ function submitSearch() {
   router.push({ path: '/recherche', query: { q: query } })
 }
 
+async function logout() {
+  await auth.logout()
+  router.push({ name: 'connexion' })
+}
+
 function onBottomNavChange(value) {
   if (typeof value === 'string' && value) {
     router.push(value)
@@ -165,6 +173,7 @@ function onBottomNavChange(value) {
         variant="text"
         color="on-surface-variant"
         aria-label="Se déconnecter"
+        @click="logout"
       >
         <v-icon icon="mdi-logout" size="22" />
       </v-btn>
