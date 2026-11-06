@@ -1,0 +1,29 @@
+# Dépendances
+vendor/
+node_modules/
+
+# Secrets et configuration locale (ne jamais committer)
+.env
+.env.*
+!.env.example
+storage/*.key
+backend/storage/*.key
+
+# Builds
+dist/
+build/
+public/build/
+public/hot
+
+# Laravel
+backend/storage/logs/*
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitignore
+.phpunit.result.cache
+
+# Éditeurs et système
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
