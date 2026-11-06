@@ -1,0 +1,120 @@
+@startuml UniConnect-CasUtilisation
+' Diagramme de cas d'utilisation UniConnect
+' Version livrée le 19/11/2026 ; les cas marqués <<v1.1>> sont prévus après la livraison.
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor<<v1.1>> #F4F6FB
+  BorderColor<<v1.1>> #A0A8B8
+  FontColor<<v1.1>> #5B6478
+}
+
+actor "Visiteur" as V
+actor "Utilisateur connecté" as U
+actor "Étudiant" as E
+actor "Enseignant" as T
+actor "Membre de l'administration" as A
+actor "Planificateur\n(tâche quotidienne)" as S <<système>>
+actor "IA gratuite\n(Gemini, Groq en secours)" as IA <<système>>
+actor "Service e-mail" as M <<système>>
+
+U <|-- E
+U <|-- T
+U <|-- A
+E <|-- T
+
+rectangle "UniConnect" {
+  package "Accès" {
+    usecase "Créer un compte" as UC01
+    usecase "Vérifier l'éligibilité" as UC01b
+    usecase "Activer son compte" as UC02
+    usecase "Se connecter" as UC03
+    usecase "Réinitialiser le mot de passe" as UC04 <<v1.1>>
+  }
+  package "Espaces" {
+    usecase "Consulter ses espaces" as UC10
+    usecase "Créer un groupe privé" as UC11
+    usecase "Inviter des membres" as UC12
+    usecase "Répondre à une invitation" as UC13
+    usecase "Rejoindre un channel" as UC14 <<v1.1>>
+    usecase "Créer un channel" as UC15 <<v1.1>>
+    usecase "Gérer les membres et rôles" as UC16
+    usecase "Fixer la durée de visibilité" as UC17 <<v1.1>>
+  }
+  package "Échanges" {
+    usecase "Envoyer un message" as UC20
+    usecase "Joindre un fichier" as UC21
+    usecase "Télécharger un fichier" as UC22
+    usecase "Publier une annonce" as UC23
+    usecase "Partager une ressource" as UC24
+    usecase "Épingler un message" as UC25 <<v1.1>>
+    usecase "Signaler un message" as UC26 <<v1.1>>
+  }
+  package "Assistant IA" {
+    usecase "Poser une question sur le cours" as UC30
+    usecase "Résumer la discussion" as UC31 <<v1.1>>
+    usecase "Noter une réponse" as UC32
+    usecase "Activer l'assistant" as UC33
+    usecase "Indexer une ressource" as UC34
+  }
+  package "Administration" {
+    usecase "Gérer les années" as UC40
+    usecase "Gérer les référentiels" as UC41
+    usecase "Gérer les comptes autorisés" as UC42
+    usecase "Importer des comptes (CSV)" as UC42b
+    usecase "Générer les groupes organisationnels" as UC43
+    usecase "Gérer les droits" as UC44 <<v1.1>>
+    usecase "Traiter les signalements" as UC45 <<v1.1>>
+    usecase "Consulter le tableau de bord" as UC46 <<v1.1>>
+    usecase "Consulter l'historique" as UC47 <<v1.1>>
+  }
+  usecase "Purger les contenus expirés" as UC50 <<v1.1>>
+}
+
+V --> UC01
+V --> UC02
+V --> UC03
+V --> UC04
+UC01 ..> UC01b : <<include>>
+UC01 --> M
+UC04 --> M
+
+U --> UC10
+U --> UC11
+U --> UC12
+U --> UC13
+U --> UC14
+U --> UC16
+U --> UC17
+U --> UC20
+U --> UC22
+U --> UC26
+UC21 ..> UC20 : <<extend>>
+E --> UC30
+E --> UC31
+E --> UC32
+UC30 --> IA
+UC31 --> IA
+
+T --> UC15
+T --> UC23
+T --> UC24
+T --> UC25
+T --> UC33
+T --> UC45
+UC24 ..> UC34 : <<include>>
+
+A --> UC15
+A --> UC40
+A --> UC41
+A --> UC42
+A --> UC43
+A --> UC44
+A --> UC45
+A --> UC46
+A --> UC47
+UC42b ..> UC42 : <<extend>>
+
+S --> UC50
+@enduml

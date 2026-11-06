@@ -1,0 +1,391 @@
+@startuml UniConnect
+' Diagramme de classes UniConnect (généré depuis gen.py)
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+package "Paramétrage académique" {
+  class AnneeUniversitaire {
+    - id : Long
+    - libelle : String
+    - dateDebut : Date
+    - dateFin : Date
+    - active : Boolean
+    --
+    + activer() : void
+    + archiverGroupes() : int
+  }
+  class Departement {
+    - code : String
+    - libelle : String
+  }
+  class Filiere {
+    - code : String
+    - libelle : String
+  }
+  class Niveau {
+    - code : String
+    - libelle : String
+  }
+  class Classe {
+    - code : String
+    - libelle : String
+    - actif : Boolean
+    --
+    + nbEtudiants() : int
+  }
+  class Matiere {
+    - code : String
+    - libelle : String
+    - semestre : int
+    - actif : Boolean
+  }
+  class ReglePlateforme <<singleton>> {
+    - dureesProposees : List<Duree>
+    - dureeDefaut : Map<TypeEspace, Duree>
+    - dureeMax : Map<TypeEspace, Duree>
+    - tailleMaxFichierMo : int = 25
+    - formatsAutorises : List<String>
+    - delaiInvitationJours : int = 14
+    - heureTraitement : Time
+  }
+}
+
+package "Utilisateurs et droits" {
+  class CompteAutorise {
+    - matricule : String
+    - nom : String
+    - prenom : String
+    - emailInstitutionnel : String
+    - profil : Profil
+    - etat : EtatCompte
+    --
+    + verifierEligibilite(matricule, email) : Boolean
+    + importer(fichier) : RapportImport
+  }
+  abstract class Utilisateur {
+    - id : Long
+    - matricule : String
+    - nom : String
+    - prenom : String
+    - email : String
+    - motDePasseHash : String
+    - photo : String
+    - etat : EtatCompte
+    - tentativesEchouees : int
+    - suspenduJusquA : DateTime
+    - derniereConnexion : DateTime
+    - droits : Set<Droit>
+    --
+    + seConnecter(email, mdp) : Session
+    + activerCompte(mdp) : void
+    + possedeDroit(d : Droit) : Boolean
+    + modifierProfil(...) : void
+  }
+  class Etudiant {
+    --
+    + rattacherGroupes() : void
+  }
+  class Enseignant {
+    - grade : String
+  }
+  class MembreAdministration {
+    - service : String
+  }
+  class PreferenceNotification {
+    - parEmail : Boolean
+    - typesActives : Set<TypeNotification>
+  }
+}
+
+package "Espaces de communication" {
+  abstract class Espace {
+    - id : Long
+    - nom : String
+    - description : String
+    - image : String
+    - dateCreation : DateTime
+    - etat : EtatEspace
+    - dureeVisibilite : Duree
+    - dureeCourteAutorisee : Boolean
+    --
+    + inviter(u : Utilisateur) : Invitation
+    + transfererPropriete(u) : void
+    + archiver() : void
+    + supprimer() : void
+  }
+  class GroupeOrganisationnel {
+    --
+    + synchroniserMembres() : void
+  }
+  class GroupePrive {
+  }
+  class Channel {
+    - modeAcces : ModeAcces
+    - modeAnnonce : Boolean
+    - audience : String
+    --
+    + rejoindre(u) : void
+  }
+  class Adhesion {
+    - role : RoleMembre
+    - dateAdhesion : Date
+    - notificationsActives : Boolean
+    --
+    + quitter() : void
+  }
+  class Invitation {
+    - invite : Utilisateur
+    - dateEnvoi : DateTime
+    - dateExpiration : DateTime
+    - etat : EtatInvitation
+    --
+    + accepter() : void
+    + refuser() : void
+    + annuler() : void
+  }
+  class DemandeAdhesion {
+    - demandeur : Utilisateur
+    - date : DateTime
+    - etat : EtatInvitation
+    --
+    + valider() : void
+    + refuser() : void
+  }
+}
+
+package "Messagerie et pédagogie" {
+  class Message {
+    - id : Long
+    - contenu : Text
+    - dateEnvoi : DateTime
+    - dateModification : DateTime
+    - dateExpiration : DateTime
+    - epingle : Boolean
+    - marqueUtile : Boolean
+    - masque : Boolean
+    --
+    + modifier(texte) : void
+    + supprimer() : void
+    + epingler() : void
+    + estExpire() : Boolean
+  }
+  class PieceJointe {
+    - nom : String
+    - format : String
+    - tailleOctets : long
+    - cheminStockage : String
+    - dateDepot : DateTime
+    - dateExpiration : DateTime
+    --
+    + lienProtege(u) : URL
+  }
+  class Annonce {
+    - titre : String
+    - contenu : Text
+    - datePublication : DateTime
+    - notifierEmail : Boolean
+    --
+    + publier() : void
+  }
+  class Chapitre {
+    - titre : String
+    - ordre : int
+  }
+  class Ressource {
+    - titre : String
+    - description : String
+    - fichierOuLien : String
+    - dateAjout : DateTime
+    - indexeeIA : Boolean
+    --
+    + indexer() : void
+  }
+}
+
+package "Modération, notifications et traçabilité" {
+  class Signalement {
+    - date : DateTime
+    - motif : MotifSignalement
+    - commentaire : String
+    - etat : EtatSignalement
+    - signalePar : Utilisateur
+  }
+  class DecisionModeration {
+    - type : TypeDecision
+    - commentaire : String
+    - date : DateTime
+    - moderateur : Utilisateur
+    --
+    + appliquer() : void
+  }
+  class Notification {
+    - destinataire : Utilisateur
+    - type : TypeNotification
+    - contenu : String
+    - lue : Boolean
+    - date : DateTime
+    --
+    + marquerLue() : void
+  }
+  class Operation <<historique>> {
+    - date : DateTime
+    - type : TypeOperation
+    - objet : String
+    - ancienneValeur : String
+    - nouvelleValeur : String
+    - auteur : Utilisateur
+  }
+  class TraitementExpiration <<tâche planifiée>> {
+    - dateExecution : DateTime
+    - nbMessagesSupprimes : int
+    - nbFichiersSupprimes : int
+    --
+    + executer() : void
+  }
+}
+
+package "Assistant IA (RAG) · nouvelle fonctionnalité" {
+  class AssistantIA {
+    - actif : Boolean
+    - fournisseur : String = gemini (Groq en secours)
+    - instructions : Text
+    - citerSources : Boolean = true
+    --
+    + repondre(q, u) : EchangeIA
+    + resumerDiscussion(depuis) : ResumeIA
+    + indexerRessource(r) : void
+  }
+  class FragmentDocument {
+    - contenu : Text
+    - page : int
+    - recherche : tsvector (FTS french)
+    - dateIndexation : DateTime
+  }
+  class ConversationIA {
+    - utilisateur : Utilisateur
+    - titre : String
+    - dateDebut : DateTime
+  }
+  class EchangeIA {
+    - question : Text
+    - reponse : Text
+    - date : DateTime
+    - avisUtile : Boolean
+    - tokens : int
+    --
+    + noter(utile) : void
+  }
+  class SourceCitee {
+    - extrait : String
+    - score : float
+  }
+  class ResumeIA {
+    - periodeDebut : DateTime
+    - periodeFin : DateTime
+    - contenu : Text
+    - nbMessages : int
+  }
+}
+
+package "Énumérations" {
+  enum Profil {
+    ETUDIANT
+    ENSEIGNANT
+    ADMINISTRATION
+  }
+  enum EtatCompte {
+    NON_CREE
+    EN_ATTENTE
+    ACTIF
+    DESACTIVE
+    SUSPENDU
+  }
+  enum Droit {
+    GERER_PARAMETRAGE
+    GERER_UTILISATEURS
+    CREER_GROUPE_ORGA
+    CREER_GROUPE_PRIVE
+    CREER_CHANNEL
+    MODERER
+    CONSULTER_TABLEAU_BORD
+  }
+  enum EtatEspace {
+    ACTIF
+    ARCHIVE
+    SUPPRIME
+  }
+  enum ModeAcces {
+    OUVERT
+    SUR_DEMANDE
+    RESTREINT
+  }
+  enum RoleMembre {
+    PROPRIETAIRE
+    CO_GESTIONNAIRE
+    MEMBRE
+  }
+  enum EtatInvitation {
+    EN_ATTENTE
+    ACCEPTEE
+    REFUSEE
+    EXPIREE
+  }
+  enum MotifSignalement {
+    INAPPROPRIE
+    HARCELEMENT
+    SPAM
+    AUTRE
+  }
+  enum EtatSignalement {
+    NOUVEAU
+    EN_COURS
+    TRAITE
+    REJETE
+  }
+  enum TypeDecision {
+    REJETER
+    MASQUER
+    SUPPRIMER
+    AVERTIR
+    RETIRER
+    SUSPENDRE
+  }
+}
+
+Utilisateur <|-- Etudiant
+Utilisateur <|-- Enseignant
+Utilisateur <|-- MembreAdministration
+Espace <|-- GroupeOrganisationnel
+Espace <|-- GroupePrive
+Espace <|-- Channel
+Departement "1" *-- "1..*" Filiere
+Niveau "1" -- "*" Classe
+Filiere "1" -- "*" Classe
+AnneeUniversitaire "1" -- "*" Classe
+Classe "1..*" -- "*" Matiere
+CompteAutorise "1" -- "0..1" Utilisateur : correspond à
+Utilisateur "1" *-- "1" PreferenceNotification
+Etudiant "*" -- "1" Classe : inscrit dans
+Enseignant "1..*" -- "*" Matiere : responsable de
+Adhesion "*" -- "1" Espace
+Adhesion "*" -- "1" Utilisateur : membre
+Invitation ..> Adhesion : «crée»
+DemandeAdhesion "*" -- "1" Channel
+GroupeOrganisationnel "*" -- "0..1" Classe
+Espace "1" *-- "*" Message
+Message "1" *-- "*" PieceJointe
+Espace "1" *-- "*" Annonce
+GroupeOrganisationnel "1" *-- "*" Chapitre
+Chapitre "1" *-- "*" Ressource
+Message "*" -- "1" Utilisateur : auteur
+Signalement "*" -- "1" Message : porte sur
+Signalement "1" *-- "0..1" DecisionModeration
+Espace "1" *-- "0..1" AssistantIA
+AssistantIA "1" *-- "*" ConversationIA
+AssistantIA "1" *-- "*" ResumeIA
+ConversationIA "1" *-- "*" EchangeIA
+EchangeIA "1" *-- "1..*" SourceCitee
+SourceCitee "*" -- "1" FragmentDocument : cite
+Ressource "1" *-- "*" FragmentDocument : découpée en
+@enduml

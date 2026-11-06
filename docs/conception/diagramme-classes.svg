@@ -1,0 +1,646 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2820" height="2123" viewBox="0 0 2820 2123" font-family="Roboto, Arial, Helvetica, sans-serif" font-size="12">
+<defs><marker id="inh" viewBox="0 0 20 20" refX="19" refY="10" markerWidth="18" markerHeight="18" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M1,1 L19,10 L1,19 Z" fill="#fff" stroke="#3A4256" stroke-width="1.4"/></marker><marker id="comp" viewBox="0 0 24 14" refX="1" refY="7" markerWidth="22" markerHeight="13" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M1,7 L12,1 L23,7 L12,13 Z" fill="#3A4256"/></marker><marker id="arr" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M1,1 L13,7 L1,13" fill="none" stroke="#3A4256" stroke-width="1.4"/></marker></defs>
+<rect width="2820" height="2123" fill="#FFFFFF"/>
+<text x="60" y="62" font-size="30" font-weight="700" fill="#1C2333">UniConnect · Diagramme de classes</text>
+<text x="60" y="94" font-size="15" fill="#5B6478">Modèle du domaine · application de communication universitaire avec Assistant IA de cours · version du 7 novembre 2026 · Laravel + PostgreSQL</text>
+<g transform="translate(1960,40)" font-size="12" fill="#3A4256"><line x1="0" y1="10" x2="60" y2="10" stroke="#3A4256" stroke-width="1.4"/><polygon points="60,10 43,1 43,19" fill="#fff" stroke="#3A4256" stroke-width="1.4"/><text x="70" y="14">Héritage</text><line x1="170" y1="10" x2="230" y2="10" stroke="#3A4256" stroke-width="1.4"/><polygon points="170,10 181,4 192,10 181,16" fill="#3A4256"/><text x="240" y="14">Composition (côté tout)</text><line x1="410" y1="10" x2="470" y2="10" stroke="#3A4256" stroke-width="1.4"/><text x="480" y="14">Association</text><line x1="580" y1="10" x2="640" y2="10" stroke="#3A4256" stroke-width="1.4" stroke-dasharray="6 4"/><polyline points="629,4 640,10 629,16" fill="none" stroke="#3A4256" stroke-width="1.4"/><text x="650" y="14">Dépendance</text><text x="0" y="44" fill="#5B6478">- privé   + public   «abstract» : classe abstraite (nom en italique)   1, *, 0..1, 1..* : multiplicités</text></g>
+<rect x="42" y="150" width="892" height="435" rx="14" fill="#E8EEF9" stroke="#1E4FB8" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M42,164 a14,14 0 0 1 14,-14 h181.2 v28 h-195.2 z" fill="#1E4FB8"/>
+<text x="56" y="169" font-size="13" font-weight="700" fill="#fff">Paramétrage académique</text>
+<rect x="1032" y="150" width="796" height="576" rx="14" fill="#E6F4F1" stroke="#00796B" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M1032,164 a14,14 0 0 1 14,-14 h181.2 v28 h-195.2 z" fill="#00796B"/>
+<text x="1046" y="169" font-size="13" font-weight="700" fill="#fff">Utilisateurs et droits</text>
+<rect x="2052" y="150" width="593" height="603" rx="14" fill="#FBEDED" stroke="#B71C1C" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M2052,164 a14,14 0 0 1 14,-14 h318.0 v28 h-332.0 z" fill="#B71C1C"/>
+<text x="2066" y="169" font-size="13" font-weight="700" fill="#fff">Modération, notifications et traçabilité</text>
+<rect x="42" y="955" width="1057" height="733" rx="14" fill="#EEF0FA" stroke="#3949AB" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M42,969 a14,14 0 0 1 14,-14 h196.39999999999998 v28 h-210.39999999999998 z" fill="#3949AB"/>
+<text x="56" y="974" font-size="13" font-weight="700" fill="#fff">Espaces de communication</text>
+<rect x="1162" y="955" width="593" height="558" rx="14" fill="#F1F4F8" stroke="#455A64" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M1755,969 a14,14 0 0 0 -14,-14 h-188.79999999999998 v28 h202.79999999999998 z" fill="#455A64"/>
+<text x="1741" y="974" text-anchor="end" font-size="13" font-weight="700" fill="#fff">Messagerie et pédagogie</text>
+<rect x="2052" y="955" width="626" height="590" rx="14" fill="#FFF4E0" stroke="#B45309" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M2052,969 a14,14 0 0 1 14,-14 h348.4 v28 h-362.4 z" fill="#B45309"/>
+<text x="2066" y="974" font-size="13" font-weight="700" fill="#fff">Assistant IA (RAG) · nouvelle fonctionnalité</text>
+<rect x="42" y="1830" width="2326" height="251" rx="14" fill="#F4F4F6" stroke="#5B6478" stroke-opacity=".35" stroke-width="1.5"/>
+<path d="M42,1844 a14,14 0 0 1 14,-14 h105.19999999999999 v28 h-119.19999999999999 z" fill="#5B6478"/>
+<text x="56" y="1849" font-size="13" font-weight="700" fill="#fff">Énumérations</text>
+<path d="M1165.0,636 L1165.0,600" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M1430.0,636 L1430.0,600" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M1700.0,636 L1700.0,600" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M1165.0,600 L1700.0,600" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M1632.5,600 L1632.5,536" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="1632.5,536.0 1641.5,553.0 1623.5,553.0" fill="#fff" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M495.5,1353 L495.5,1317" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M741.0,1353 L741.0,1317" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M971.0,1353 L971.0,1317" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M495.5,1317 L971.0,1317" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M526.5,1317 L526.5,1273" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="526.5,1273.0 535.5,1290.0 517.5,1290.0" fill="#fff" stroke="#3A4256" stroke-width="1.4"/>
+<path d="M170.0,279.0 L170.0,339.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="170.0,279.0 176.0,290.0 170.0,301.0 164.0,290.0" fill="#3A4256"/>
+<text x="177" y="319" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="177" y="332" font-size="12" font-weight="500" fill="#1E4FB8">1..*</text>
+<path d="M270.0,509.5 L330.0,509.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="278" y="502" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="315" y="502" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M270.0,378.5 L430.0,378.5 L430.0,426.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="278" y="372" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="437" y="419" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M430.0,366.0 L430.0,426.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="437" y="382" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="437" y="419" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M530.0,491.0 L620.0,491.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="538" y="484" font-size="12" font-weight="500" fill="#1E4FB8">1..*</text>
+<text x="605" y="484" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M1422.0,291.5 L1500.0,291.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="1430" y="284" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1464" y="284" font-size="12" font-weight="500" fill="#1E4FB8">0..1</text>
+<rect x="1416" y="272" width="89" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="1461" y="284" text-anchor="middle" font-style="italic" fill="#3A4256">correspond à</text>
+<path d="M1500.0,492.5 L1346.0,492.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="1500.0,492.5 1489.0,498.5 1478.0,492.5 1489.0,486.5" fill="#3A4256"/>
+<text x="1461" y="486" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1354" y="486" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<path d="M1123.0,698.0 L1123.0,830.0 L420.0,830.0 L420.0,541.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="1130" y="714" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="427" y="557" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<rect x="727" y="810" width="89" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="772" y="823" text-anchor="middle" font-style="italic" fill="#3A4256">inscrit dans</text>
+<path d="M1410.0,698.0 L1410.0,855.0 L720.0,855.0 L720.0,554.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="1417" y="714" font-size="12" font-weight="500" fill="#1E4FB8">1..*</text>
+<text x="727" y="570" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<rect x="1014" y="835" width="102" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="1065" y="848" text-anchor="middle" font-style="italic" fill="#3A4256">responsable de</text>
+<path d="M314.0,1062.5 L380.0,1062.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="322" y="1056" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="365" y="1056" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<path d="M192.0,1005.0 L192.0,805.0 L1300.0,805.0 L1300.0,568.0 L1530.0,568.0 L1530.0,536.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="199" y="998" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="1537" y="552" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<rect x="721" y="785" width="50" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="746" y="798" text-anchor="middle" font-style="italic" fill="#3A4256">membre</text>
+<path d="M175.0,1353.0 L175.0,1120.0" fill="none" stroke="#3A4256" stroke-width="1.4" stroke-dasharray="6 4"/>
+<polyline points="181.0,1131.0 175.0,1120.0 169.0,1131.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<rect x="179" y="1228" width="50" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="184" y="1240" font-style="italic" fill="#3A4256">«crée»</text>
+<path d="M971.0,1528.0 L971.0,1468.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="978" y="1521" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="978" y="1484" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<path d="M380.0,1384.0 L350.0,1384.0 L350.0,780.0 L480.0,780.0 L480.0,541.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="365" y="1377" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="487" y="557" font-size="12" font-weight="500" fill="#1E4FB8">0..1</text>
+<path d="M673.0,1130.5 L1190.0,1130.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="673.0,1130.5 684.0,1124.5 695.0,1130.5 684.0,1136.5" fill="#3A4256"/>
+<text x="705" y="1124" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1175" y="1124" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M1295.0,1256.0 L1295.0,1316.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="1295.0,1256.0 1301.0,1267.0 1295.0,1278.0 1289.0,1267.0" fill="#3A4256"/>
+<text x="1302" y="1296" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1302" y="1309" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M673.0,1045.2 L1135.0,1045.2 L1135.0,983.0 L1534.0,983.0 L1534.0,1005.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="673.0,1045.2 684.0,1039.2 695.0,1045.2 684.0,1051.2" fill="#3A4256"/>
+<text x="705" y="1038" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1541" y="998" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M495.5,1415.0 L495.5,1705.0 L1480.0,1705.0 L1480.0,1236.5 L1510.0,1236.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="495.5,1415.0 501.5,1426.0 495.5,1437.0 489.5,1426.0" fill="#3A4256"/>
+<text x="502" y="1455" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1495" y="1230" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M1610.0,1276.0 L1610.0,1336.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="1610.0,1276.0 1616.0,1287.0 1610.0,1298.0 1604.0,1287.0" fill="#3A4256"/>
+<text x="1617" y="1316" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="1617" y="1329" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M1257.2,1005.0 L1257.2,880.0 L1915.0,880.0 L1915.0,496.0 L1765.0,496.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="1264" y="998" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="1773" y="489" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<rect x="1561" y="860" width="50" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="1586" y="873" text-anchor="middle" font-style="italic" fill="#3A4256">auteur</text>
+<path d="M2080.0,239.0 L2000.0,239.0 L2000.0,905.0 L1374.0,905.0 L1374.0,1005.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="2065" y="232" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="1381" y="998" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<rect x="2004" y="563" width="69" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="2009" y="576" font-style="italic" fill="#3A4256">porte sur</text>
+<path d="M2181.5,330.0 L2181.5,390.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="2181.5,330.0 2187.5,341.0 2181.5,352.0 2175.5,341.0" fill="#3A4256"/>
+<text x="2188" y="370" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2188" y="383" font-size="12" font-weight="500" fill="#1E4FB8">0..1</text>
+<path d="M673.0,1232.8 L1118.0,1232.8 L1118.0,1745.0 L2045.0,1745.0 L2045.0,1088.0 L2080.0,1088.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="673.0,1232.8 684.0,1226.8 695.0,1232.8 684.0,1238.8" fill="#3A4256"/>
+<text x="705" y="1226" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2044" y="1081" font-size="12" font-weight="500" fill="#1E4FB8">0..1</text>
+<path d="M2366.0,1053.0 L2440.0,1053.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="2366.0,1053.0 2377.0,1047.0 2388.0,1053.0 2377.0,1059.0" fill="#3A4256"/>
+<text x="2398" y="1046" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2425" y="1046" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M2180.0,1171.0 L2180.0,1231.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="2180.0,1171.0 2186.0,1182.0 2180.0,1193.0 2174.0,1182.0" fill="#3A4256"/>
+<text x="2187" y="1211" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2187" y="1224" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M2540.0,1101.0 L2540.0,1161.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="2540.0,1101.0 2546.0,1112.0 2540.0,1123.0 2534.0,1112.0" fill="#3A4256"/>
+<text x="2547" y="1141" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2547" y="1154" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<path d="M2540.0,1310.0 L2540.0,1370.0" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="2540.0,1310.0 2546.0,1321.0 2540.0,1332.0 2534.0,1321.0" fill="#3A4256"/>
+<text x="2547" y="1350" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2547" y="1363" font-size="12" font-weight="500" fill="#1E4FB8">1..*</text>
+<path d="M2440.0,1426.5 L2345.0,1426.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<text x="2425" y="1420" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<text x="2353" y="1420" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<rect x="2374" y="1406" width="36" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="2392" y="1420" text-anchor="middle" font-style="italic" fill="#3A4256">cite</text>
+<path d="M1710.0,1444.5 L2080.0,1444.5" fill="none" stroke="#3A4256" stroke-width="1.4"/>
+<polygon points="1710.0,1444.5 1721.0,1438.5 1732.0,1444.5 1721.0,1450.5" fill="#3A4256"/>
+<text x="1742" y="1438" font-size="12" font-weight="500" fill="#1E4FB8">1</text>
+<text x="2065" y="1438" font-size="12" font-weight="500" fill="#1E4FB8">*</text>
+<rect x="1854" y="1424" width="83" height="17" rx="3" fill="#fff" fill-opacity=".9"/><text x="1895" y="1438" text-anchor="middle" font-style="italic" fill="#3A4256">découpée en</text>
+<g><rect x="330" y="200" width="200" height="166" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M330,206 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="430.0" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">AnneeUniversitaire</text>
+<line x1="330" y1="227" x2="530" y2="227" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="338" y="245" fill="#1C2333">- id : Long</text>
+<text x="338" y="262" fill="#1C2333">- libelle : String</text>
+<text x="338" y="279" fill="#1C2333">- dateDebut : Date</text>
+<text x="338" y="296" fill="#1C2333">- dateFin : Date</text>
+<text x="338" y="313" fill="#1C2333">- active : Boolean</text>
+<line x1="330" y1="322" x2="530" y2="322" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="338" y="340" fill="#1C2333">+ activer() : void</text>
+<text x="338" y="357" fill="#1C2333">+ archiverGroupes() : int</text>
+</g>
+<g><rect x="70" y="200" width="200" height="79" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M70,206 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="170.0" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Departement</text>
+<line x1="70" y1="227" x2="270" y2="227" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="78" y="245" fill="#1C2333">- code : String</text>
+<text x="78" y="262" fill="#1C2333">- libelle : String</text>
+<line x1="70" y1="271" x2="270" y2="271" stroke="#1E4FB8" stroke-opacity=".6"/>
+</g>
+<g><rect x="70" y="339" width="200" height="79" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M70,345 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="170.0" y="357" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Filiere</text>
+<line x1="70" y1="366" x2="270" y2="366" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="78" y="384" fill="#1C2333">- code : String</text>
+<text x="78" y="401" fill="#1C2333">- libelle : String</text>
+<line x1="70" y1="410" x2="270" y2="410" stroke="#1E4FB8" stroke-opacity=".6"/>
+</g>
+<g><rect x="70" y="478" width="200" height="79" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M70,484 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="170.0" y="496" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Niveau</text>
+<line x1="70" y1="505" x2="270" y2="505" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="78" y="523" fill="#1C2333">- code : String</text>
+<text x="78" y="540" fill="#1C2333">- libelle : String</text>
+<line x1="70" y1="549" x2="270" y2="549" stroke="#1E4FB8" stroke-opacity=".6"/>
+</g>
+<g><rect x="330" y="426" width="200" height="115" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M330,432 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="430.0" y="444" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Classe</text>
+<line x1="330" y1="453" x2="530" y2="453" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="338" y="471" fill="#1C2333">- code : String</text>
+<text x="338" y="488" fill="#1C2333">- libelle : String</text>
+<text x="338" y="505" fill="#1C2333">- actif : Boolean</text>
+<line x1="330" y1="514" x2="530" y2="514" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="338" y="532" fill="#1C2333">+ nbEtudiants() : int</text>
+</g>
+<g><rect x="620" y="441" width="200" height="113" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M620,447 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="720.0" y="459" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Matiere</text>
+<line x1="620" y1="468" x2="820" y2="468" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="628" y="486" fill="#1C2333">- code : String</text>
+<text x="628" y="503" fill="#1C2333">- libelle : String</text>
+<text x="628" y="520" fill="#1C2333">- semestre : int</text>
+<text x="628" y="537" fill="#1C2333">- actif : Boolean</text>
+<line x1="620" y1="546" x2="820" y2="546" stroke="#1E4FB8" stroke-opacity=".6"/>
+</g>
+<g><rect x="620" y="200" width="286" height="181" rx="6" fill="#fff" stroke="#1E4FB8" stroke-width="1.4"/>
+<path d="M620,206 a6,6 0 0 1 6,-6 h274 a6,6 0 0 1 6,6 v38 h-286 z" fill="#1E4FB8" fill-opacity="0.16"/>
+<text x="763.0" y="218" text-anchor="middle" font-size="11" fill="#5B6478">«singleton»</text>
+<text x="763.0" y="235" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">ReglePlateforme</text>
+<line x1="620" y1="244" x2="906" y2="244" stroke="#1E4FB8" stroke-opacity=".6"/>
+<text x="628" y="262" fill="#1C2333">- dureesProposees : List&lt;Duree&gt;</text>
+<text x="628" y="279" fill="#1C2333">- dureeDefaut : Map&lt;TypeEspace, Duree&gt;</text>
+<text x="628" y="296" fill="#1C2333">- dureeMax : Map&lt;TypeEspace, Duree&gt;</text>
+<text x="628" y="313" fill="#1C2333">- tailleMaxFichierMo : int = 25</text>
+<text x="628" y="330" fill="#1C2333">- formatsAutorises : List&lt;String&gt;</text>
+<text x="628" y="347" fill="#1C2333">- delaiInvitationJours : int = 14</text>
+<text x="628" y="364" fill="#1C2333">- heureTraitement : Time</text>
+<line x1="620" y1="373" x2="906" y2="373" stroke="#1E4FB8" stroke-opacity=".6"/>
+</g>
+<g><rect x="1060" y="200" width="362" height="183" rx="6" fill="#fff" stroke="#00796B" stroke-width="1.4"/>
+<path d="M1060,206 a6,6 0 0 1 6,-6 h350 a6,6 0 0 1 6,6 v21 h-362 z" fill="#00796B" fill-opacity="0.16"/>
+<text x="1241.0" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">CompteAutorise</text>
+<line x1="1060" y1="227" x2="1422" y2="227" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1068" y="245" fill="#1C2333">- matricule : String</text>
+<text x="1068" y="262" fill="#1C2333">- nom : String</text>
+<text x="1068" y="279" fill="#1C2333">- prenom : String</text>
+<text x="1068" y="296" fill="#1C2333">- emailInstitutionnel : String</text>
+<text x="1068" y="313" fill="#1C2333">- profil : Profil</text>
+<text x="1068" y="330" fill="#1C2333">- etat : EtatCompte</text>
+<line x1="1060" y1="339" x2="1422" y2="339" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1068" y="357" fill="#1C2333">+ verifierEligibilite(matricule, email) : Boolean</text>
+<text x="1068" y="374" fill="#1C2333">+ importer(fichier) : RapportImport</text>
+</g>
+<g><rect x="1500" y="200" width="265" height="336" rx="6" fill="#fff" stroke="#00796B" stroke-width="1.4"/>
+<path d="M1500,206 a6,6 0 0 1 6,-6 h253 a6,6 0 0 1 6,6 v38 h-265 z" fill="#00796B" fill-opacity="0.16"/>
+<text x="1632.5" y="218" text-anchor="middle" font-size="11" fill="#5B6478">«abstract»</text>
+<text x="1632.5" y="235" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333" font-style="italic">Utilisateur</text>
+<line x1="1500" y1="244" x2="1765" y2="244" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1508" y="262" fill="#1C2333">- id : Long</text>
+<text x="1508" y="279" fill="#1C2333">- matricule : String</text>
+<text x="1508" y="296" fill="#1C2333">- nom : String</text>
+<text x="1508" y="313" fill="#1C2333">- prenom : String</text>
+<text x="1508" y="330" fill="#1C2333">- email : String</text>
+<text x="1508" y="347" fill="#1C2333">- motDePasseHash : String</text>
+<text x="1508" y="364" fill="#1C2333">- photo : String</text>
+<text x="1508" y="381" fill="#1C2333">- etat : EtatCompte</text>
+<text x="1508" y="398" fill="#1C2333">- tentativesEchouees : int</text>
+<text x="1508" y="415" fill="#1C2333">- suspenduJusquA : DateTime</text>
+<text x="1508" y="432" fill="#1C2333">- derniereConnexion : DateTime</text>
+<text x="1508" y="449" fill="#1C2333">- droits : Set&lt;Droit&gt;</text>
+<line x1="1500" y1="458" x2="1765" y2="458" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1508" y="476" fill="#1C2333">+ seConnecter(email, mdp) : Session</text>
+<text x="1508" y="493" fill="#1C2333">+ activerCompte(mdp) : void</text>
+<text x="1508" y="510" fill="#1C2333">+ possedeDroit(d : Droit) : Boolean</text>
+<text x="1508" y="527" fill="#1C2333">+ modifierProfil(...) : void</text>
+</g>
+<g><rect x="1060" y="636" width="210" height="62" rx="6" fill="#fff" stroke="#00796B" stroke-width="1.4"/>
+<path d="M1060,642 a6,6 0 0 1 6,-6 h198 a6,6 0 0 1 6,6 v21 h-210 z" fill="#00796B" fill-opacity="0.16"/>
+<text x="1165.0" y="654" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Etudiant</text>
+<line x1="1060" y1="663" x2="1270" y2="663" stroke="#00796B" stroke-opacity=".6"/>
+<line x1="1060" y1="671" x2="1270" y2="671" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1068" y="689" fill="#1C2333">+ rattacherGroupes() : void</text>
+</g>
+<g><rect x="1330" y="636" width="200" height="62" rx="6" fill="#fff" stroke="#00796B" stroke-width="1.4"/>
+<path d="M1330,642 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#00796B" fill-opacity="0.16"/>
+<text x="1430.0" y="654" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Enseignant</text>
+<line x1="1330" y1="663" x2="1530" y2="663" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1338" y="681" fill="#1C2333">- grade : String</text>
+<line x1="1330" y1="690" x2="1530" y2="690" stroke="#00796B" stroke-opacity=".6"/>
+</g>
+<g><rect x="1600" y="636" width="200" height="62" rx="6" fill="#fff" stroke="#00796B" stroke-width="1.4"/>
+<path d="M1600,642 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#00796B" fill-opacity="0.16"/>
+<text x="1700.0" y="654" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">MembreAdministration</text>
+<line x1="1600" y1="663" x2="1800" y2="663" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1608" y="681" fill="#1C2333">- service : String</text>
+<line x1="1600" y1="690" x2="1800" y2="690" stroke="#00796B" stroke-opacity=".6"/>
+</g>
+<g><rect x="1060" y="453" width="286" height="79" rx="6" fill="#fff" stroke="#00796B" stroke-width="1.4"/>
+<path d="M1060,459 a6,6 0 0 1 6,-6 h274 a6,6 0 0 1 6,6 v21 h-286 z" fill="#00796B" fill-opacity="0.16"/>
+<text x="1203.0" y="471" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">PreferenceNotification</text>
+<line x1="1060" y1="480" x2="1346" y2="480" stroke="#00796B" stroke-opacity=".6"/>
+<text x="1068" y="498" fill="#1C2333">- parEmail : Boolean</text>
+<text x="1068" y="515" fill="#1C2333">- typesActives : Set&lt;TypeNotification&gt;</text>
+<line x1="1060" y1="524" x2="1346" y2="524" stroke="#00796B" stroke-opacity=".6"/>
+</g>
+<g><rect x="380" y="1005" width="293" height="268" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M380,1011 a6,6 0 0 1 6,-6 h281 a6,6 0 0 1 6,6 v38 h-293 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="526.5" y="1023" text-anchor="middle" font-size="11" fill="#5B6478">«abstract»</text>
+<text x="526.5" y="1040" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333" font-style="italic">Espace</text>
+<line x1="380" y1="1049" x2="673" y2="1049" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="388" y="1067" fill="#1C2333">- id : Long</text>
+<text x="388" y="1084" fill="#1C2333">- nom : String</text>
+<text x="388" y="1101" fill="#1C2333">- description : String</text>
+<text x="388" y="1118" fill="#1C2333">- image : String</text>
+<text x="388" y="1135" fill="#1C2333">- dateCreation : DateTime</text>
+<text x="388" y="1152" fill="#1C2333">- etat : EtatEspace</text>
+<text x="388" y="1169" fill="#1C2333">- dureeVisibilite : Duree</text>
+<text x="388" y="1186" fill="#1C2333">- dureeCourteAutorisee : Boolean</text>
+<line x1="380" y1="1195" x2="673" y2="1195" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="388" y="1213" fill="#1C2333">+ inviter(u : Utilisateur) : Invitation</text>
+<text x="388" y="1230" fill="#1C2333">+ transfererPropriete(u) : void</text>
+<text x="388" y="1247" fill="#1C2333">+ archiver() : void</text>
+<text x="388" y="1264" fill="#1C2333">+ supprimer() : void</text>
+</g>
+<g><rect x="380" y="1353" width="231" height="62" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M380,1359 a6,6 0 0 1 6,-6 h219 a6,6 0 0 1 6,6 v21 h-231 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="495.5" y="1371" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">GroupeOrganisationnel</text>
+<line x1="380" y1="1380" x2="611" y2="1380" stroke="#3949AB" stroke-opacity=".6"/>
+<line x1="380" y1="1388" x2="611" y2="1388" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="388" y="1406" fill="#1C2333">+ synchroniserMembres() : void</text>
+</g>
+<g><rect x="641" y="1353" width="200" height="43" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M641,1359 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="741.0" y="1371" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">GroupePrive</text>
+<line x1="641" y1="1380" x2="841" y2="1380" stroke="#3949AB" stroke-opacity=".6"/>
+<line x1="641" y1="1388" x2="841" y2="1388" stroke="#3949AB" stroke-opacity=".6"/>
+</g>
+<g><rect x="871" y="1353" width="200" height="115" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M871,1359 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="971.0" y="1371" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Channel</text>
+<line x1="871" y1="1380" x2="1071" y2="1380" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="879" y="1398" fill="#1C2333">- modeAcces : ModeAcces</text>
+<text x="879" y="1415" fill="#1C2333">- modeAnnonce : Boolean</text>
+<text x="879" y="1432" fill="#1C2333">- audience : String</text>
+<line x1="871" y1="1441" x2="1071" y2="1441" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="879" y="1459" fill="#1C2333">+ rejoindre(u) : void</text>
+</g>
+<g><rect x="70" y="1005" width="244" height="115" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M70,1011 a6,6 0 0 1 6,-6 h232 a6,6 0 0 1 6,6 v21 h-244 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="192.0" y="1023" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Adhesion</text>
+<line x1="70" y1="1032" x2="314" y2="1032" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="78" y="1050" fill="#1C2333">- role : RoleMembre</text>
+<text x="78" y="1067" fill="#1C2333">- dateAdhesion : Date</text>
+<text x="78" y="1084" fill="#1C2333">- notificationsActives : Boolean</text>
+<line x1="70" y1="1093" x2="314" y2="1093" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="78" y="1111" fill="#1C2333">+ quitter() : void</text>
+</g>
+<g><rect x="70" y="1353" width="210" height="166" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M70,1359 a6,6 0 0 1 6,-6 h198 a6,6 0 0 1 6,6 v21 h-210 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="175.0" y="1371" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Invitation</text>
+<line x1="70" y1="1380" x2="280" y2="1380" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="78" y="1398" fill="#1C2333">- invite : Utilisateur</text>
+<text x="78" y="1415" fill="#1C2333">- dateEnvoi : DateTime</text>
+<text x="78" y="1432" fill="#1C2333">- dateExpiration : DateTime</text>
+<text x="78" y="1449" fill="#1C2333">- etat : EtatInvitation</text>
+<line x1="70" y1="1458" x2="280" y2="1458" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="78" y="1476" fill="#1C2333">+ accepter() : void</text>
+<text x="78" y="1493" fill="#1C2333">+ refuser() : void</text>
+<text x="78" y="1510" fill="#1C2333">+ annuler() : void</text>
+</g>
+<g><rect x="871" y="1528" width="200" height="132" rx="6" fill="#fff" stroke="#3949AB" stroke-width="1.4"/>
+<path d="M871,1534 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#3949AB" fill-opacity="0.16"/>
+<text x="971.0" y="1546" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">DemandeAdhesion</text>
+<line x1="871" y1="1555" x2="1071" y2="1555" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="879" y="1573" fill="#1C2333">- demandeur : Utilisateur</text>
+<text x="879" y="1590" fill="#1C2333">- date : DateTime</text>
+<text x="879" y="1607" fill="#1C2333">- etat : EtatInvitation</text>
+<line x1="871" y1="1616" x2="1071" y2="1616" stroke="#3949AB" stroke-opacity=".6"/>
+<text x="879" y="1634" fill="#1C2333">+ valider() : void</text>
+<text x="879" y="1651" fill="#1C2333">+ refuser() : void</text>
+</g>
+<g><rect x="1190" y="1005" width="224" height="251" rx="6" fill="#fff" stroke="#455A64" stroke-width="1.4"/>
+<path d="M1190,1011 a6,6 0 0 1 6,-6 h212 a6,6 0 0 1 6,6 v21 h-224 z" fill="#455A64" fill-opacity="0.16"/>
+<text x="1302.0" y="1023" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Message</text>
+<line x1="1190" y1="1032" x2="1414" y2="1032" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1198" y="1050" fill="#1C2333">- id : Long</text>
+<text x="1198" y="1067" fill="#1C2333">- contenu : Text</text>
+<text x="1198" y="1084" fill="#1C2333">- dateEnvoi : DateTime</text>
+<text x="1198" y="1101" fill="#1C2333">- dateModification : DateTime</text>
+<text x="1198" y="1118" fill="#1C2333">- dateExpiration : DateTime</text>
+<text x="1198" y="1135" fill="#1C2333">- epingle : Boolean</text>
+<text x="1198" y="1152" fill="#1C2333">- marqueUtile : Boolean</text>
+<text x="1198" y="1169" fill="#1C2333">- masque : Boolean</text>
+<line x1="1190" y1="1178" x2="1414" y2="1178" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1198" y="1196" fill="#1C2333">+ modifier(texte) : void</text>
+<text x="1198" y="1213" fill="#1C2333">+ supprimer() : void</text>
+<text x="1198" y="1230" fill="#1C2333">+ epingler() : void</text>
+<text x="1198" y="1247" fill="#1C2333">+ estExpire() : Boolean</text>
+</g>
+<g><rect x="1190" y="1316" width="210" height="166" rx="6" fill="#fff" stroke="#455A64" stroke-width="1.4"/>
+<path d="M1190,1322 a6,6 0 0 1 6,-6 h198 a6,6 0 0 1 6,6 v21 h-210 z" fill="#455A64" fill-opacity="0.16"/>
+<text x="1295.0" y="1334" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">PieceJointe</text>
+<line x1="1190" y1="1343" x2="1400" y2="1343" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1198" y="1361" fill="#1C2333">- nom : String</text>
+<text x="1198" y="1378" fill="#1C2333">- format : String</text>
+<text x="1198" y="1395" fill="#1C2333">- tailleOctets : long</text>
+<text x="1198" y="1412" fill="#1C2333">- cheminStockage : String</text>
+<text x="1198" y="1429" fill="#1C2333">- dateDepot : DateTime</text>
+<text x="1198" y="1446" fill="#1C2333">- dateExpiration : DateTime</text>
+<line x1="1190" y1="1455" x2="1400" y2="1455" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1198" y="1473" fill="#1C2333">+ lienProtege(u) : URL</text>
+</g>
+<g><rect x="1510" y="1005" width="217" height="132" rx="6" fill="#fff" stroke="#455A64" stroke-width="1.4"/>
+<path d="M1510,1011 a6,6 0 0 1 6,-6 h205 a6,6 0 0 1 6,6 v21 h-217 z" fill="#455A64" fill-opacity="0.16"/>
+<text x="1618.5" y="1023" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Annonce</text>
+<line x1="1510" y1="1032" x2="1727" y2="1032" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1518" y="1050" fill="#1C2333">- titre : String</text>
+<text x="1518" y="1067" fill="#1C2333">- contenu : Text</text>
+<text x="1518" y="1084" fill="#1C2333">- datePublication : DateTime</text>
+<text x="1518" y="1101" fill="#1C2333">- notifierEmail : Boolean</text>
+<line x1="1510" y1="1110" x2="1727" y2="1110" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1518" y="1128" fill="#1C2333">+ publier() : void</text>
+</g>
+<g><rect x="1510" y="1197" width="200" height="79" rx="6" fill="#fff" stroke="#455A64" stroke-width="1.4"/>
+<path d="M1510,1203 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#455A64" fill-opacity="0.16"/>
+<text x="1610.0" y="1215" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Chapitre</text>
+<line x1="1510" y1="1224" x2="1710" y2="1224" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1518" y="1242" fill="#1C2333">- titre : String</text>
+<text x="1518" y="1259" fill="#1C2333">- ordre : int</text>
+<line x1="1510" y1="1268" x2="1710" y2="1268" stroke="#455A64" stroke-opacity=".6"/>
+</g>
+<g><rect x="1510" y="1336" width="200" height="149" rx="6" fill="#fff" stroke="#455A64" stroke-width="1.4"/>
+<path d="M1510,1342 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#455A64" fill-opacity="0.16"/>
+<text x="1610.0" y="1354" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Ressource</text>
+<line x1="1510" y1="1363" x2="1710" y2="1363" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1518" y="1381" fill="#1C2333">- titre : String</text>
+<text x="1518" y="1398" fill="#1C2333">- description : String</text>
+<text x="1518" y="1415" fill="#1C2333">- fichierOuLien : String</text>
+<text x="1518" y="1432" fill="#1C2333">- dateAjout : DateTime</text>
+<text x="1518" y="1449" fill="#1C2333">- indexeeIA : Boolean</text>
+<line x1="1510" y1="1458" x2="1710" y2="1458" stroke="#455A64" stroke-opacity=".6"/>
+<text x="1518" y="1476" fill="#1C2333">+ indexer() : void</text>
+</g>
+<g><rect x="2080" y="200" width="203" height="130" rx="6" fill="#fff" stroke="#B71C1C" stroke-width="1.4"/>
+<path d="M2080,206 a6,6 0 0 1 6,-6 h191 a6,6 0 0 1 6,6 v21 h-203 z" fill="#B71C1C" fill-opacity="0.16"/>
+<text x="2181.5" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Signalement</text>
+<line x1="2080" y1="227" x2="2283" y2="227" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2088" y="245" fill="#1C2333">- date : DateTime</text>
+<text x="2088" y="262" fill="#1C2333">- motif : MotifSignalement</text>
+<text x="2088" y="279" fill="#1C2333">- commentaire : String</text>
+<text x="2088" y="296" fill="#1C2333">- etat : EtatSignalement</text>
+<text x="2088" y="313" fill="#1C2333">- signalePar : Utilisateur</text>
+<line x1="2080" y1="322" x2="2283" y2="322" stroke="#B71C1C" stroke-opacity=".6"/>
+</g>
+<g><rect x="2080" y="390" width="203" height="132" rx="6" fill="#fff" stroke="#B71C1C" stroke-width="1.4"/>
+<path d="M2080,396 a6,6 0 0 1 6,-6 h191 a6,6 0 0 1 6,6 v21 h-203 z" fill="#B71C1C" fill-opacity="0.16"/>
+<text x="2181.5" y="408" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">DecisionModeration</text>
+<line x1="2080" y1="417" x2="2283" y2="417" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2088" y="435" fill="#1C2333">- type : TypeDecision</text>
+<text x="2088" y="452" fill="#1C2333">- commentaire : String</text>
+<text x="2088" y="469" fill="#1C2333">- date : DateTime</text>
+<text x="2088" y="486" fill="#1C2333">- moderateur : Utilisateur</text>
+<line x1="2080" y1="495" x2="2283" y2="495" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2088" y="513" fill="#1C2333">+ appliquer() : void</text>
+</g>
+<g><rect x="2400" y="200" width="217" height="149" rx="6" fill="#fff" stroke="#B71C1C" stroke-width="1.4"/>
+<path d="M2400,206 a6,6 0 0 1 6,-6 h205 a6,6 0 0 1 6,6 v21 h-217 z" fill="#B71C1C" fill-opacity="0.16"/>
+<text x="2508.5" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Notification</text>
+<line x1="2400" y1="227" x2="2617" y2="227" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2408" y="245" fill="#1C2333">- destinataire : Utilisateur</text>
+<text x="2408" y="262" fill="#1C2333">- type : TypeNotification</text>
+<text x="2408" y="279" fill="#1C2333">- contenu : String</text>
+<text x="2408" y="296" fill="#1C2333">- lue : Boolean</text>
+<text x="2408" y="313" fill="#1C2333">- date : DateTime</text>
+<line x1="2400" y1="322" x2="2617" y2="322" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2408" y="340" fill="#1C2333">+ marquerLue() : void</text>
+</g>
+<g><rect x="2400" y="389" width="200" height="164" rx="6" fill="#fff" stroke="#B71C1C" stroke-width="1.4"/>
+<path d="M2400,395 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#B71C1C" fill-opacity="0.16"/>
+<text x="2500.0" y="407" text-anchor="middle" font-size="11" fill="#5B6478">«historique»</text>
+<text x="2500.0" y="424" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Operation</text>
+<line x1="2400" y1="433" x2="2600" y2="433" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2408" y="451" fill="#1C2333">- date : DateTime</text>
+<text x="2408" y="468" fill="#1C2333">- type : TypeOperation</text>
+<text x="2408" y="485" fill="#1C2333">- objet : String</text>
+<text x="2408" y="502" fill="#1C2333">- ancienneValeur : String</text>
+<text x="2408" y="519" fill="#1C2333">- nouvelleValeur : String</text>
+<text x="2408" y="536" fill="#1C2333">- auteur : Utilisateur</text>
+<line x1="2400" y1="545" x2="2600" y2="545" stroke="#B71C1C" stroke-opacity=".6"/>
+</g>
+<g><rect x="2400" y="593" width="210" height="132" rx="6" fill="#fff" stroke="#B71C1C" stroke-width="1.4"/>
+<path d="M2400,599 a6,6 0 0 1 6,-6 h198 a6,6 0 0 1 6,6 v38 h-210 z" fill="#B71C1C" fill-opacity="0.16"/>
+<text x="2505.0" y="611" text-anchor="middle" font-size="11" fill="#5B6478">«tâche planifiée»</text>
+<text x="2505.0" y="628" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">TraitementExpiration</text>
+<line x1="2400" y1="637" x2="2610" y2="637" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2408" y="655" fill="#1C2333">- dateExecution : DateTime</text>
+<text x="2408" y="672" fill="#1C2333">- nbMessagesSupprimes : int</text>
+<text x="2408" y="689" fill="#1C2333">- nbFichiersSupprimes : int</text>
+<line x1="2400" y1="698" x2="2610" y2="698" stroke="#B71C1C" stroke-opacity=".6"/>
+<text x="2408" y="716" fill="#1C2333">+ executer() : void</text>
+</g>
+<g><rect x="2080" y="1005" width="286" height="166" rx="6" fill="#fff" stroke="#B45309" stroke-width="2"/>
+<path d="M2080,1011 a6,6 0 0 1 6,-6 h274 a6,6 0 0 1 6,6 v21 h-286 z" fill="#B45309" fill-opacity="0.22"/>
+<text x="2223.0" y="1023" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">AssistantIA</text>
+<line x1="2080" y1="1032" x2="2366" y2="1032" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2088" y="1050" fill="#1C2333">- actif : Boolean</text>
+<text x="2088" y="1067" fill="#1C2333">- fournisseur : String = gemini (Groq en secours)</text>
+<text x="2088" y="1084" fill="#1C2333">- instructions : Text</text>
+<text x="2088" y="1101" fill="#1C2333">- citerSources : Boolean = true</text>
+<line x1="2080" y1="1110" x2="2366" y2="1110" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2088" y="1128" fill="#1C2333">+ repondre(q, u) : EchangeIA</text>
+<text x="2088" y="1145" fill="#1C2333">+ resumerDiscussion(depuis) : ResumeIA</text>
+<text x="2088" y="1162" fill="#1C2333">+ indexerRessource(r) : void</text>
+</g>
+<g><rect x="2080" y="1404" width="265" height="113" rx="6" fill="#fff" stroke="#B45309" stroke-width="2"/>
+<path d="M2080,1410 a6,6 0 0 1 6,-6 h253 a6,6 0 0 1 6,6 v21 h-265 z" fill="#B45309" fill-opacity="0.22"/>
+<text x="2212.5" y="1422" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">FragmentDocument</text>
+<line x1="2080" y1="1431" x2="2345" y2="1431" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2088" y="1449" fill="#1C2333">- contenu : Text</text>
+<text x="2088" y="1466" fill="#1C2333">- page : int</text>
+<text x="2088" y="1483" fill="#1C2333">- recherche : tsvector (FTS french)</text>
+<text x="2088" y="1500" fill="#1C2333">- dateIndexation : DateTime</text>
+<line x1="2080" y1="1509" x2="2345" y2="1509" stroke="#B45309" stroke-opacity=".6"/>
+</g>
+<g><rect x="2440" y="1005" width="210" height="96" rx="6" fill="#fff" stroke="#B45309" stroke-width="2"/>
+<path d="M2440,1011 a6,6 0 0 1 6,-6 h198 a6,6 0 0 1 6,6 v21 h-210 z" fill="#B45309" fill-opacity="0.22"/>
+<text x="2545.0" y="1023" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">ConversationIA</text>
+<line x1="2440" y1="1032" x2="2650" y2="1032" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2448" y="1050" fill="#1C2333">- utilisateur : Utilisateur</text>
+<text x="2448" y="1067" fill="#1C2333">- titre : String</text>
+<text x="2448" y="1084" fill="#1C2333">- dateDebut : DateTime</text>
+<line x1="2440" y1="1093" x2="2650" y2="1093" stroke="#B45309" stroke-opacity=".6"/>
+</g>
+<g><rect x="2440" y="1161" width="200" height="149" rx="6" fill="#fff" stroke="#B45309" stroke-width="2"/>
+<path d="M2440,1167 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#B45309" fill-opacity="0.22"/>
+<text x="2540.0" y="1179" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">EchangeIA</text>
+<line x1="2440" y1="1188" x2="2640" y2="1188" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2448" y="1206" fill="#1C2333">- question : Text</text>
+<text x="2448" y="1223" fill="#1C2333">- reponse : Text</text>
+<text x="2448" y="1240" fill="#1C2333">- date : DateTime</text>
+<text x="2448" y="1257" fill="#1C2333">- avisUtile : Boolean</text>
+<text x="2448" y="1274" fill="#1C2333">- tokens : int</text>
+<line x1="2440" y1="1283" x2="2640" y2="1283" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2448" y="1301" fill="#1C2333">+ noter(utile) : void</text>
+</g>
+<g><rect x="2440" y="1370" width="200" height="79" rx="6" fill="#fff" stroke="#B45309" stroke-width="2"/>
+<path d="M2440,1376 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#B45309" fill-opacity="0.22"/>
+<text x="2540.0" y="1388" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">SourceCitee</text>
+<line x1="2440" y1="1397" x2="2640" y2="1397" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2448" y="1415" fill="#1C2333">- extrait : String</text>
+<text x="2448" y="1432" fill="#1C2333">- score : float</text>
+<line x1="2440" y1="1441" x2="2640" y2="1441" stroke="#B45309" stroke-opacity=".6"/>
+</g>
+<g><rect x="2080" y="1231" width="200" height="113" rx="6" fill="#fff" stroke="#B45309" stroke-width="2"/>
+<path d="M2080,1237 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v21 h-200 z" fill="#B45309" fill-opacity="0.22"/>
+<text x="2180.0" y="1249" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">ResumeIA</text>
+<line x1="2080" y1="1258" x2="2280" y2="1258" stroke="#B45309" stroke-opacity=".6"/>
+<text x="2088" y="1276" fill="#1C2333">- periodeDebut : DateTime</text>
+<text x="2088" y="1293" fill="#1C2333">- periodeFin : DateTime</text>
+<text x="2088" y="1310" fill="#1C2333">- contenu : Text</text>
+<text x="2088" y="1327" fill="#1C2333">- nbMessages : int</text>
+<line x1="2080" y1="1336" x2="2280" y2="1336" stroke="#B45309" stroke-opacity=".6"/>
+</g>
+<g><rect x="70" y="1880" width="200" height="105" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M70,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="170.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="170.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Profil</text>
+<line x1="70" y1="1924" x2="270" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="78" y="1942" fill="#1C2333">ETUDIANT</text>
+<text x="78" y="1959" fill="#1C2333">ENSEIGNANT</text>
+<text x="78" y="1976" fill="#1C2333">ADMINISTRATION</text>
+</g>
+<g><rect x="300" y="1880" width="200" height="139" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M300,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="400.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="400.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">EtatCompte</text>
+<line x1="300" y1="1924" x2="500" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="308" y="1942" fill="#1C2333">NON_CREE</text>
+<text x="308" y="1959" fill="#1C2333">EN_ATTENTE</text>
+<text x="308" y="1976" fill="#1C2333">ACTIF</text>
+<text x="308" y="1993" fill="#1C2333">DESACTIVE</text>
+<text x="308" y="2010" fill="#1C2333">SUSPENDU</text>
+</g>
+<g><rect x="530" y="1880" width="200" height="173" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M530,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="630.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="630.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">Droit</text>
+<line x1="530" y1="1924" x2="730" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="538" y="1942" fill="#1C2333">GERER_PARAMETRAGE</text>
+<text x="538" y="1959" fill="#1C2333">GERER_UTILISATEURS</text>
+<text x="538" y="1976" fill="#1C2333">CREER_GROUPE_ORGA</text>
+<text x="538" y="1993" fill="#1C2333">CREER_GROUPE_PRIVE</text>
+<text x="538" y="2010" fill="#1C2333">CREER_CHANNEL</text>
+<text x="538" y="2027" fill="#1C2333">MODERER</text>
+<text x="538" y="2044" fill="#1C2333">CONSULTER_TABLEAU_BORD</text>
+</g>
+<g><rect x="760" y="1880" width="200" height="105" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M760,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="860.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="860.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">EtatEspace</text>
+<line x1="760" y1="1924" x2="960" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="768" y="1942" fill="#1C2333">ACTIF</text>
+<text x="768" y="1959" fill="#1C2333">ARCHIVE</text>
+<text x="768" y="1976" fill="#1C2333">SUPPRIME</text>
+</g>
+<g><rect x="990" y="1880" width="200" height="105" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M990,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="1090.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="1090.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">ModeAcces</text>
+<line x1="990" y1="1924" x2="1190" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="998" y="1942" fill="#1C2333">OUVERT</text>
+<text x="998" y="1959" fill="#1C2333">SUR_DEMANDE</text>
+<text x="998" y="1976" fill="#1C2333">RESTREINT</text>
+</g>
+<g><rect x="1220" y="1880" width="200" height="105" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M1220,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="1320.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="1320.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">RoleMembre</text>
+<line x1="1220" y1="1924" x2="1420" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="1228" y="1942" fill="#1C2333">PROPRIETAIRE</text>
+<text x="1228" y="1959" fill="#1C2333">CO_GESTIONNAIRE</text>
+<text x="1228" y="1976" fill="#1C2333">MEMBRE</text>
+</g>
+<g><rect x="1450" y="1880" width="200" height="122" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M1450,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="1550.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="1550.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">EtatInvitation</text>
+<line x1="1450" y1="1924" x2="1650" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="1458" y="1942" fill="#1C2333">EN_ATTENTE</text>
+<text x="1458" y="1959" fill="#1C2333">ACCEPTEE</text>
+<text x="1458" y="1976" fill="#1C2333">REFUSEE</text>
+<text x="1458" y="1993" fill="#1C2333">EXPIREE</text>
+</g>
+<g><rect x="1680" y="1880" width="200" height="122" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M1680,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="1780.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="1780.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">MotifSignalement</text>
+<line x1="1680" y1="1924" x2="1880" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="1688" y="1942" fill="#1C2333">INAPPROPRIE</text>
+<text x="1688" y="1959" fill="#1C2333">HARCELEMENT</text>
+<text x="1688" y="1976" fill="#1C2333">SPAM</text>
+<text x="1688" y="1993" fill="#1C2333">AUTRE</text>
+</g>
+<g><rect x="1910" y="1880" width="200" height="122" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M1910,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="2010.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="2010.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">EtatSignalement</text>
+<line x1="1910" y1="1924" x2="2110" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="1918" y="1942" fill="#1C2333">NOUVEAU</text>
+<text x="1918" y="1959" fill="#1C2333">EN_COURS</text>
+<text x="1918" y="1976" fill="#1C2333">TRAITE</text>
+<text x="1918" y="1993" fill="#1C2333">REJETE</text>
+</g>
+<g><rect x="2140" y="1880" width="200" height="156" rx="6" fill="#fff" stroke="#5B6478" stroke-width="1.4"/>
+<path d="M2140,1886 a6,6 0 0 1 6,-6 h188 a6,6 0 0 1 6,6 v38 h-200 z" fill="#5B6478" fill-opacity="0.16"/>
+<text x="2240.0" y="1898" text-anchor="middle" font-size="11" fill="#5B6478">«enumeration»</text>
+<text x="2240.0" y="1915" text-anchor="middle" font-size="14" font-weight="700" fill="#1C2333">TypeDecision</text>
+<line x1="2140" y1="1924" x2="2340" y2="1924" stroke="#5B6478" stroke-opacity=".6"/>
+<text x="2148" y="1942" fill="#1C2333">REJETER</text>
+<text x="2148" y="1959" fill="#1C2333">MASQUER</text>
+<text x="2148" y="1976" fill="#1C2333">SUPPRIMER</text>
+<text x="2148" y="1993" fill="#1C2333">AVERTIR</text>
+<text x="2148" y="2010" fill="#1C2333">RETIRER</text>
+<text x="2148" y="2027" fill="#1C2333">SUSPENDRE</text>
+</g>
+</svg>
