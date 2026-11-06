@@ -1,0 +1,142 @@
+[
+  {
+    "question": "Qu'est-ce qu'un curseur PL/SQL ?",
+    "document": "chap03.pdf",
+    "page": 1,
+    "hors_sujet": false,
+    "reponse_attendue": "Un mécanisme qui nomme la zone de travail (zone de contexte) allouée par Oracle pour un ordre SQL et permet d'en manipuler les données ligne par ligne."
+  },
+  {
+    "question": "Quelle est la différence entre un curseur explicite et un curseur implicite ?",
+    "document": "chap03.pdf",
+    "page": 1,
+    "hors_sujet": false,
+    "reponse_attendue": "Le curseur explicite est créé et géré par l'utilisateur pour un SELECT qui ramène plusieurs lignes ; le curseur implicite est généré et géré par le noyau pour les autres commandes SQL."
+  },
+  {
+    "question": "Quelles sont les étapes pour utiliser un curseur explicite ?",
+    "document": "chap03.pdf",
+    "page": 1,
+    "hors_sujet": false,
+    "reponse_attendue": "Quatre étapes : déclaration (DECLARE), ouverture (OPEN), traitement des lignes (FETCH), fermeture (CLOSE)."
+  },
+  {
+    "question": "Dans quelle partie d'un bloc PL/SQL doit-on déclarer un curseur ?",
+    "document": "chap03.pdf",
+    "page": 2,
+    "hors_sujet": false,
+    "reponse_attendue": "Dans la partie DECLARE du bloc, avec la syntaxe CURSOR nomcurseur IS commande_SELECT."
+  },
+  {
+    "question": "Que se passe-t-il au moment où on ouvre un curseur avec OPEN ?",
+    "document": "chap03.pdf",
+    "page": 2,
+    "hors_sujet": false,
+    "reponse_attendue": "Allocation mémoire du curseur, analyse sémantique et syntaxique de l'ordre, et pose éventuelle de verrous (SELECT ... FOR UPDATE)."
+  },
+  {
+    "question": "Pourquoi faut-il fermer un curseur ?",
+    "document": "chap03.pdf",
+    "page": 2,
+    "hors_sujet": false,
+    "reponse_attendue": "CLOSE libère la place mémoire réservée au curseur."
+  },
+  {
+    "question": "Combien de lignes l'instruction FETCH récupère-t-elle à chaque appel ?",
+    "document": "chap03.pdf",
+    "page": 2,
+    "hors_sujet": false,
+    "reponse_attendue": "Une seule ligne à la fois ; il faut répéter FETCH pour traiter la ligne suivante."
+  },
+  {
+    "question": "Quels sont les attributs d'un curseur explicite ?",
+    "document": "chap03.pdf",
+    "page": 3,
+    "hors_sujet": false,
+    "reponse_attendue": "%FOUND, %NOTFOUND, %ISOPEN et %ROWCOUNT."
+  },
+  {
+    "question": "Que contient l'attribut %ROWCOUNT ?",
+    "document": "chap03.pdf",
+    "page": 3,
+    "hors_sujet": false,
+    "reponse_attendue": "Le nombre de lignes traitées par l'ordre SQL ; il évolue à chaque ligne distribuée."
+  },
+  {
+    "question": "Comment teste-t-on le résultat d'un curseur implicite après un UPDATE ?",
+    "document": "chap03.pdf",
+    "page": 3,
+    "hors_sujet": false,
+    "reponse_attendue": "Avec les attributs préfixés par SQL : SQL%FOUND, SQL%NOTFOUND, SQL%ISOPEN, SQL%ROWCOUNT."
+  },
+  {
+    "question": "Quand l'attribut %ISOPEN vaut-il VRAI ?",
+    "document": "chap03.pdf",
+    "page": 3,
+    "hors_sujet": false,
+    "reponse_attendue": "Quand le curseur est ouvert (attribut booléen)."
+  },
+  {
+    "question": "Comment parcourir toutes les lignes d'un curseur sans écrire soi-même OPEN, FETCH et CLOSE ?",
+    "document": "chap03.pdf",
+    "page": 4,
+    "hors_sujet": false,
+    "reponse_attendue": "Avec une boucle FOR nomrecord IN nomcurseur LOOP ... END LOOP, qui génère implicitement le record %ROWTYPE, l'ouverture, le FETCH, la sortie sur %NOTFOUND et la fermeture."
+  },
+  {
+    "question": "À quoi sert un curseur paramétré ?",
+    "document": "chap03.pdf",
+    "page": 4,
+    "hors_sujet": false,
+    "reponse_attendue": "À utiliser des variables dans le curseur, principalement dans la clause WHERE."
+  },
+  {
+    "question": "Quels types peut-on donner aux paramètres d'un curseur ?",
+    "document": "chap03.pdf",
+    "page": 4,
+    "hors_sujet": false,
+    "reponse_attendue": "char, number, date et boolean, sans spécifier la longueur."
+  },
+  {
+    "question": "À quoi sert la clause WHERE CURRENT OF ?",
+    "document": "chap03.pdf",
+    "page": 5,
+    "hors_sujet": false,
+    "reponse_attendue": "À accéder directement à la ligne ramenée par le dernier FETCH pour la modifier ou la supprimer (UPDATE, DELETE)."
+  },
+  {
+    "question": "Que faut-il ajouter à la déclaration du curseur pour pouvoir utiliser WHERE CURRENT OF ?",
+    "document": "chap03.pdf",
+    "page": 5,
+    "hors_sujet": false,
+    "reponse_attendue": "La clause FOR UPDATE OF nom_colonne, qui pose un verrou d'intention sur les lignes."
+  },
+  {
+    "question": "Qui a gagné la Coupe du monde de football 2022 ?",
+    "document": null,
+    "page": null,
+    "hors_sujet": true,
+    "reponse_attendue": "L'assistant doit indiquer qu'il ne trouve pas l'information dans les ressources du cours."
+  },
+  {
+    "question": "Quel temps fera-t-il demain à Tunis ?",
+    "document": null,
+    "page": null,
+    "hors_sujet": true,
+    "reponse_attendue": "L'assistant doit indiquer qu'il ne trouve pas l'information dans les ressources du cours."
+  },
+  {
+    "question": "Qu'est-ce que la troisième forme normale (3FN) ?",
+    "document": null,
+    "page": null,
+    "hors_sujet": true,
+    "reponse_attendue": "Piège : sujet de bases de données mais absent de ce cours ; l'assistant ne doit pas répondre de mémoire et doit dire qu'il ne trouve pas l'information."
+  },
+  {
+    "question": "Comment créer un composant Vue 3 avec Vuetify ?",
+    "document": null,
+    "page": null,
+    "hors_sujet": true,
+    "reponse_attendue": "Piège : sujet technique hors du cours ; l'assistant doit indiquer qu'il ne trouve pas l'information dans les ressources."
+  }
+]
