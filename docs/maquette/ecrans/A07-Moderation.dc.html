@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Administration · Modération – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4FB8;width:228px;flex:none}
+.brand:hover{text-decoration:none;color:#1E4FB8}
+.brand-mark{width:36px;height:36px;border-radius:8px;background:#1E4FB8;color:#fff;display:grid;place-items:center}
+.admin-tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#FEF3DC;color:#7A4A00;border-radius:4px;padding:2px 6px}
+.search{flex:0 1 520px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:999px;background:#EEF2FA;color:#5B6478}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:#1C2333}
+.spacer{flex:1}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.dot{position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;color:#1C2333}
+.v-avatar{width:40px;height:40px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;background:#01579B;flex:none}
+.layout{display:flex;flex:1}
+.v-navigation-drawer{width:288px;flex:none;background:#fff;border-right:1px solid #D5DBE7;padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.subheader{font-size:12px;font-weight:500;letter-spacing:.125em;text-transform:uppercase;color:#5B6478;padding:16px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:8px;color:#1C2333}
+.nav-item:hover{background:#EEF2FA;text-decoration:none;color:#1C2333}
+.nav-item .i{color:#5B6478}
+.nav-item.active{background:#E3EBFB;color:#1E4FB8;font-weight:500}.nav-item.active .i{color:#1E4FB8}
+.grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#C62828;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center}
+.v-main{flex:1 1 auto;min-width:0;padding:28px 32px 40px;display:flex;flex-direction:column;gap:16px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--flat:disabled{background:#D5DBE7;color:#5B6478;box-shadow:none;cursor:not-allowed}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.v-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;border:1px solid transparent;background:transparent}
+.v-chip.lg{height:30px;padding:0 12px;font-size:13px;cursor:pointer}
+.c-primary{background:#E3EBFB;color:#1E4FB8}.c-error{background:#FBE4E4;color:#B71C1C}.c-warning{background:#FDEBD9;color:#8A4100}.c-success{background:#E3F1E4;color:#1B5E20}.c-neutral{background:#EEF2FA;color:#4A5366}.c-outline{border-color:#D5DBE7;color:#4A5366}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.v-card{background:#fff;border:1px solid #D5DBE7;border-radius:12px;min-width:0}
+.md{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.queue{flex:1 1 340px;max-width:420px;overflow:hidden}
+.detail{flex:999 1 480px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.q{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;width:100%;border:0;border-top:1px solid #EEF2FA;background:transparent;text-align:left;cursor:pointer}
+.q:hover{background:#F4F6FB}
+.q.on{background:#E3EBFB;box-shadow:inset 3px 0 0 #1E4FB8}
+.ctx{display:flex;flex-direction:column;gap:2px;border:1px solid #D5DBE7;border-radius:8px;padding:8px;background:#F7F9FE}
+.cm{display:flex;gap:10px;padding:8px;border-radius:6px;opacity:.6}
+.cm.target{opacity:1;background:#fff;border:2px solid #C62828}
+.mini{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;font-size:12px;font-weight:500;color:#fff;flex:none}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #D5DBE7;border-radius:8px;cursor:pointer}
+.opt.on{border-color:#1E4FB8;background:#F3F6FD}
+.opt input{width:18px;height:18px;margin:0;accent-color:#1E4FB8}
+.field{position:relative;display:flex;flex-direction:column;gap:4px}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:#fff;font-size:12px;line-height:16px;color:#5B6478}
+.control{display:flex;border:1px solid #8A93A6;border-radius:4px;padding:14px 16px;background:#fff}
+.control textarea{border:0;outline:0;background:transparent;flex:1;resize:vertical;min-height:56px;font-size:15px}
+@media (max-width:1100px){.brand{width:auto}}
+@media (max-width:960px){.v-navigation-drawer{display:none}.v-main{padding:20px 16px 40px}.search{display:none}.user-text{display:none}.queue{max-width:none}.opts{grid-template-columns:minmax(0,1fr)}.detail{padding:16px}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <button class="icon-btn" type="button" aria-label="Ouvrir le menu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.menu}}"></path></svg></button>
+    <a class="brand" href="A09-Dashboard.dc.html"><span class="brand-mark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span>UniConnect<span class="admin-tag">Admin</span></a>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input type="search" aria-label="Rechercher" placeholder="Rechercher un utilisateur, un espace…"></label>
+    <span class="spacer"></span>
+    <a class="icon-btn" href="A07-Moderation.dc.html" aria-label="Signalements en attente"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.bell}}"></path></svg><sc-if value="{{pending}}" hint-placeholder-val="{{true}}"><span class="dot">{{pending}}</span></sc-if></a>
+    <span class="user"><span class="v-avatar">LH</span><span class="user-text"><span style="display:block;font-weight:500">Leila Haddad</span><span class="caption">Administration · Scolarité</span></span></span>
+  </header>
+  <div class="layout">
+    <nav class="v-navigation-drawer" aria-label="Navigation administration">
+      <sc-for list="{{nav}}" as="sec" hint-placeholder-count="6">
+        <sc-if value="{{sec.title}}" hint-placeholder-val="{{true}}"><div class="subheader">{{sec.title}}</div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="2">
+          <a class="{{it.cls}}" href="{{it.href}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{it.d}}"></path></svg><span class="grow">{{it.label}}</span><sc-if value="{{it.badge}}" hint-placeholder-val="{{false}}"><span class="badge">{{it.badge}}</span></sc-if></a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <main class="v-main">
+      <div><h1 style="font-size:24px;line-height:32px;font-weight:500">Modération des signalements</h1><p class="muted">Chaque décision est historisée avec son commentaire.</p></div>
+      <div class="md">
+        <section class="v-card queue" aria-label="File des signalements">
+          <div style="display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap" role="group" aria-label="Filtrer par état">
+            <sc-for list="{{filters}}" as="f" hint-placeholder-count="3"><button class="{{f.cls}}" type="button" aria-pressed="{{f.on}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for>
+          </div>
+          <sc-for list="{{queue}}" as="q" hint-placeholder-count="4">
+            <button class="{{q.cls}}" type="button" onClick="{{q.pick}}" aria-pressed="{{q.on}}">
+              <svg class="i" style="color:#B71C1C;margin-top:2px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.flag}}"></path></svg>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="display:flex;gap:8px;align-items:center"><span class="grow" style="font-weight:500">{{q.motif}}</span><span class="{{q.stCls}}">{{q.st}}</span></span><span class="muted grow">{{q.space}} · {{q.author}}</span><span class="caption">{{q.date}} · {{q.count}}</span></span>
+            </button>
+          </sc-for>
+        </section>
+        <section class="v-card detail" aria-labelledby="t-d">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><h2 id="t-d" style="font-size:20px;font-weight:500;flex:1">{{cur.motif}}</h2><span class="{{cur.stCls}}">{{cur.st}}</span></div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap" class="muted"><span>Espace : <strong style="color:#1C2333">{{cur.space}}</strong></span><span>Auteur : <strong style="color:#1C2333">{{cur.author}}</strong></span><span>{{cur.count}}</span></div>
+          <div>
+            <div class="caption" style="margin-bottom:6px">Contenu signalé dans son contexte</div>
+            <div class="ctx">
+              <sc-for list="{{cur.ctx}}" as="m" hint-placeholder-count="3">
+                <div class="{{m.cls}}"><span class="mini" style="{{m.av}}">{{m.ini}}</span><div style="min-width:0"><div><strong>{{m.name}}</strong> <span class="caption">{{m.time}}</span></div><p>{{m.body}}</p></div></div>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{cur.open}}" hint-placeholder-val="{{true}}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div>
+                <div style="font-weight:500;margin-bottom:8px">Décision</div>
+                <div class="opts" role="radiogroup" aria-label="Décision">
+                  <sc-for list="{{decisions}}" as="d" hint-placeholder-count="6"><label class="{{d.cls}}"><input type="radio" name="dec" checked="{{d.on}}" onChange="{{d.pick}}">{{d.label}}</label></sc-for>
+                </div>
+              </div>
+              <div class="field"><label for="cm">Commentaire de décision (obligatoire)</label><div class="control"><textarea id="cm" rows="2" placeholder="Expliquez la décision…" value="{{comment}}" onInput="{{onComment}}"></textarea></div></div>
+              <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap"><button class="v-btn v-btn--text" type="button">Voir l'historique de l'auteur</button><button class="v-btn v-btn--flat" type="button" disabled="{{cantSubmit}}" onClick="{{submit}}">Valider la décision</button></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{cur.closed}}" hint-placeholder-val="{{false}}">
+            <div style="padding:12px 16px;border-radius:8px;background:#E3F1E4;color:#1B5E20">Décision enregistrée : <strong>{{cur.decision}}</strong>. L'auteur du signalement a été notifié.</div>
+          </sc-if>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+const IC = {
+  menu: "M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell: "M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  dashboard: "M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z",
+  calendar: "M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z",
+  cog: "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  accountMultiple: "M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  accountKey: "M11 10V12H9V14H7V12H5.8C5.4 13.2 4.3 14 3 14C1.3 14 0 12.7 0 11S1.3 8 3 8C4.3 8 5.4 8.8 5.8 10H11M3 10C2.4 10 2 10.4 2 11S2.4 12 3 12 4 11.6 4 11 3.6 10 3 10M16 14C18.7 14 24 15.3 24 18V20H8V18C8 15.3 13.3 14 16 14M16 12C13.8 12 12 10.2 12 8S13.8 4 16 4 20 5.8 20 8 18.2 12 16 12Z",
+  group: "M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z",
+  flag: "M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  history: "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3",
+  message: "M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6M14,14H6V12H14M18,8H6V6H18"
+};
+const NAV = [
+  [null, [["Tableau de bord","dashboard","A09-Dashboard.dc.html"]]],
+  ["Paramétrage", [["Années universitaires","calendar","A01-Annees.dc.html"],["Référentiels académiques","school","A02-Referentiels.dc.html"],["Règles de visibilité","cog","A05-Visibilite.dc.html"]]],
+  ["Utilisateurs", [["Comptes autorisés","accountMultiple","A03-Comptes.dc.html"],["Utilisateurs et droits","accountKey","A04-Droits.dc.html"]]],
+  ["Espaces", [["Groupes organisationnels","group","A06-Groupes.dc.html"]]],
+  ["Supervision", [["Modération","flag","A07-Moderation.dc.html"],["Historique","history","A08-Historique.dc.html"]]],
+  [null, [["Retour à la messagerie","message","E04-Accueil.dc.html"]]]
+];
+const R = [
+  { k: "a", motif: "Harcèlement", space: "Vie étudiante", author: "Compte E-2291", date: "Hier, 18:40", count: "4 signalements", st0: "Nouveau",
+    ctx: [["SM","background:#00796B","Sami M.","18:31","Quelqu'un a les horaires du bus de 18 h ?"],["E2","background:#C62828","Compte E-2291","18:38","[Message signalé : propos insultants visant un autre étudiant]"],["RK","background:#01579B","Rim K.","18:42","Merci de rester respectueux s'il vous plaît."]], t: 1 },
+  { k: "b", motif: "Spam", space: "Club Informatique", author: "Compte E-1820", date: "Aujourd'hui, 08:12", count: "2 signalements", st0: "Nouveau",
+    ctx: [["E1","background:#C62828","Compte E-1820","08:10","Achetez des abonnements pas chers, lien en message privé !!!"],["AT","background:#01579B","Amine T.","08:15","Ce message n'a rien à faire ici."]], t: 0 },
+  { k: "c", motif: "Information erronée", space: "Scolarité – Annonces", author: "Service scolarité", date: "11/10, 14:02", count: "1 signalement", st0: "En cours",
+    ctx: [["SC","background:#F59E0B;color:#1C2333","Service scolarité","14:00","L'examen de réseaux aura lieu le 12/01 en amphi C."],["YB","background:#1E4FB8","Yassine B.","14:05","Le calendrier affiché indique le 14/01, lequel est correct ?"]], t: 0 }
+];
+const DEC = ["Rejeter le signalement", "Masquer le message", "Supprimer le contenu", "Avertir l'auteur", "Retirer l'auteur de l'espace", "Suspendre le compte"];
+const STC = { "Nouveau": "v-chip c-error", "En cours": "v-chip c-warning", "Traité": "v-chip c-success" };
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sel: "a", filter: "À traiter", dec: "Supprimer le contenu", comment: "", done: {} }; }
+  renderVals() {
+    const s = this.state;
+    const stOf = (r) => s.done[r.k] ? "Traité" : r.st0;
+    const list = R.filter((r) => s.filter === "Tous" || (s.filter === "Traités" ? stOf(r) === "Traité" : stOf(r) !== "Traité"));
+    const r = R.find((x) => x.k === s.sel);
+    const pend = R.filter((x) => stOf(x) !== "Traité").length;
+    return {
+      ic: IC,
+      pending: pend ? String(pend) : "",
+      nav: NAV.map(([title, items]) => ({ title, items: items.map(([label, icon, href, badge]) => ({ label, href, badge: label === "Modération" && pend ? String(pend) : (badge || ""), d: IC[icon], cls: label === "Modération" ? "nav-item active" : "nav-item" })) })),
+      filters: ["À traiter", "Traités", "Tous"].map((label) => ({ label, on: label === s.filter ? "true" : "false", cls: label === s.filter ? "v-chip lg c-primary" : "v-chip lg c-outline", pick: () => this.setState({ filter: label }) })),
+      queue: list.map((x) => ({ ...x, st: stOf(x), stCls: STC[stOf(x)], on: x.k === s.sel ? "true" : "false", cls: x.k === s.sel ? "q on" : "q", pick: () => this.setState({ sel: x.k, comment: "" }) })),
+      cur: { ...r, st: stOf(r), stCls: STC[stOf(r)], open: !s.done[r.k], closed: !!s.done[r.k], decision: s.done[r.k] || "",
+        ctx: r.ctx.map(([ini, av, name, time, body], i) => ({ ini, av, name, time, body, cls: i === r.t ? "cm target" : "cm" })) },
+      decisions: DEC.map((label) => ({ label, on: label === s.dec, cls: label === s.dec ? "opt on" : "opt", pick: () => this.setState({ dec: label }) })),
+      comment: s.comment, onComment: (e) => this.setState({ comment: e.target.value }),
+      cantSubmit: !s.comment.trim(),
+      submit: () => this.setState({ done: Object.assign({}, s.done, { [r.k]: s.dec }), comment: "" })
+    };
+  }
+}
+</script>
+</body>
+</html>

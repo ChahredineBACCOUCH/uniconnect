@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Créer un espace – UniConnect</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;font-size:14px;line-height:1.43;color:#1C2333;background:#F4F6FB}
+a{color:#1E4FB8;text-decoration:none}a:hover{color:#163C8C;text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.v-app-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;min-height:64px;padding:0 16px 0 12px;background:#fff;border-bottom:1px solid #D5DBE7}
+.icon-btn{position:relative;width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:#5B6478;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:#EEF2FA;color:#1C2333}
+.v-main{flex:1;display:flex;justify-content:center;padding:32px 16px 48px}
+.wrap{width:100%;max-width:840px;display:flex;flex-direction:column;gap:20px}
+.v-card{background:#fff;border:1px solid #D5DBE7;border-radius:12px}
+.stepper{display:flex;align-items:center;gap:8px;padding:16px 20px;border-bottom:1px solid #D5DBE7;overflow-x:auto}
+.step{display:flex;align-items:center;gap:8px;white-space:nowrap;color:#5B6478}
+.step b{width:26px;height:26px;border-radius:999px;display:grid;place-items:center;font-size:13px;background:#EEF2FA;color:#4A5366}
+.step.on{color:#1E4FB8;font-weight:500}.step.on b{background:#1E4FB8;color:#fff}
+.step.done b{background:#2E7D32;color:#fff}
+.sep{flex:1;min-width:24px;height:1px;background:#D5DBE7}
+.body{padding:24px;display:flex;flex-direction:column;gap:20px}
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.opt{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid #D5DBE7;border-radius:10px;cursor:pointer;background:#fff;text-align:left}
+.opt.on{border:2px solid #1E4FB8;background:#F3F6FD;padding:15px}
+.opt[disabled]{opacity:.55;cursor:not-allowed}
+.opt-ico{width:44px;height:44px;border-radius:10px;display:grid;place-items:center}
+.field{position:relative;display:flex;flex-direction:column;gap:4px}
+.field label{position:absolute;top:-9px;left:12px;padding:0 4px;background:#fff;font-size:12px;line-height:16px;color:#5B6478}
+.control{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;border:1px solid #8A93A6;border-radius:4px;background:#fff;color:#5B6478}
+.control input,.control textarea,.control select{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:16px;color:#1C2333}
+.control textarea{padding:16px 0;resize:vertical;min-height:72px}
+.field.focused .control{border:2px solid #1E4FB8}.field.focused label{color:#1E4FB8}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.v-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:14px;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;text-decoration:none;white-space:nowrap;background:transparent}
+.v-btn .i{width:18px;height:18px}.v-btn:hover{text-decoration:none}
+.v-btn--flat{background:#1E4FB8;color:#fff;box-shadow:0 2px 3px -1px rgba(0,0,0,.2)}.v-btn--flat:hover{background:#163C8C;color:#fff}
+.v-btn--text{color:#1E4FB8;padding:0 10px}.v-btn--text:hover{background:#E3EBFB}
+.v-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 6px 0 4px;border-radius:999px;font-size:13px;font-weight:500;background:#E3EBFB;color:#1E4FB8}
+.mini{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;font-size:11px;font-weight:500;color:#fff}
+.chip-x{width:22px;height:22px;border:0;border-radius:999px;background:transparent;color:#1E4FB8;display:grid;place-items:center;cursor:pointer}
+.actions{display:flex;justify-content:space-between;gap:12px;padding:16px 24px;border-top:1px solid #D5DBE7;flex-wrap:wrap}
+.muted{color:#5B6478}.caption{font-size:12px;line-height:16px;color:#5B6478}
+.recap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px 20px}
+.recap dt{color:#5B6478}.recap dd{margin:0;font-weight:500}
+@media (max-width:720px){.opts,.two{grid-template-columns:minmax(0,1fr)}.recap{grid-template-columns:minmax(0,1fr)}.recap dd{margin-bottom:8px}.body{padding:16px}}
+</style>
+</helmet>
+<div class="app">
+  <header class="v-app-bar">
+    <a class="icon-btn" href="E04-Accueil.dc.html" aria-label="Fermer et revenir à l'accueil"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.close}}"></path></svg></a>
+    <h1 style="font-size:20px;font-weight:500;flex:1">Créer un espace</h1>
+    <span class="caption">Brouillon enregistré automatiquement</span>
+  </header>
+  <main class="v-main">
+    <div class="wrap">
+      <section class="v-card" aria-label="Création d'un espace">
+        <ol class="stepper" style="margin:0;list-style:none">
+          <sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+            <li class="{{s.cls}}"><b>{{s.n}}</b>{{s.label}}</li><sc-if value="{{s.sep}}" hint-placeholder-val="{{true}}"><li class="sep" aria-hidden="true"></li></sc-if>
+          </sc-for>
+        </ol>
+        <sc-if value="{{s1}}" hint-placeholder-val="{{true}}">
+          <div class="body">
+            <div><h2 style="font-size:18px;font-weight:500">Quel type d'espace ?</h2><p class="muted">Seuls les types autorisés par vos droits sont disponibles.</p></div>
+            <div class="opts" role="radiogroup" aria-label="Type d'espace">
+              <button class="{{optPriv}}" type="button" role="radio" aria-checked="true" onClick="{{noop}}"><span class="opt-ico" style="background:#E3EBFB;color:#1E4FB8"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.lock}}"></path></svg></span><span style="font-weight:500;font-size:16px">Groupe privé</span><span class="caption">Sur invitation uniquement. Invisible dans les recherches.</span></button>
+              <button class="opt" type="button" role="radio" aria-checked="false" disabled=""><span class="opt-ico" style="background:#EEF2FA;color:#4A5366"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.pound}}"></path></svg></span><span style="font-weight:500;font-size:16px">Channel communautaire</span><span class="caption">Réservé aux enseignants et à l'administration.</span></button>
+              <button class="opt" type="button" role="radio" aria-checked="false" disabled=""><span class="opt-ico" style="background:#EEF2FA;color:#4A5366"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.school}}"></path></svg></span><span style="font-weight:500;font-size:16px">Groupe organisationnel</span><span class="caption">Créé par l'administration depuis les référentiels.</span></button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{s2}}" hint-placeholder-val="{{false}}">
+          <div class="body">
+            <h2 style="font-size:18px;font-weight:500">Informations</h2>
+            <div class="field focused"><label for="nm">Nom de l'espace (3 à 60 caractères)</label><div class="control"><input id="nm" value="Projet intégration – Équipe 4"></div></div>
+            <div class="field"><label for="ds">Description</label><div class="control"><textarea id="ds" rows="2">Suivi du projet d'intégration : maquettes, backlog Jira et revues de code.</textarea></div></div>
+            <div class="two">
+              <div class="field"><label for="pub">Droit de publication</label><div class="control"><select id="pub"><option>Tous les membres</option><option>Gestionnaires seulement</option></select></div></div>
+              <div class="field"><label for="vis">Visibilité des messages</label><div class="control"><select id="vis"><option>7 jours (par défaut)</option><option>24 heures</option><option>30 jours</option><option>Illimitée</option></select></div></div>
+            </div>
+            <p class="caption">La durée par défaut d'un groupe privé est fixée par l'administration. Vous pourrez la modifier plus tard dans les paramètres.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{s3}}" hint-placeholder-val="{{false}}">
+          <div class="body">
+            <div><h2 style="font-size:18px;font-weight:500">Inviter des membres</h2><p class="muted">Facultatif : vous pourrez inviter d'autres personnes plus tard.</p></div>
+            <div class="field focused"><label for="q">Rechercher par nom ou identifiant</label><div class="control"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.magnify}}"></path></svg><input id="q" value="Nour"></div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" aria-label="Personnes sélectionnées">
+              <sc-for list="{{invited}}" as="p" hint-placeholder-count="3"><span class="v-chip"><span class="mini" style="{{p.av}}">{{p.ini}}</span>{{p.name}}<button class="chip-x" type="button" aria-label="Retirer {{p.name}}" onClick="{{p.remove}}"><svg class="i" style="width:16px;height:16px" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.close}}"></path></svg></button></span></sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{s4}}" hint-placeholder-val="{{false}}">
+          <div class="body">
+            <h2 style="font-size:18px;font-weight:500">Récapitulatif</h2>
+            <dl class="recap" style="margin:0">
+              <dt>Type</dt><dd>Groupe privé</dd>
+              <dt>Nom</dt><dd>Projet intégration – Équipe 4</dd>
+              <dt>Publication</dt><dd>Tous les membres</dd>
+              <dt>Visibilité des messages</dt><dd>7 jours</dd>
+              <dt>Invitations</dt><dd>{{inviteCount}}</dd>
+              <dt>Propriétaire</dt><dd>Vous (Yassine Ben Salah)</dd>
+            </dl>
+          </div>
+        </sc-if>
+        <div class="actions">
+          <sc-if value="{{canBack}}" hint-placeholder-val="{{false}}"><button class="v-btn v-btn--text" type="button" onClick="{{back}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.left}}"></path></svg>Retour</button></sc-if>
+          <sc-if value="{{isFirst}}" hint-placeholder-val="{{true}}"><a class="v-btn v-btn--text" href="E04-Accueil.dc.html">Annuler</a></sc-if>
+          <sc-if value="{{notLast}}" hint-placeholder-val="{{true}}"><button class="v-btn v-btn--flat" type="button" onClick="{{next}}">Continuer<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.right}}"></path></svg></button></sc-if>
+          <sc-if value="{{isLast}}" hint-placeholder-val="{{false}}"><a class="v-btn v-btn--flat" href="E05-Discussion.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ic.check}}"></path></svg>Créer l'espace</a></sc-if>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+const IC = {
+  close: "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+  lock: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound: "M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  school: "M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  left: "M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z",
+  right: "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",
+  check: "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
+};
+const PEOPLE = [
+  { k: "a", ini: "AT", av: "background:#01579B", name: "Amine Trabelsi" },
+  { k: "b", ini: "NK", av: "background:#F59E0B;color:#1C2333", name: "Nour Kallel" },
+  { k: "c", ini: "MH", av: "background:#C62828", name: "Meriem Haddad" }
+];
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { step: 1, removed: {} }; }
+  renderVals() {
+    const s = this.state.step;
+    const inv = PEOPLE.filter((p) => !this.state.removed[p.k]);
+    return {
+      ic: IC,
+      steps: ["Type", "Informations", "Membres", "Récapitulatif"].map((label, i) => ({ n: i + 1 < s ? "✓" : String(i + 1), label, sep: i < 3, cls: i + 1 === s ? "step on" : i + 1 < s ? "step done" : "step" })),
+      s1: s === 1, s2: s === 2, s3: s === 3, s4: s === 4,
+      optPriv: "opt on", noop: () => {},
+      invited: inv.map((p) => ({ ...p, remove: () => this.setState({ removed: Object.assign({}, this.state.removed, { [p.k]: true }) }) })),
+      inviteCount: inv.length ? inv.map((p) => p.name).join(", ") : "Aucune pour l'instant",
+      canBack: s > 1, isFirst: s === 1, notLast: s < 4, isLast: s === 4,
+      next: () => this.setState({ step: Math.min(4, s + 1) }), back: () => this.setState({ step: Math.max(1, s - 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UniConnect v1.0</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap">
+<style>
+/* Layout : bandeau de version + app Vuetify (app bar, menu latéral, contenu) ; menu bas sur téléphone */
+:root{
+  --bg:#F4F6FB;--surface:#FFFFFF;--surface-2:#EEF2FA;--line:#D5DBE7;--fg:#1C2333;--muted:#5B6478;
+  --primary:#1E4FB8;--on-primary:#FFFFFF;--primary-soft:#E3EBFB;--primary-hover:#163C8C;
+  --ai:#B45309;--ai-soft:#FEF3DC;--ok:#1B5E20;--ok-soft:#E3F1E4;--warn:#8A4100;--warn-soft:#FDEBD9;--err:#B71C1C;--err-soft:#FBE4E4;
+  --strip:#14254F;--strip-fg:#E3EBFB;--jira:#0B57D0;--scrim:rgba(15,20,32,.5);--snack:#2B3140;--snack-fg:#FFFFFF;
+  --font:Roboto,"Segoe UI",Arial,sans-serif;--mono:"Roboto Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1420;--surface:#171D2B;--surface-2:#1F2737;--line:#2C3547;--fg:#E6EAF2;--muted:#9AA4B8;
+  --primary:#8AB0FF;--on-primary:#0F1420;--primary-soft:#1D2C4F;--primary-hover:#A9C4FF;
+  --ai:#F2B35B;--ai-soft:#3A2A12;--ok:#8BD49A;--ok-soft:#173222;--warn:#F5B27A;--warn-soft:#3A2614;--err:#F49A9A;--err-soft:#3B1A1A;
+  --strip:#0A0F1A;--strip-fg:#C9D6F2;--jira:#8AB0FF;--scrim:rgba(0,0,0,.6);--snack:#E6EAF2;--snack-fg:#0F1420;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1420;--surface:#171D2B;--surface-2:#1F2737;--line:#2C3547;--fg:#E6EAF2;--muted:#9AA4B8;
+  --primary:#8AB0FF;--on-primary:#0F1420;--primary-soft:#1D2C4F;--primary-hover:#A9C4FF;
+  --ai:#F2B35B;--ai-soft:#3A2A12;--ok:#8BD49A;--ok-soft:#173222;--warn:#F5B27A;--warn-soft:#3A2614;--err:#F49A9A;--err-soft:#3B1A1A;
+  --strip:#0A0F1A;--strip-fg:#C9D6F2;--jira:#8AB0FF;--scrim:rgba(0,0,0,.6);--snack:#E6EAF2;--snack-fg:#0F1420;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--font)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--strip)}
+h1,h2,h3,p{margin:0}h1,h2{text-wrap:balance}
+a{color:var(--primary)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.i{width:22px;height:22px;fill:currentColor;flex:none}
+.muted{color:var(--muted)}.cap{font-size:12px;line-height:16px;color:var(--muted)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* bandeau de version */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.strip{background:var(--strip);color:var(--strip-fg);display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding-block:8px}
+.strip .ver{font-weight:700;letter-spacing:.02em}
+.strip .meta{font-size:12px;opacity:.8}
+.strip .sp{flex:1}
+.seg{display:inline-flex;border:1px solid color-mix(in srgb,var(--strip-fg) 40%,transparent);border-radius:999px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--strip-fg);padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--strip-fg);color:var(--strip)}
+.strip-btn{background:transparent;border:1px solid color-mix(in srgb,var(--strip-fg) 40%,transparent);color:var(--strip-fg);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.strip-btn[aria-pressed="true"]{background:var(--strip-fg);color:var(--strip)}
+
+/* app bar */
+.appbar{background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;color:var(--primary);text-decoration:none;flex:none;background:none;border:0;cursor:pointer;padding:0}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center}
+.brand-mark .i{width:20px;height:20px}
+.admin-tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--ai-soft);color:var(--ai);border-radius:4px;padding:2px 6px}
+.search{flex:0 1 460px;display:flex;align-items:center;gap:10px;height:42px;padding:0 16px;border-radius:999px;background:var(--surface-2);color:var(--muted);margin-left:24px}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:var(--fg)}
+.spacer{flex:1}
+.icon-btn{position:relative;width:42px;height:42px;border:0;border-radius:999px;background:transparent;color:var(--muted);display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:var(--surface-2);color:var(--fg)}
+.dot{position:absolute;top:3px;right:3px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#C62828;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.user{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:4px;border-radius:8px;text-align:left}
+.user:hover{background:var(--surface-2)}
+.av{width:38px;height:38px;border-radius:999px;display:inline-grid;place-items:center;font-weight:500;color:#fff;flex:none;font-size:14px}
+
+/* structure */
+.layout{display:flex;align-items:flex-start}
+.drawer{width:272px;flex:none;align-self:stretch;min-height:calc(100vh - 100px);background:var(--surface);border-right:1px solid var(--line);padding:16px 12px 32px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:2px}
+.sub{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:14px 12px 6px}
+.nav{display:flex;align-items:center;gap:12px;min-height:42px;padding:0 12px;border-radius:8px;border:0;background:transparent;color:var(--fg);text-align:left;cursor:pointer;width:100%}
+.nav:hover{background:var(--surface-2)}
+.nav .i{color:var(--muted);width:20px;height:20px}
+.nav.on{background:var(--primary-soft);color:var(--primary);font-weight:500}.nav.on .i{color:var(--primary)}
+.nav .lbl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--primary);color:var(--on-primary);font-size:11px;font-weight:700;line-height:20px;text-align:center}
+.main{flex:1;min-width:0;padding-block:24px 56px;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.bnav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.bnav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:60px;border:0;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;position:relative}
+.bnav button.on{color:var(--primary);font-weight:500}
+.bnav .dot{top:4px;right:calc(50% - 22px)}
+body[data-mode="auth"] .appbar,body[data-mode="auth"] .drawer,body[data-mode="auth"] .bnav{display:none!important}
+body[data-mode="auth"] .main{padding:0}
+
+/* éléments */
+.ph{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.ph-text{flex:1;min-width:240px;display:flex;flex-direction:column;gap:6px}
+.ph h1{font-size:24px;line-height:32px;font-weight:500}
+.ph-act{display:flex;gap:8px;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;min-width:0}
+.pad{padding:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:4px;border:1px solid transparent;font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;background:transparent;color:var(--primary);text-decoration:none}
+.btn .i{width:18px;height:18px}
+.btn-primary{background:var(--primary);color:var(--on-primary)}.btn-primary:hover{background:var(--primary-hover)}
+.btn-outline{border-color:var(--primary)}.btn-outline:hover,.btn-text:hover{background:var(--primary-soft)}
+.btn-danger{background:#C62828;color:#fff}
+.btn-ai{background:var(--ai);color:var(--surface)}
+.btn[disabled]{background:var(--line);color:var(--muted);cursor:not-allowed;border-color:transparent}
+.btn-sm{min-height:32px;padding:0 10px;font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;background:var(--surface-2);color:var(--muted)}
+.c-primary{background:var(--primary-soft);color:var(--primary)}.c-ok{background:var(--ok-soft);color:var(--ok)}.c-warn{background:var(--warn-soft);color:var(--warn)}.c-err{background:var(--err-soft);color:var(--err)}.c-ai{background:var(--ai-soft);color:var(--ai)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.fchip{border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;height:30px;padding:0 12px;border-radius:999px;font-size:13px}
+.fchip[aria-pressed="true"]{background:var(--primary-soft);border-color:var(--primary-soft);color:var(--primary);font-weight:500}
+.jira-row{display:inline-flex;flex-wrap:wrap;gap:6px}
+.jira{font:500 11px/18px var(--mono);color:var(--jira);border:1px dashed var(--jira);border-radius:4px;padding:0 6px;text-decoration:none;white-space:nowrap}
+.jira:hover{background:var(--primary-soft)}
+body:not(.show-jira) .jira-row{display:none}
+.tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{display:inline-flex;align-items:center;gap:6px;height:46px;padding:0 14px;font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:0;border-bottom:2px solid transparent;background:transparent;cursor:pointer;white-space:nowrap}
+.tab:hover{background:var(--surface-2);color:var(--fg)}
+.tab.on{color:var(--primary);border-bottom-color:var(--primary)}
+.fld{display:flex;flex-direction:column;gap:4px;position:relative}
+.fld label{font-size:12px;color:var(--muted);font-weight:500}
+.inp{border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:11px 14px;font-size:15px;outline:0;width:100%;min-width:0}
+.inp:focus{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+.inp[readonly]{background:var(--surface-2);border-style:dashed;color:var(--muted)}
+.err-msg{font-size:12px;color:var(--err)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.alert{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:8px;background:var(--primary-soft);color:var(--fg)}
+.alert .i{color:var(--primary)}
+.alert-warn{background:var(--warn-soft)}.alert-warn .i{color:var(--warn)}
+.alert-err{background:var(--err-soft)}.alert-err .i{color:var(--err)}
+.tw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;min-width:640px}
+.tbl th{text-align:left;font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:10px 16px;border-bottom:1px solid var(--surface-2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.who{display:flex;align-items:center;gap:12px}
+.who .av{width:32px;height:32px;font-size:12px}
+.switch{position:relative;width:36px;height:20px;flex:none;display:inline-block}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.switch .tr{position:absolute;inset:0;border-radius:999px;background:var(--line)}
+.switch .th{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:left .15s}
+.switch input:checked~.tr{background:var(--primary)}.switch input:checked~.th{left:18px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--surface-2)}
+.row:last-child{border-bottom:0}
+.grow{flex:1;min-width:0}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+
+/* auth */
+.auth{display:flex;flex-wrap:wrap;min-height:calc(100vh - 44px)}
+.auth-brand{flex:1 1 50%;background:var(--primary);color:var(--on-primary);padding:56px max(24px,env(safe-area-inset-left,0px)) 56px;display:flex;flex-direction:column;justify-content:space-between;gap:32px}
+.auth-brand h1{font-size:34px;line-height:40px;font-weight:500;max-width:440px}
+.auth-form{flex:1 1 50%;display:flex;align-items:center;justify-content:center;padding:40px max(16px,env(safe-area-inset-right,0px)) 40px 16px}
+.auth-card{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:36px;display:flex;flex-direction:column;gap:18px}
+.rules{display:flex;flex-direction:column;gap:4px}
+.rule{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}.rule.ok{color:var(--ok)}
+.rule .i{width:16px;height:16px}
+.meter{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.meter span{height:4px;border-radius:2px;background:var(--line)}
+
+/* accueil */
+.spaces{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.sp-card{display:flex;flex-direction:column;gap:10px;padding:18px;text-align:left;cursor:pointer;color:var(--fg)}
+.sp-card:hover{border-color:var(--primary)}
+.sp-ico{width:42px;height:42px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+
+/* espace */
+.space-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.space-head .sp-ico{width:48px;height:48px;border-radius:12px}
+.msgs{display:flex;flex-direction:column}
+.msg{display:flex;gap:12px;padding:12px 20px;position:relative}
+.msg:hover{background:var(--surface-2)}
+.msg .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.msg .meta{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.msg .acts{display:flex;gap:4px;flex-wrap:wrap}
+.file{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--surface);align-self:flex-start;cursor:pointer;color:var(--fg)}
+.file .i{color:#C62828}
+.composer{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.compose-row{display:flex;gap:8px;align-items:flex-end}
+.compose-row textarea{flex:1;min-width:0;resize:none;border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--surface);outline:0;min-height:44px}
+.compose-row textarea:focus{border-color:var(--primary)}
+.sum{border:1px solid color-mix(in srgb,var(--ai) 40%,var(--line));background:var(--ai-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;margin:16px 20px 4px}
+.sum ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.typing{display:inline-flex;gap:3px}.typing span{width:6px;height:6px;border-radius:99px;background:var(--ai);animation:b 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.typing span{animation:none;opacity:.7}.switch .th{transition:none}}
+.ai-wrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:start}
+.ai-chat{display:flex;flex-direction:column}
+.ai-msgs{display:flex;flex-direction:column;gap:16px;padding:20px}
+.q{align-self:flex-end;max-width:80%;background:var(--primary);color:var(--on-primary);padding:10px 14px;border-radius:16px 16px 4px 16px}
+.a{display:flex;gap:12px;align-items:flex-start}
+.ai-av{width:34px;height:34px;border-radius:999px;background:var(--ai-soft);color:var(--ai);display:grid;place-items:center;flex:none}
+.ai-av .i{width:18px;height:18px}
+.a-body{flex:1;min-width:0;background:var(--surface-2);border-radius:4px 16px 16px 16px;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.a-body ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.srcs{display:flex;gap:8px;flex-wrap:wrap}
+.src{display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;color:var(--fg);cursor:pointer}
+.fb{display:flex;align-items:center;gap:4px}
+.fbb{width:32px;height:32px;border-radius:999px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.fbb.on{background:var(--primary-soft);color:var(--primary)}
+.fbb .i{width:16px;height:16px}
+.sugg{display:flex;gap:8px;flex-wrap:wrap;padding:0 20px 16px}
+.sugg button{border:1px solid color-mix(in srgb,var(--ai) 45%,var(--line));background:var(--surface);color:var(--fg);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px;text-align:left}
+.chap{border-bottom:1px solid var(--line)}.chap:last-child{border-bottom:0}
+.chap-h{display:flex;align-items:center;gap:12px;width:100%;padding:14px 20px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--fg)}
+.chap-h:hover{background:var(--surface-2)}
+
+/* admin */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.kpi .n{font-size:28px;line-height:36px;font-weight:500;font-variant-numeric:tabular-nums}
+.bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding:24px 20px 0;border-bottom:1px solid var(--line);margin:0 20px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.bar .v{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar .b{width:70%;max-width:38px;background:var(--primary);border-radius:4px 4px 0 0}
+.xl{display:flex;gap:10px;margin:6px 40px 16px}.xl span{flex:1;text-align:center;font-size:12px;color:var(--muted)}
+.hrow{display:grid;grid-template-columns:110px minmax(0,1fr) 56px;gap:12px;align-items:center}
+.htr{height:12px;background:var(--surface-2);border-radius:0 4px 4px 0}.hf{height:100%;background:var(--primary);border-radius:0 4px 4px 0}
+.md{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.md-list{flex:1 1 280px;max-width:360px;overflow:hidden}
+.md-det{flex:999 1 420px}
+.u{display:flex;align-items:center;gap:12px;padding:10px 16px;width:100%;border:0;border-top:1px solid var(--surface-2);background:transparent;text-align:left;cursor:pointer;color:var(--fg)}
+.u:hover{background:var(--surface-2)}.u.on{background:var(--primary-soft);box-shadow:inset 3px 0 0 var(--primary)}
+.rights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 24px}
+.right{display:flex;gap:12px;align-items:flex-start;padding:8px 0;cursor:pointer}
+.right input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--primary)}
+.rep{display:flex;gap:16px;padding:16px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.quote{border-left:3px solid var(--line);padding:6px 12px;background:var(--surface-2);border-radius:0 6px 6px 0}
+
+/* dialogue, snackbar */
+.overlay{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.dlg{background:var(--surface);border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.dlg h2{font-size:20px;font-weight:500}
+.dlg-act{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.pick{display:flex;align-items:center;gap:12px;padding:8px 4px;border-radius:6px;cursor:pointer}
+.pick:hover{background:var(--surface-2)}
+.pick input{width:18px;height:18px;margin:0;accent-color:var(--primary)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--snack);color:var(--snack-fg);border-radius:6px;padding:12px 18px;box-shadow:0 3px 8px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
+
+/* contenu v1 */
+.vstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.sprint-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:16px 20px 8px}
+.sprint-h h2{font-size:18px;font-weight:500}
+.tech{font-size:12px;color:var(--muted);font-style:italic}
+
+@media (max-width:1200px){.kpis,.vstats{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-wrap{grid-template-columns:minmax(0,1fr)}.ai-wrap aside{border-left:0!important;border-top:1px solid var(--line)}}
+@media (max-width:960px){
+  .drawer,.search,.user-text,.hide-sm{display:none}
+  .main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .bnav{display:flex}
+  .grid2,.rights{grid-template-columns:minmax(0,1fr)}
+  .md-list{max-width:none}
+  .auth-card{padding:24px}
+  .auth-brand{padding-block:28px;flex-basis:100%}.auth-brand .hide-sm{display:none}
+  .auth-form{flex-basis:100%}
+  .msg{padding:12px 14px}
+}
+@media (max-width:520px){.kpis,.vstats{grid-template-columns:minmax(0,1fr)}.hrow{grid-template-columns:90px minmax(0,1fr) 48px}.ph h1{font-size:21px}}
+</style>
+
+<div class="top">
+  <div class="strip gut" id="strip"></div>
+  <header class="appbar gut" id="appbar"></header>
+</div>
+<div class="layout">
+  <nav class="drawer" id="drawer" aria-label="Navigation principale"></nav>
+  <main class="main" id="main"></main>
+</div>
+<nav class="bnav" id="bnav" aria-label="Navigation mobile"></nav>
+<div id="dlg"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const IC = {
+  menu:"M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school:"M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify:"M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell:"M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  home:"M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  book:"M18,2A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H18M18,4H13V12L10.5,9.75L8,12V4H6V20H18V4Z",
+  lock:"M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound:"M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  compass:"M14.19,14.19L6,18L9.81,9.81L18,6M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,10.9A1.1,1.1 0 0,0 10.9,12A1.1,1.1 0 0,0 12,13.1A1.1,1.1 0 0,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z",
+  account:"M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z",
+  group:"M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  plus:"M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",
+  send:"M2,21L23,12L2,3V10L17,12L2,14V21Z",
+  clip:"M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z",
+  pin:"M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z",
+  flag:"M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  spark:"M19,1L17.74,3.75L15,5L17.74,6.26L19,9L20.25,6.26L23,5L20.25,3.75M9,4L6.5,9.5L1,12L6.5,14.5L9,20L11.5,14.5L17,12L11.5,9.5M19,15L17.74,17.74L15,19L17.74,20.25L19,23L20.25,20.25L23,19L20.25,17.74",
+  file:"M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z",
+  download:"M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z",
+  chevron:"M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",
+  check:"M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
+  close:"M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+  dashboard:"M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z",
+  calendar:"M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z",
+  cog:"M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  history:"M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3",
+  shield:"M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z",
+  logout:"M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z",
+  up:"M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z",
+  down:"M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z",
+  info:"M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z",
+  alert:"M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z",
+  folder:"M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z",
+  upload:"M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z",
+  bullhorn:"M12,8H4A2,2 0 0,0 2,10V14A2,2 0 0,0 4,16H5V20A1,1 0 0,0 6,21H8A1,1 0 0,0 9,20V16H12L17,20V4L12,8M21.5,12C21.5,13.71 20.54,15.26 19,16V8C20.53,8.75 21.5,10.3 21.5,12Z",
+  list:"M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
+};
+const ico = (k, st) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"${st ? ` style="${st}"` : ""}><path d="${IC[k]}"></path></svg>`;
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const av = (ini, color, st) => `<span class="av" style="background:${color};${st || ""}">${esc(ini)}</span>`;
+
+/* ===== Les 47 user stories du Jira (clé, sprint, titre, écran) ===== */
+const JURL = "https://uniconnectteam26.atlassian.net/browse/SCRUM-";
+const US = {};
+[
+  ["01",16,"S0","Monorepo et environnement local",""],
+  ["02",18,"S0","Intégration continue GitHub Actions",""],
+  ["03",19,"S0","Squelette déployé en production",""],
+  ["04",20,"S0","Mise en page Vue 3 et thème Vuetify","accueil"],
+  ["05",21,"S0","Modèle de données socle et données de démo",""],
+  ["06",22,"S0","Preuve de concept de l'Assistant IA",""],
+  ["07",23,"S0","Présentation de la conception du 7 novembre",""],
+  ["10",49,"S1","Création de compte avec contrôle d'éligibilité","connexion:register"],
+  ["11",50,"S1","Activation du compte et choix du mot de passe","connexion:activate"],
+  ["12",51,"S1","Connexion et déconnexion","connexion:login"],
+  ["14",52,"S1","Gestion des années universitaires (A01)","admin-annees"],
+  ["15",53,"S1","Comptes autorisés et import CSV (A03)","admin-comptes"],
+  ["16",54,"S1","Référentiels académiques (A02)","admin-referentiels"],
+  ["17",55,"S1","Génération des groupes organisationnels (A06)","admin-groupes"],
+  ["18",56,"S1","Accueil : mes espaces (E04)","accueil"],
+  ["19",57,"S1","Groupes privés et invitations","accueil"],
+  ["20",58,"S1","Membres et rôles d'un espace (E07)","espace:membres"],
+  ["21",59,"S1","Discussion d'un espace","espace:discussion"],
+  ["22",60,"S1","Indexation des ressources pour l'IA","espace:ressources"],
+  ["23",61,"S1","API de question à l'Assistant IA","espace:assistant"],
+  ["13",103,"S2","Mot de passe oublié","connexion:forgot"],
+  ["24",104,"S2","Annuaire des channels et adhésion (E08)","channels"],
+  ["25",105,"S2","Notifications dans l'application","notifications"],
+  ["26",106,"S2","Annonces (onglet Annonces)","espace:annonces"],
+  ["27",107,"S2","Ressources classées par chapitre","espace:ressources"],
+  ["28",108,"S2","Épinglés","espace:epingles"],
+  ["29",109,"S2","Durée de visibilité et purge des contenus expirés","espace:discussion"],
+  ["30",110,"S2","Historique des opérations (A08)","admin-historique"],
+  ["31",111,"S2","Pièces jointes et téléchargement protégé","espace:fichiers"],
+  ["32",112,"S2","Onglet Fichiers","espace:fichiers"],
+  ["33",113,"S2","Interface de l'Assistant IA","espace:assistant"],
+  ["34",114,"S2","Avis, quotas et activation de l'assistant","espace:assistant"],
+  ["35",115,"S2","Signaler un message","espace:discussion"],
+  ["36",116,"S2","Traitement des signalements (A07)","admin-moderation"],
+  ["37",153,"S3","Utilisateurs et droits (A04)","admin-droits"],
+  ["38",154,"S3","Tableau de bord (A09)","admin-dashboard"],
+  ["39",155,"S3","Recherche simple (E10)","recherche"],
+  ["40",156,"S3","Responsive et accessibilité",""],
+  ["41",157,"S3","Tests multi-profils et API",""],
+  ["42",158,"S3","Résumé IA de la discussion","espace:discussion"],
+  ["43",159,"S3","Tests de pertinence de l'IA",""],
+  ["44",160,"S3","Sauvegardes et surveillance de la production",""],
+  ["45",161,"S3","États vides, chargements et messages",""],
+  ["46",162,"S3","Documentation technique et utilisateur",""],
+  ["47",163,"S3","Recette finale et démonstration du 26 novembre",""],
+  ["48",164,"S3","Règles de visibilité et de stockage (A05)","admin-visibilite"],
+  ["49",165,"S3","Profil utilisateur (E11)","profil"]
+].forEach(([c, k, s, t, v]) => { US[c] = { c, k, s, t, v }; });
+const J = (...codes) => `<span class="jira-row">${codes.map((c) => `<a class="jira" href="${JURL}${US[c].k}" target="_blank" rel="noopener" title="${esc(US[c].t)}">US-${c} · ${US[c].s}</a>`).join("")}</span>`;
+
+/* ===== Données de démonstration ===== */
+const ROLES = {
+  etudiant: { ini: "YB", name: "Yassine Ben Salah", first: "Yassine", sub: "Étudiant · L2 Info A", color: "#1E4FB8", mail: "yassine.bensalah@univ.tn" },
+  enseignant: { ini: "SB", name: "Mme Sarra Ben Ali", first: "Sarra", sub: "Enseignante · Informatique", color: "#00796B", mail: "sarra.benali@univ.tn" },
+  admin: { ini: "LH", name: "Leila Haddad", first: "Leila", sub: "Administration · Scolarité", color: "#01579B", mail: "leila.haddad@univ.tn" }
+};
+const SPACES = [
+  { id: "bd", name: "Bases de données · L2 Info A", short: "Bases de données", type: "Matière", icon: "book", members: 48, unread: 5, last: "Mme Ben Ali : le TP2 est à rendre le 24/10." },
+  { id: "web", name: "Développement Web · L2 Info A", short: "Développement Web", type: "Matière", icon: "book", members: 46, unread: 0, last: "M. Mansour : correction du TD3 publiée." },
+  { id: "classe", name: "L2 Informatique – Groupe A", short: "L2 Info – Groupe A", type: "Classe", icon: "school", members: 52, unread: 2, last: "Scolarité : emploi du temps du S1 mis à jour." },
+  { id: "rev", name: "Révisions BD", short: "Révisions BD", type: "Groupe privé", icon: "lock", members: 6, unread: 1, last: "Nour : on se retrouve jeudi ?" },
+  { id: "club", name: "Club Informatique", short: "Club Informatique", type: "Channel", icon: "pound", members: 134, unread: 0, last: "Hackathon le 14 décembre, inscriptions ouvertes." }
+];
+const MEMBERS = [
+  ["SB", "#00796B", "Mme Sarra Ben Ali", "ENS-0142", "Enseignante", "Propriétaire", "01/09/2026"],
+  ["KM", "#01579B", "M. Karim Mansour", "ENS-0098", "Enseignant", "Co-gestionnaire", "01/09/2026"],
+  ["AT", "#1E4FB8", "Amine Trabelsi", "LI2-2026-0311", "Étudiant", "Membre", "01/09/2026"],
+  ["NK", "#B45309", "Nour Kallel", "LI2-2026-0388", "Étudiante", "Membre", "01/09/2026"],
+  ["YB", "#1E4FB8", "Yassine Ben Salah", "LI2-2026-0457", "Étudiant", "Membre", "02/09/2026"],
+  ["MH", "#C62828", "Meriem Haddad", "LI2-2026-0402", "Étudiante", "Membre", "03/09/2026"]
+];
+const CH = [
+  { t: "Chapitre 1 – Introduction aux bases de données", items: [["Cours 1 – Concepts fondamentaux.pdf", "PDF · 1,8 Mo", "15/09/2026"], ["Fiche de révision – Vocabulaire.docx", "Word · 120 Ko", "18/09/2026"]] },
+  { t: "Chapitre 2 – Modèle relationnel", items: [["Cours 2 – Algèbre relationnelle.pdf", "PDF · 2,1 Mo", "29/09/2026"], ["TD2 – Exercices corrigés.pdf", "PDF · 640 Ko", "06/10/2026"]] },
+  { t: "Chapitre 3 – Normalisation", items: [["Chapitre 3 – Normalisation.pdf", "PDF · 2,4 Mo", "12/10/2026"], ["TP2 – Requêtes SQL.docx", "Word · 380 Ko", "12/10/2026"]] }
+];
+const QA = {
+  fn: { q: "Qu'est-ce que la troisième forme normale (3FN) ?", intro: "Une relation est en 3FN si elle est en 2FN et qu'aucun attribut non clé ne dépend d'un autre attribut non clé.",
+    points: ["Elle doit d'abord être en 1FN (valeurs atomiques) et en 2FN (aucune dépendance à une partie seulement de la clé).", "Il ne doit exister aucune dépendance transitive : clé → A → B, avec A qui n'est pas une clé.", "Pour corriger, on déplace B dans une nouvelle relation dont A devient la clé."],
+    outro: "Exemple du cours : Étudiant(num, nom, codeFiliere, nomFiliere) n'est pas en 3FN, car nomFiliere dépend de codeFiliere.", src: [["Chapitre 3 – Normalisation.pdf", "p. 14"], ["Chapitre 3 – Normalisation.pdf", "p. 16"]] },
+  df: { q: "Comment trouver les dépendances fonctionnelles d'une table ?", intro: "On cherche, pour chaque attribut, ce qui suffit à le déterminer de façon unique.",
+    points: ["Partir des règles de gestion, pas des valeurs d'un exemple.", "Écrire A → B quand deux lignes ayant le même A ont forcément le même B.", "Retirer les dépendances déduites (transitivité, augmentation) pour garder une couverture minimale."], outro: "", src: [["Chapitre 3 – Normalisation.pdf", "p. 8"]] },
+  tp: { q: "Pour quand faut-il rendre le TP2 ?", intro: "D'après l'énoncé du TP2, le rendu est attendu le 24/10 avant 23 h 59.",
+    points: ["Travail en binôme, un seul dépôt par binôme.", "Déposer le fichier .sql et un court compte rendu en PDF."], outro: "", src: [["TP2 – Requêtes SQL.docx", "p. 1"]] },
+  none: { q: "", intro: "Je ne trouve pas cette information dans les ressources de ce cours.",
+    points: ["Reformulez la question avec les termes du cours.", "Ou posez-la à votre enseignante dans l'onglet Discussion."], outro: "", src: [] }
+};
+const SUMMARY = ["Le TP2 (requêtes SQL) est à rendre le 24/10, en binôme.", "Les sous-requêtes corrélées sont autorisées, et même attendues, pour la question 4.", "Nour a partagé une fiche de révision sur la normalisation.", "Proposition de séance de révision jeudi à 14 h à la bibliothèque."];
+const RIGHTS = [["param", "Gérer le paramétrage", "Années, référentiels, règles par défaut"], ["users", "Gérer les utilisateurs", "Comptes autorisés, droits, suspension"], ["org", "Créer des groupes organisationnels", "Génération depuis les référentiels"], ["priv", "Créer des groupes privés", "Espaces sur invitation"], ["chan", "Créer des channels", "Espaces ouverts à une communauté"], ["mod", "Modérer les contenus", "Traitement des signalements"], ["dash", "Consulter le tableau de bord", "Indicateurs et statistiques"]];
+const ADM_USERS = [
+  { k: "lh", ini: "LH", c: "#01579B", name: "Leila Haddad", prof: "Administration", mail: "leila.haddad@univ.tn" },
+  { k: "sb", ini: "SB", c: "#00796B", name: "Mme Sarra Ben Ali", prof: "Enseignant", mail: "sarra.benali@univ.tn" },
+  { k: "km", ini: "KM", c: "#00796B", name: "M. Karim Mansour", prof: "Enseignant", mail: "karim.mansour@univ.tn" },
+  { k: "yb", ini: "YB", c: "#1E4FB8", name: "Yassine Ben Salah", prof: "Étudiant", mail: "yassine.bensalah@univ.tn" },
+  { k: "fz", ini: "FZ", c: "#5B6478", name: "Fatma Zribi", prof: "Administration", mail: "fatma.zribi@univ.tn" }
+];
+
+const S = {
+  role: "etudiant", view: "connexion", authMode: "login", space: "bd", tab: "discussion", jira: true,
+  pwd: "Univ2026", search: "normalisation", profileTab: "info", dialog: null, att: null, sum: "idle", aiOn: true, quota: 18,
+  msgs: [
+    { id: 1, ini: "SB", c: "#00796B", name: "Mme Sarra Ben Ali", role: "Enseignante", time: "Hier 09:12", text: "Bonjour à tous. Le TP2 sur les requêtes SQL est en ligne dans Ressources. À rendre le 24/10, en binôme.", pinned: true, days: 28 },
+    { id: 2, ini: "AT", c: "#1E4FB8", name: "Amine Trabelsi", time: "Hier 10:40", text: "Est-ce qu'on a le droit d'utiliser des sous-requêtes corrélées pour la question 4 ?", days: 28 },
+    { id: 3, ini: "SB", c: "#00796B", name: "Mme Sarra Ben Ali", role: "Enseignante", time: "Hier 11:02", text: "Oui, c'est même attendu pour la question 4. Justifiez votre choix dans le compte rendu.", days: 28 },
+    { id: 4, ini: "NK", c: "#B45309", name: "Nour Kallel", time: "Aujourd'hui 08:15", text: "J'ai mis ma fiche de révision sur la normalisation, si ça aide quelqu'un.", file: ["Fiche-normalisation.pdf", "240 Ko"], days: 30 },
+    { id: 5, ini: "MH", c: "#C62828", name: "Meriem Haddad", time: "Aujourd'hui 08:31", text: "Merci Nour ! Quelqu'un est partant pour réviser jeudi à 14 h à la bibliothèque ?", days: 30 }
+  ],
+  files: [["Fiche-normalisation.pdf", "Nour Kallel", "Aujourd'hui", "240 Ko"], ["TP2 – Requêtes SQL.docx", "Mme Sarra Ben Ali", "12/10/2026", "380 Ko"], ["schema-bibliotheque.png", "Amine Trabelsi", "10/10/2026", "1,1 Mo"], ["TD2 – Correction.pdf", "Mme Sarra Ben Ali", "06/10/2026", "640 Ko"]],
+  annonces: [["Contrôle de TP le 5 novembre", "Le contrôle a lieu en salle B12 de 10 h à 12 h. Document autorisé : une feuille A4 recto verso.", "14/10/2026"], ["Correction du TD2 publiée", "La correction est disponible dans Ressources, chapitre 2.", "06/10/2026"]],
+  ai: [{ k: "fn", q: QA.fn.q, done: true, fb: "" }],
+  openCh: { 2: true },
+  notifs: [
+    { id: 1, type: "invite", icon: "lock", text: "Nour Kallel vous invite dans le groupe privé « Révisions BD ».", time: "il y a 2 h", unread: true, state: "pending" },
+    { id: 2, type: "mention", icon: "account", text: "Mme Sarra Ben Ali vous a mentionné dans Bases de données · L2 Info A.", time: "il y a 3 h", unread: true },
+    { id: 3, type: "annonce", icon: "bullhorn", text: "Nouvelle annonce : contrôle de TP le 5 novembre.", time: "hier", unread: true },
+    { id: 4, type: "ressource", icon: "file", text: "Nouvelle ressource : Chapitre 3 – Normalisation.pdf", time: "hier", unread: false },
+    { id: 5, type: "signal", icon: "flag", text: "Votre signalement a été traité par la modération.", time: "lundi", unread: false }
+  ],
+  channels: [
+    { n: "Club Informatique", d: "Ateliers, hackathons et projets entre étudiants.", m: 134, mode: "Ouvert", st: "joined" },
+    { n: "Vie étudiante", d: "Événements, associations et bons plans du campus.", m: 812, mode: "Ouvert", st: "" },
+    { n: "Robotique", d: "Préparation de la coupe de robotique 2027.", m: 38, mode: "Sur demande", st: "" },
+    { n: "Entraide Mathématiques", d: "Questions entre étudiants de L1 et L2.", m: 207, mode: "Ouvert", st: "" },
+    { n: "Scolarité – Annonces", d: "Informations officielles de la scolarité, en lecture seule.", m: 2846, mode: "Automatique", st: "joined" }
+  ],
+  reports: [
+    { id: "r1", where: "Club Informatique", author: "Compte étudiant · L1 Info B", text: "Corrigés d'examens à vendre, contactez-moi en privé.", reason: "Spam ou publicité", date: "Hier 18:40", n: 2, st: "open" },
+    { id: "r2", where: "L2 Informatique – Groupe A", author: "Compte étudiant · L2 Info A", text: "Franchement ce cours est une perte de temps, le prof ne sait pas expliquer.", reason: "Propos irrespectueux", date: "Hier 15:05", n: 1, st: "open" },
+    { id: "r3", where: "Révisions BD", author: "Compte étudiant · L2 Info B", text: "Quelqu'un a le sujet du contrôle de demain ?", reason: "Triche ou fraude", date: "Lundi 21:10", n: 1, st: "open" }
+  ],
+  prefs: [["Invitations reçues", true, true, true], ["Mentions (@vous)", true, true], ["Annonces des enseignants", true, true, true], ["Nouvelles ressources", true, false], ["Tous les nouveaux messages", false, false]],
+  compFilter: "Tous", imp: "choose", selUser: "sb", susp: {},
+  rights: { lh: { param: 1, users: 1, org: 1, priv: 1, chan: 1, mod: 1, dash: 1 }, sb: { org: 1, priv: 1, chan: 1 }, km: { org: 1, priv: 1, chan: 1, mod: 1 }, yb: { priv: 1 }, fz: { chan: 1, dash: 1 } },
+  groupsGenerated: false,
+  log: [
+    ["20/10/2026 09:14", "Leila Haddad", "Import de comptes autorisés", "comptes-L2-2026.csv · 312 lignes"],
+    ["19/10/2026 16:02", "Leila Haddad", "Droits modifiés", "M. Karim Mansour · + Modérer les contenus"],
+    ["19/10/2026 03:00", "Système", "Purge des contenus expirés", "1 284 messages · 96 fichiers"],
+    ["18/10/2026 11:40", "Fatma Zribi", "Signalement traité", "Message supprimé · Club Informatique"],
+    ["15/10/2026 10:05", "Leila Haddad", "Année universitaire activée", "2026/2027"]
+  ]
+};
+const me = () => ROLES[S.role];
+const isT = () => S.role === "enseignant";
+const unread = () => S.notifs.filter((n) => n.unread).length;
+const openReports = () => S.reports.filter((r) => r.st === "open").length;
+const curSpace = () => SPACES.find((s) => s.id === S.space) || SPACES[0];
+
+/* ===== Cadre : bandeau, app bar, menus ===== */
+function stripHtml() {
+  const roles = [["etudiant", "Étudiant"], ["enseignant", "Enseignant"], ["admin", "Administration"]];
+  return `<span class="ver">UniConnect · v1.0</span><span class="meta">Version cible livrée le 26/11/2026 · 47 user stories Jira · données de démonstration</span><span class="sp"></span>
+  <span class="seg" role="group" aria-label="Voir l'application en tant que">${roles.map(([k, l]) => `<button type="button" data-act="role" data-a="${k}" aria-pressed="${S.role === k}">${l}</button>`).join("")}</span>
+  <button class="strip-btn" type="button" data-act="jira" aria-pressed="${S.jira}">Tâches Jira</button>
+  <button class="strip-btn" type="button" data-act="go" data-a="contenu" aria-pressed="${S.view === "contenu"}">${ico("list", "width:14px;height:14px")}Contenu de la v1</button>`;
+}
+function barHtml() {
+  const u = me();
+  return `<button class="brand" type="button" data-act="go" data-a="${S.role === "admin" ? "admin-dashboard" : "accueil"}"><span class="brand-mark">${ico("school")}</span>UniConnect${S.role === "admin" ? '<span class="admin-tag">Admin</span>' : ""}</button>
+  <form class="search" data-submit="search" role="search"><span class="muted">${ico("magnify")}</span><input id="top-search" name="q" aria-label="Rechercher" placeholder="Rechercher un espace, une personne, un fichier…"></form>
+  <span class="spacer"></span>
+  <button class="icon-btn" type="button" data-act="go" data-a="notifications" aria-label="Notifications, ${unread()} non lues">${ico("bell")}${unread() ? `<span class="dot">${unread()}</span>` : ""}</button>
+  <button class="user" type="button" data-act="go" data-a="profil">${av(u.ini, u.color)}<span class="user-text"><span style="display:block;font-weight:500">${u.name}</span><span class="cap">${u.sub}</span></span></button>
+  <button class="icon-btn" type="button" data-act="logout" aria-label="Se déconnecter">${ico("logout")}</button>`;
+}
+function navSections() {
+  const it = (view, label, icon, badge, a2) => ({ view, label, icon, badge, a2 });
+  const out = [
+    ["", [it("accueil", "Accueil", "home"), it("notifications", "Notifications", "bell", unread())]],
+    ["Mes espaces", SPACES.map((s) => it("espace", s.short, s.icon, s.unread, s.id))],
+    ["", [it("channels", "Explorer les channels", "compass"), it("recherche", "Recherche", "magnify"), it("profil", "Mon profil", "account")]]
+  ];
+  if (S.role === "admin") out.push(["Administration", [it("admin-dashboard", "Tableau de bord", "dashboard"), it("admin-annees", "Années universitaires", "calendar"), it("admin-referentiels", "Référentiels", "school"), it("admin-comptes", "Comptes autorisés", "group"), it("admin-droits", "Utilisateurs et droits", "account"), it("admin-visibilite", "Visibilité et stockage", "cog"), it("admin-groupes", "Groupes organisationnels", "folder"), it("admin-moderation", "Modération", "flag", openReports()), it("admin-historique", "Historique", "history")]]);
+  return out;
+}
+function drawerHtml() {
+  return `<button class="btn btn-primary" type="button" data-act="dlg" data-a="create" style="margin-bottom:8px">${ico("plus")}Créer un groupe privé</button>` +
+    navSections().map(([t, items]) => (t ? `<div class="sub">${t}</div>` : "") + items.map((n) => {
+      const on = n.view === S.view && (n.view !== "espace" || n.a2 === S.space);
+      return `<button class="nav${on ? " on" : ""}" type="button" data-act="go" data-a="${n.view}"${n.a2 ? ` data-b="${n.a2}"` : ""}${on ? ' aria-current="page"' : ""}>${ico(n.icon)}<span class="lbl">${esc(n.label)}</span>${n.badge ? `<span class="badge">${n.badge}</span>` : ""}</button>`;
+    }).join("")).join("");
+}
+function bnavHtml() {
+  const items = [["accueil", "Accueil", "home"], ["espace", "Espaces", "group"], ["channels", "Channels", "compass"], ["notifications", "Notifs", "bell"], ["profil", "Profil", "account"]];
+  if (S.role === "admin") items[2] = ["admin-dashboard", "Admin", "dashboard"];
+  return items.map(([v, l, i]) => {
+    const on = S.view === v || (v === "admin-dashboard" && S.view.startsWith("admin"));
+    return `<button type="button" class="${on ? "on" : ""}" data-act="go" data-a="${v}">${ico(i)}${l}${v === "notifications" && unread() ? `<span class="dot">${unread()}</span>` : ""}</button>`;
+  }).join("");
+}
+const head = (title, sub, codes, actions) => `<div class="ph"><div class="ph-text"><h1>${title}</h1>${sub ? `<p class="muted">${sub}</p>` : ""}${codes ? J(...codes) : ""}</div>${actions ? `<div class="ph-act">${actions}</div>` : ""}</div>`;
+
+/* ===== Authentification ===== */
+function pwdChecks(p) { return [["8 caractères minimum", p.length >= 8], ["Une majuscule", /[A-Z]/.test(p)], ["Une minuscule", /[a-z]/.test(p)], ["Un chiffre", /[0-9]/.test(p)]]; }
+function rulesHtml() {
+  const c = pwdChecks(S.pwd), n = c.filter((x) => x[1]).length, col = n === 4 ? "var(--ok)" : n >= 2 ? "var(--warn)" : "var(--err)";
+  return `<div class="meter" aria-hidden="true">${[0, 1, 2, 3].map((i) => `<span style="${i < n ? "background:" + col : ""}"></span>`).join("")}</div>
+  <div class="rules">${c.map(([l, ok]) => `<span class="rule${ok ? " ok" : ""}">${ico(ok ? "check" : "close")}${l}</span>`).join("")}</div>`;
+}
+function vAuth() {
+  const m = S.authMode, u = me();
+  const brand = `<section class="auth-brand"><div style="display:flex;align-items:center;gap:12px"><span class="brand-mark" style="background:rgba(255,255,255,.18);color:#fff;width:42px;height:42px">${ico("school")}</span><span style="font-size:22px;font-weight:700">UniConnect</span></div>
+    <div style="display:flex;flex-direction:column;gap:16px"><h1>La messagerie des classes, des matières et des clubs de l'université.</h1><p class="hide-sm" style="font-size:16px;line-height:24px;opacity:.88;max-width:440px">Vos espaces sont créés automatiquement à partir de votre inscription. L'Assistant IA répond à partir des supports de vos enseignants.</p></div>
+    <div class="hide-sm" style="font-size:12px;opacity:.8">Année universitaire 2026/2027</div></section>`;
+  let card = "";
+  if (m === "login") card = `<form class="auth-card" data-submit="login"><div style="display:flex;flex-direction:column;gap:6px"><h2 style="font-size:24px;font-weight:500">Connexion</h2>${J("12")}</div>
+    <div class="fld"><label for="l-mail">Adresse électronique institutionnelle</label><input class="inp" id="l-mail" type="email" value="${u.mail}" required></div>
+    <div class="fld"><label for="l-pwd">Mot de passe</label><input class="inp" id="l-pwd" type="password" value="Univ2026" required></div>
+    <button class="btn btn-primary" type="submit">Se connecter</button>
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><button class="btn btn-text" type="button" data-act="auth" data-a="forgot">Mot de passe oublié ?</button><button class="btn btn-text" type="button" data-act="auth" data-a="register">Créer mon compte</button></div>
+    <p class="cap">Démo : le profil choisi dans le bandeau du haut (étudiant, enseignant, administration) détermine le compte connecté.</p></form>`;
+  if (m === "register") card = `<form class="auth-card" data-submit="register"><div style="display:flex;flex-direction:column;gap:6px"><span class="cap">Étape 1 sur 2 · Éligibilité</span><h2 style="font-size:24px;font-weight:500">Créer mon compte</h2>${J("10")}</div>
+    <div class="alert">${ico("info")}<span>Seules les personnes figurant sur la liste des comptes autorisés de l'année active peuvent créer un compte.</span></div>
+    <div class="fld"><label for="r-mat">Identifiant universitaire (matricule)</label><input class="inp" id="r-mat" value="LI2-2026-0457"></div>
+    <div class="grid2"><div class="fld"><label for="r-nom">Nom</label><input class="inp" id="r-nom" value="Ben Salah"></div><div class="fld"><label for="r-pre">Prénom</label><input class="inp" id="r-pre" value="Yassine"></div></div>
+    <div class="fld"><label for="r-mail">Adresse électronique institutionnelle</label><input class="inp" id="r-mail" name="mail" type="email" value="yassine.bensalah@univ.tn"><span class="err-msg" id="r-err" hidden>Cette adresse ne figure pas sur la liste des comptes autorisés. Utilisez votre adresse @univ.tn.</span></div>
+    <label class="pick" style="padding:0"><input type="checkbox" id="r-ch" checked>J'accepte la charte d'utilisation de la plateforme</label>
+    <button class="btn btn-primary" type="submit">Vérifier et envoyer le lien</button>
+    <button class="btn btn-text" type="button" data-act="auth" data-a="login">J'ai déjà un compte</button></form>`;
+  if (m === "sent") card = `<div class="auth-card" style="text-align:center"><span class="ai-av" style="width:64px;height:64px;align-self:center;background:var(--ok-soft);color:var(--ok)">${ico("check", "width:30px;height:30px")}</span>
+    <h2 style="font-size:22px;font-weight:500">Vérifiez votre boîte de réception</h2>${J("10", "11")}
+    <p class="muted">Un lien d'activation a été envoyé à <strong>yassine.bensalah@univ.tn</strong>. Il est valable 48 heures.</p>
+    <button class="btn btn-primary" type="button" data-act="auth" data-a="activate">Ouvrir le lien reçu (démo)</button>
+    <button class="btn btn-text" type="button" data-act="toast" data-a="Un nouvel e-mail d'activation a été envoyé.">Renvoyer l'e-mail</button></div>`;
+  if (m === "activate") card = `<form class="auth-card" data-submit="activate"><div style="display:flex;flex-direction:column;gap:6px"><span class="cap">Étape 2 sur 2 · Activation</span><h2 style="font-size:24px;font-weight:500">Choisir mon mot de passe</h2>${J("11")}</div>
+    <div class="alert" style="background:var(--ok-soft)">${ico("check", "color:var(--ok)")}<span>Adresse vérifiée. Profil : Étudiant · L2 Informatique A. Vous rejoindrez automatiquement 4 espaces.</span></div>
+    <div class="fld"><label for="a-pwd">Nouveau mot de passe</label><input class="inp" id="a-pwd" type="password" value="${esc(S.pwd)}" data-live="pwd" aria-describedby="rules-box"></div>
+    <div id="rules-box">${rulesHtml()}</div>
+    <button class="btn btn-primary" id="act-btn" type="submit"${pwdChecks(S.pwd).every((c) => c[1]) ? "" : " disabled"}>Activer mon compte</button></form>`;
+  if (m === "forgot") card = `<form class="auth-card" data-submit="forgot"><div style="display:flex;flex-direction:column;gap:6px"><h2 style="font-size:24px;font-weight:500">Mot de passe oublié</h2>${J("13")}</div>
+    <p class="muted">Saisissez votre adresse institutionnelle : vous recevrez un lien valable 1 heure pour choisir un nouveau mot de passe.</p>
+    <div class="fld"><label for="f-mail">Adresse électronique institutionnelle</label><input class="inp" id="f-mail" type="email" value="${u.mail}"></div>
+    <button class="btn btn-primary" type="submit">Envoyer le lien</button><button class="btn btn-text" type="button" data-act="auth" data-a="login">Retour à la connexion</button></form>`;
+  if (m === "forgotSent") card = `<div class="auth-card" style="text-align:center"><h2 style="font-size:22px;font-weight:500">E-mail envoyé</h2>${J("13")}<p class="muted">Si un compte existe pour cette adresse, un lien de réinitialisation vient d'être envoyé.</p><button class="btn btn-primary" type="button" data-act="auth" data-a="login">Retour à la connexion</button></div>`;
+  return `<div class="auth">${brand}<section class="auth-form">${card}</section></div>`;
+}
+
+/* ===== Accueil ===== */
+function vHome() {
+  const u = me();
+  return head(`Bonjour ${u.first}`, "Année universitaire 2026/2027 · vos espaces de communication", ["18", "04", "19"], `<button class="btn btn-outline" type="button" data-act="dlg" data-a="create">${ico("plus")}Créer un groupe privé</button>`) +
+  `<section class="spaces" aria-label="Mes espaces">${SPACES.map((s) => `<button class="card sp-card" type="button" data-act="go" data-a="espace" data-b="${s.id}">
+    <div style="display:flex;align-items:center;gap:12px"><span class="sp-ico">${ico(s.icon)}</span><div class="grow"><div style="font-weight:500">${esc(s.name)}</div><span class="cap">${s.type} · ${s.members} membres</span></div>${s.unread ? `<span class="badge">${s.unread}</span>` : ""}</div>
+    <span class="muted" style="font-size:13px">${esc(s.last)}</span></button>`).join("")}</section>
+  <section class="card"><div class="pad" style="display:flex;align-items:center;gap:12px;padding-bottom:4px"><h2 style="font-size:18px;font-weight:500" class="grow">Activité récente</h2><button class="btn btn-text" type="button" data-act="go" data-a="notifications">Tout voir</button></div>
+    <div style="padding:0 20px 8px">${S.notifs.slice(0, 3).map((n) => `<div class="row"><span class="sp-ico" style="width:36px;height:36px">${ico(n.icon, "width:18px;height:18px")}</span><span class="grow">${esc(n.text)}</span><span class="cap">${n.time}</span></div>`).join("")}</div></section>`;
+}
+
+/* ===== Espace ===== */
+const TABS = [["discussion", "Discussion"], ["annonces", "Annonces"], ["ressources", "Ressources"], ["fichiers", "Fichiers"], ["epingles", "Épinglés"], ["assistant", "Assistant IA"], ["membres", "Membres"]];
+function vSpace() {
+  const s = curSpace();
+  const body = { discussion: tDiscussion, annonces: tAnnonces, ressources: tRessources, fichiers: tFichiers, epingles: tEpingles, assistant: tAssistant, membres: tMembres }[S.tab]();
+  return `<div class="space-head"><span class="sp-ico">${ico(s.icon, "width:26px;height:26px")}</span><div class="grow" style="display:flex;flex-direction:column;gap:4px"><h1 style="font-size:22px;line-height:28px;font-weight:500">${esc(s.name)}</h1><div class="chips"><span class="chip c-primary">${s.type}</span><span class="cap" style="align-self:center">${s.members} membres${isT() ? " · vous êtes propriétaire" : ""}</span></div></div></div>
+  <div class="card" style="overflow:hidden"><nav class="tabs" aria-label="Onglets de l'espace">${TABS.map(([k, l]) => `<button class="tab${S.tab === k ? " on" : ""}" type="button" data-act="tab" data-a="${k}"${S.tab === k ? ' aria-current="page"' : ""}>${k === "assistant" ? ico("spark", "width:16px;height:16px;color:var(--ai)") : ""}${l}</button>`).join("")}</nav>${body}</div>`;
+}
+function msgHtml(m) {
+  const mine = m.ini === me().ini;
+  const exp = m.pinned ? '<span class="chip c-ai">Épinglé · n\'expire pas</span>' : `<span class="cap">expire dans ${m.days} j</span>`;
+  return `<article class="msg">${av(m.ini, m.c)}<div class="body">
+    <div class="meta"><strong>${esc(m.name)}</strong>${m.role ? `<span class="chip c-ok" style="height:20px">${m.role}</span>` : ""}<span class="cap">${m.time}</span>${exp}${m.reported ? '<span class="chip c-err">Signalé</span>' : ""}</div>
+    <div>${esc(m.text)}</div>
+    ${m.file ? `<button class="file" type="button" data-act="dl" data-a="${esc(m.file[0])}">${ico("file")}<span>${esc(m.file[0])}</span><span class="cap">${m.file[1]}</span></button>` : ""}
+    <div class="acts">${isT() ? `<button class="btn btn-text btn-sm" type="button" data-act="pin" data-a="${m.id}">${ico("pin")}${m.pinned ? "Désépingler" : "Épingler"}</button>` : ""}${!mine && !m.reported ? `<button class="btn btn-text btn-sm" type="button" data-act="dlg" data-a="report" data-b="${m.id}" style="color:var(--muted)">${ico("flag")}Signaler</button>` : ""}</div>
+  </div></article>`;
+}
+function tDiscussion() {
+  const sum = S.sum === "idle" ? `<button class="btn btn-ai btn-sm" type="button" data-act="sum" style="align-self:flex-start">${ico("spark")}Résumer les messages non lus</button>`
+    : S.sum === "loading" ? `<span class="cap" style="display:flex;gap:8px;align-items:center"><span class="typing"><span></span><span></span><span></span></span>Lecture des 5 derniers messages…</span>`
+    : `<ul>${SUMMARY.map((t) => `<li>${t}</li>`).join("")}</ul><span class="cap">Généré par l'IA à partir de 5 messages. Vérifiez dans la discussion.</span>`;
+  return `<div class="sum"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${ico("spark", "color:var(--ai);width:18px;height:18px")}<strong>Résumé de la discussion</strong>${J("42")}</div>${sum}</div>
+  <div style="padding:8px 20px 0">${J("21", "29", "31", "35")}</div>
+  <div class="msgs" aria-live="polite">${S.msgs.map(msgHtml).join("")}</div>
+  <form class="composer" data-submit="send">
+    ${S.att ? `<div style="display:flex;gap:8px;align-items:center"><span class="file" style="cursor:default">${ico("file")}${esc(S.att[0])}<span class="cap">${S.att[1]}</span></span><button class="icon-btn" type="button" data-act="unattach" aria-label="Retirer la pièce jointe">${ico("close")}</button></div>` : ""}
+    <div class="compose-row"><button class="icon-btn" type="button" data-act="attach" aria-label="Joindre un fichier">${ico("clip")}</button><textarea id="draft" name="t" rows="1" placeholder="Écrire un message à ${esc(curSpace().short)}…" aria-label="Votre message"></textarea><button class="btn btn-primary" type="submit">${ico("send")}<span class="hide-sm">Envoyer</span></button></div>
+    <span class="cap">Les messages de cet espace sont visibles 30 jours, sauf s'ils sont épinglés. Fichiers : 10 Mo maximum.</span></form>`;
+}
+function tAnnonces() {
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:16px">${J("26")}
+  ${isT() ? `<form class="card pad" data-submit="annonce" style="display:flex;flex-direction:column;gap:12px;background:var(--surface-2)"><strong>Nouvelle annonce</strong><input class="inp" id="an-t" name="t" placeholder="Titre de l'annonce" required><textarea class="inp" id="an-b" name="b" rows="3" placeholder="Texte de l'annonce" required></textarea><div><button class="btn btn-primary" type="submit">${ico("bullhorn")}Publier et notifier les membres</button></div></form>` : `<p class="cap">Seuls les enseignants de l'espace publient des annonces. Vous êtes notifié à chaque nouvelle annonce.</p>`}
+  ${S.annonces.map(([t, b, d]) => `<article class="card pad" style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="chip c-primary">${ico("bullhorn", "width:14px;height:14px")}Annonce</span><strong>${esc(t)}</strong></div><p>${esc(b)}</p><span class="cap">Mme Sarra Ben Ali · ${d}</span></article>`).join("")}</div>`;
+}
+function tRessources() {
+  return `<div class="pad" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-bottom:12px"><span class="grow">${J("27", "22")}</span>${isT() ? `<button class="btn btn-primary" type="button" data-act="toast" data-a="Ressource ajoutée et indexée pour l'Assistant IA (démo).">${ico("upload")}Ajouter une ressource</button>` : '<span class="cap">Lecture seule pour les étudiants</span>'}</div>
+  <div style="border-top:1px solid var(--line)">${CH.map((c, i) => {
+    const open = !!S.openCh[i];
+    return `<section class="chap"><button class="chap-h" type="button" data-act="chap" data-a="${i}" aria-expanded="${open}">${ico("folder", "color:var(--primary)")}<span class="grow"><span style="display:block;font-weight:500">${c.t}</span><span class="cap">${c.items.length} ressources</span></span>${ico("chevron", open ? "transform:rotate(90deg);color:var(--muted)" : "color:var(--muted)")}</button>
+    ${open ? `<div class="tw"><table class="tbl"><tbody>${c.items.map(([n, t, d]) => `<tr><td><div class="who">${ico("file", "color:#C62828")}<div><div style="font-weight:500">${n}</div><span class="cap">${t} · ajoutée le ${d}</span></div></div></td><td><span class="chip c-ok">${ico("spark", "width:12px;height:12px")}Indexée pour l'IA</span></td><td style="text-align:right;white-space:nowrap"><button class="btn btn-text btn-sm" type="button" data-act="dl" data-a="${esc(n)}">${ico("download")}Télécharger</button>${isT() ? `<button class="btn btn-text btn-sm" type="button" data-act="toast" data-a="Ressource supprimée (démo)." style="color:var(--err)">Supprimer</button>` : ""}</td></tr>`).join("")}</tbody></table></div>` : ""}</section>`;
+  }).join("")}</div>`;
+}
+function tFichiers() {
+  return `<div class="pad" style="padding-bottom:12px">${J("32", "31")}</div><div class="tw" style="border-top:1px solid var(--line)"><table class="tbl"><thead><tr><th>Fichier</th><th>Partagé par</th><th>Date</th><th>Taille</th><th><span class="cap" style="position:absolute;left:-9999px">Actions</span></th></tr></thead><tbody>
+  ${S.files.map(([n, b, d, t]) => `<tr><td><div class="who">${ico("file", "color:#C62828")}<span style="font-weight:500">${esc(n)}</span></div></td><td class="muted">${esc(b)}</td><td class="muted">${d}</td><td class="muted">${t}</td><td style="text-align:right"><button class="btn btn-text btn-sm" type="button" data-act="dl" data-a="${esc(n)}">${ico("download")}Télécharger</button></td></tr>`).join("")}
+  </tbody></table></div><p class="cap pad" style="padding-top:12px">Les liens de téléchargement sont protégés : seuls les membres de l'espace y ont accès, même avec le lien direct.</p>`;
+}
+function tEpingles() {
+  const p = S.msgs.filter((m) => m.pinned);
+  return `<div class="pad" style="padding-bottom:8px">${J("28")}</div>${p.length ? `<div class="msgs">${p.map(msgHtml).join("")}</div>` : `<div class="empty">Aucun message épinglé. Les enseignants épinglent les messages importants : ils n'expirent pas.</div>`}`;
+}
+function tAssistant() {
+  if (!S.aiOn && !isT()) return `<div class="empty">${ico("spark", "width:40px;height:40px;color:var(--ai)")}<p style="margin-top:8px">L'Assistant IA est désactivé pour cet espace par l'enseignante.</p>${J("34")}</div>`;
+  const asked = {}; S.ai.forEach((e) => { asked[e.k] = 1; });
+  const sugg = ["df", "tp"].filter((k) => !asked[k]);
+  const exch = S.ai.map((e, i) => {
+    const a = QA[e.k];
+    return `<div class="q">${esc(e.q)}</div><div class="a"><span class="ai-av">${ico("spark")}</span><div class="a-body">
+    ${!e.done ? `<span class="cap" style="display:flex;gap:8px;align-items:center"><span class="typing"><span></span><span></span><span></span></span>Recherche dans les ressources du cours…</span>` : `
+    <p style="font-weight:500">${a.intro}</p><ul>${a.points.map((p) => `<li>${p}</li>`).join("")}</ul>${a.outro ? `<p>${a.outro}</p>` : ""}
+    ${a.src.length ? `<div class="srcs">${a.src.map(([f, p], j) => `<button class="src" type="button" data-act="tab" data-a="ressources"><b>[${j + 1}]</b>${ico("file", "width:14px;height:14px;color:#C62828")}${f} · ${p}</button>`).join("")}</div>` : ""}
+    <div class="fb"><span class="cap grow">Réponse générée par l'IA, à vérifier dans les sources.</span>${e.fb ? '<span class="cap">Merci pour votre avis</span>' : ""}<button class="fbb${e.fb === "up" ? " on" : ""}" type="button" data-act="fb" data-a="${i}" data-b="up" aria-label="Réponse utile">${ico("up")}</button><button class="fbb${e.fb === "down" ? " on" : ""}" type="button" data-act="fb" data-a="${i}" data-b="down" aria-label="Réponse pas utile">${ico("down")}</button></div>`}
+    </div></div>`;
+  }).join("");
+  return `<div class="ai-wrap" style="padding:0"><section class="ai-chat"><div class="pad" style="padding-bottom:0">${J("33", "23", "34")}</div>
+    <div class="ai-msgs" aria-live="polite"><div class="a"><span class="ai-av">${ico("spark")}</span><div class="a-body"><p>Bonjour ${me().first}. Je réponds à vos questions sur <strong>Bases de données</strong> uniquement à partir des supports publiés par Mme Ben Ali, avec les sources.</p></div></div>${exch}</div>
+    ${sugg.length ? `<div class="sugg" role="group" aria-label="Questions suggérées">${sugg.map((k) => `<button type="button" data-act="sugg" data-a="${k}">${QA[k].q}</button>`).join("")}</div>` : ""}
+    <form class="composer" data-submit="ask"><div class="compose-row"><textarea id="ai-q" name="q" rows="1" placeholder="Posez une question sur le cours…" aria-label="Votre question"${S.quota <= 0 ? " disabled" : ""}></textarea><button class="btn btn-ai" type="submit"${S.quota <= 0 ? " disabled" : ""}>${ico("send")}<span class="hide-sm">Demander</span></button></div>
+    <span class="cap">Questions restantes aujourd'hui : ${S.quota} sur 20. Vos questions sont privées : ni l'enseignante ni les autres membres ne les voient.</span></form></section>
+    <aside style="border-left:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:12px;align-self:stretch">
+      ${isT() ? `<label class="row" style="padding-top:0;cursor:pointer"><span class="grow"><strong>Assistant activé</strong><span class="cap" style="display:block">Pour les étudiants de cet espace</span></span><span class="switch"><input type="checkbox" data-act="aiOn"${S.aiOn ? " checked" : ""} aria-label="Activer l'assistant"><span class="tr"></span><span class="th"></span></span></label><div class="row"><span class="grow">Avis des étudiants (7 jours)</span><span class="chip c-ok">86 % utiles</span></div>` : ""}
+      <strong>Sources indexées</strong>${CH.flatMap((c) => c.items).filter((x) => x[1].startsWith("PDF")).map(([n]) => `<div style="display:flex;gap:8px;align-items:center;font-size:13px">${ico("file", "width:16px;height:16px;color:#C62828")}<span class="grow">${n}</span></div>`).join("")}
+    </aside></div>`;
+}
+function tMembres() {
+  return `<div class="pad" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-bottom:12px"><span class="grow">${J("20", "19")}</span>${isT() ? `<button class="btn btn-primary" type="button" data-act="dlg" data-a="invite">${ico("plus")}Inviter</button>` : ""}</div>
+  <div class="tw" style="border-top:1px solid var(--line)"><table class="tbl"><thead><tr><th>Membre</th><th>Profil</th><th>Rôle dans l'espace</th><th>Membre depuis</th>${isT() ? "<th></th>" : ""}</tr></thead><tbody>
+  ${MEMBERS.map(([ini, c, n, id, p, r, d]) => `<tr><td><div class="who">${av(ini, c)}<div><div style="font-weight:500">${n}</div><span class="cap">${id}</span></div></div></td><td><span class="chip${p.startsWith("Ens") ? " c-ok" : ""}">${p}</span></td><td>${r}</td><td class="muted">${d}</td>${isT() ? `<td style="text-align:right;white-space:nowrap">${r === "Propriétaire" ? "" : `<button class="btn btn-text btn-sm" type="button" data-act="toast" data-a="Rôle modifié pour ${n} (démo).">${r === "Membre" ? "Nommer co-gestionnaire" : "Retirer le rôle"}</button>`}</td>` : ""}</tr>`).join("")}
+  </tbody></table></div><p class="cap pad" style="padding-top:12px">Les étudiants de la classe sont ajoutés automatiquement. Un membre retiré perd immédiatement l'accès aux messages et aux fichiers.</p>`;
+}
+
+/* ===== Channels, notifications, recherche, profil ===== */
+function vChannels() {
+  return head("Explorer les channels", "Espaces ouverts à une communauté : clubs, associations, entraide.", ["24"]) +
+  `<div class="spaces">${S.channels.map((c, i) => {
+    const btn = c.mode === "Automatique" ? '<span class="chip">Membre automatiquement</span>'
+      : c.st === "joined" ? `<button class="btn btn-outline btn-sm" type="button" data-act="join" data-a="${i}">Quitter</button>`
+      : c.st === "req" ? '<span class="chip c-warn">Demande envoyée</span>'
+      : `<button class="btn btn-primary btn-sm" type="button" data-act="join" data-a="${i}">${c.mode === "Sur demande" ? "Demander à rejoindre" : "Rejoindre"}</button>`;
+    return `<article class="card sp-card" style="cursor:default"><div style="display:flex;align-items:center;gap:12px"><span class="sp-ico">${ico("pound")}</span><div class="grow"><div style="font-weight:500">${c.n}</div><span class="cap">${c.m} membres · ${c.mode}</span></div></div><span class="muted" style="font-size:13px">${c.d}</span><div>${btn}</div></article>`;
+  }).join("")}</div>`;
+}
+function vNotifs() {
+  return head("Notifications", `${unread()} non lue${unread() > 1 ? "s" : ""}`, ["25", "19"], unread() ? `<button class="btn btn-outline" type="button" data-act="allRead">Tout marquer comme lu</button>` : "") +
+  `<section class="card" style="padding:4px 20px">${S.notifs.map((n) => `<div class="row" style="${n.unread ? "font-weight:500" : ""}"><span class="sp-ico" style="width:36px;height:36px">${ico(n.icon, "width:18px;height:18px")}</span><div class="grow" style="display:flex;flex-direction:column;gap:6px"><span>${esc(n.text)}</span>
+    ${n.type === "invite" ? (n.state === "pending" ? `<div class="chips"><button class="btn btn-primary btn-sm" type="button" data-act="invite" data-a="${n.id}" data-b="ok">Accepter</button><button class="btn btn-text btn-sm" type="button" data-act="invite" data-a="${n.id}" data-b="no">Refuser</button></div>` : `<span class="chip ${n.state === "ok" ? "c-ok" : ""}" style="align-self:flex-start">${n.state === "ok" ? "Invitation acceptée" : "Invitation refusée"}</span>`) : ""}</div>
+    <span class="cap">${n.time}</span>${n.unread ? `<button class="icon-btn" type="button" data-act="read" data-a="${n.id}" aria-label="Marquer comme lu" title="Marquer comme lu"><span style="width:10px;height:10px;border-radius:99px;background:var(--primary)"></span></button>` : ""}</div>`).join("")}</section>`;
+}
+function searchResults() {
+  const q = S.search.trim().toLowerCase();
+  if (q.length < 2) return `<div class="empty">Saisissez au moins 2 caractères.</div>`;
+  const has = (s) => s.toLowerCase().includes(q);
+  const groups = [
+    ["Espaces", SPACES.filter((s) => has(s.name)).map((s) => `<button class="row nav" type="button" data-act="go" data-a="espace" data-b="${s.id}" style="padding:10px 0;min-height:0">${ico(s.icon)}<span class="lbl">${esc(s.name)}</span><span class="cap">${s.type}</span></button>`)],
+    ["Personnes", MEMBERS.filter((m) => has(m[2])).map((m) => `<div class="row">${av(m[0], m[1], "width:32px;height:32px;font-size:12px")}<span class="grow">${m[2]}</span><span class="cap">${m[4]}</span></div>`)],
+    ["Fichiers et ressources", [...S.files.map((f) => f[0]), ...CH.flatMap((c) => c.items.map((x) => x[0]))].filter(has).map((n) => `<div class="row">${ico("file", "color:#C62828")}<span class="grow">${esc(n)}</span><span class="cap">Bases de données</span></div>`)],
+    ["Messages", S.msgs.filter((m) => has(m.text)).map((m) => `<div class="row">${av(m.ini, m.c, "width:32px;height:32px;font-size:12px")}<span class="grow">${esc(m.text)}</span><span class="cap">${m.time}</span></div>`)]
+  ].filter((g) => g[1].length);
+  if (!groups.length) return `<div class="empty">Aucun résultat pour « ${esc(S.search)} » dans vos espaces.</div>`;
+  return groups.map(([t, rows]) => `<section class="card" style="padding:12px 20px"><h2 class="sub" style="padding:4px 0">${t} · ${rows.length}</h2>${rows.join("")}</section>`).join("");
+}
+function vSearch() {
+  return head("Recherche", "Dans les espaces dont vous êtes membre uniquement.", ["39"]) +
+  `<label class="search" style="margin:0;flex:none;max-width:560px;width:100%"><span class="muted">${ico("magnify")}</span><input id="q-main" value="${esc(S.search)}" data-live="search" aria-label="Rechercher"></label><div id="results" style="display:flex;flex-direction:column;gap:16px">${searchResults()}</div>`;
+}
+function vProfil() {
+  const u = me(), t = S.profileTab;
+  const rk = { etudiant: "yb", enseignant: "sb", admin: "lh" }[S.role];
+  const mine = RIGHTS.filter(([k]) => S.rights[rk][k]);
+  const tabs = [["info", "Informations"], ["secu", "Sécurité"], ["notif", "Notifications"]];
+  let body = "";
+  if (t === "info") body = `<div class="grid2">${[["Nom complet", u.name], ["Adresse électronique", u.mail], ["Profil", u.sub.split(" · ")[0]], ["Rattachement", u.sub.split(" · ")[1]]].map(([l, v], i) => `<div class="fld"><label for="pf${i}">${l}</label><input class="inp" id="pf${i}" value="${esc(v)}" readonly></div>`).join("")}
+    <div class="fld"><label for="pf-tel">Téléphone</label><input class="inp" id="pf-tel" value="+216 98 765 432"></div></div>
+    <p class="cap">Les champs grisés viennent de la liste des comptes autorisés : seule l'administration peut les modifier.</p>
+    <div style="border:1px dashed var(--line);border-radius:8px;background:var(--surface-2);padding:16px;display:flex;flex-direction:column;gap:10px"><strong>Mes droits <span class="cap">· lecture seule</span></strong><div class="chips">${mine.map(([, l]) => `<span class="chip c-primary">${l}</span>`).join("")}</div><span class="cap">Attribués par l'administration. Pour une demande, contactez la scolarité.</span></div>
+    <div><button class="btn btn-primary" type="button" data-act="toast" data-a="Profil enregistré.">Enregistrer</button></div>`;
+  if (t === "secu") body = `<form data-submit="pwdchange" style="display:flex;flex-direction:column;gap:16px;max-width:460px"><div class="fld"><label for="ps1">Mot de passe actuel</label><input class="inp" id="ps1" type="password" value="Univ2026"></div><div class="fld"><label for="ps2">Nouveau mot de passe</label><input class="inp" id="ps2" type="password" value="${esc(S.pwd)}" data-live="pwd"></div><div id="rules-box">${rulesHtml()}</div><div><button class="btn btn-primary" id="act-btn" type="submit"${pwdChecks(S.pwd).every((c) => c[1]) ? "" : " disabled"}>Modifier le mot de passe</button></div></form>`;
+  if (t === "notif") body = `<div class="tw"><table class="tbl" style="min-width:420px"><thead><tr><th>Événement</th><th style="text-align:center">Application</th><th style="text-align:center">E-mail</th></tr></thead><tbody>
+    ${S.prefs.map(([l, a, m, forced], i) => `<tr><td>${l}${forced ? '<span class="cap" style="display:block">Toujours activé dans l\'application</span>' : ""}</td><td style="text-align:center"><span class="switch"><input type="checkbox" data-act="pref" data-a="${i}" data-b="1"${a ? " checked" : ""}${forced ? " disabled" : ""} aria-label="${l} dans l'application"><span class="tr"></span><span class="th"></span></span></td><td style="text-align:center"><span class="switch"><input type="checkbox" data-act="pref" data-a="${i}" data-b="2"${m ? " checked" : ""} aria-label="${l} par e-mail"><span class="tr"></span><span class="th"></span></span></td></tr>`).join("")}
+    </tbody></table></div><div><button class="btn btn-primary" type="button" data-act="toast" data-a="Préférences enregistrées.">Enregistrer les préférences</button></div>`;
+  return `<div class="ph"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap" class="ph-text">${av(u.ini, u.color, "width:64px;height:64px;font-size:22px")}<div style="display:flex;flex-direction:column;gap:4px"><h1 style="font-size:24px;font-weight:500">${u.name}</h1><span class="muted">${u.sub} · 2026/2027</span>${J("49")}</div></div></div>
+  <section class="card" style="overflow:hidden"><div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button class="tab${t === k ? " on" : ""}" type="button" role="tab" aria-selected="${t === k}" data-act="ptab" data-a="${k}">${l}</button>`).join("")}</div><div class="pad" style="display:flex;flex-direction:column;gap:16px">${body}</div></section>`;
+}
+
+/* ===== Administration ===== */
+function vForbidden() {
+  return `<div class="empty" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:64px"><span class="sp-ico" style="width:88px;height:88px;border-radius:999px;background:var(--warn-soft);color:var(--warn)">${ico("shield", "width:44px;height:44px")}</span><span style="font:700 12px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--warn)">Erreur 403 · Accès refusé</span><h1 style="font-size:26px;font-weight:500;color:var(--fg)">Cette page est réservée à l'administration</h1><p style="max-width:460px">Votre compte n'a pas le droit nécessaire. Les droits sont vérifiés par le serveur (policies Laravel), pas seulement dans l'interface.</p>${J("37", "45")}<button class="btn btn-primary" type="button" data-act="go" data-a="accueil">${ico("home")}Retour à l'accueil</button></div>`;
+}
+const tbl = (cols, rows, minw) => `<div class="tw"><table class="tbl"${minw ? ` style="min-width:${minw}px"` : ""}><thead><tr>${cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+function vDash() {
+  const weeks = [["S36", 4210], ["S37", 6120], ["S38", 7480], ["S39", 8020], ["S40", 7690], ["S41", 8840], ["S42", 9310], ["S43", 8960]], max = 9310;
+  const prof = [["Étudiants", 2610], ["Enseignants", 184], ["Administration", 52]];
+  const fr = (n) => n.toLocaleString("fr-FR");
+  return head("Tableau de bord", "Année universitaire active : 2026/2027", ["38"]) +
+  `<section class="kpis">${[["Utilisateurs actifs", "2 846", "Étudiants 2 610 · Enseignants 184 · Admin. 52"], ["Espaces actifs", "412", "286 organisationnels · 94 privés · 32 channels"], ["Messages (8 semaines)", fr(weeks.reduce((a, w) => a + w[1], 0)), "dont 1 932 fichiers partagés"], ["Stockage utilisé", "148 Go", "sur 500 Go alloués (30 %)"]].map(([l, n, c]) => `<div class="card kpi"><span class="cap">${l}</span><span class="n">${n}</span><span class="cap">${c}</span></div>`).join("")}</section>
+  <section class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+    <div class="card kpi"><span class="cap">Comptes autorisés non activés</span><span class="n">214 <span class="cap">sur 3 060</span></span><div class="htr" style="border-radius:4px;height:8px"><div class="hf" style="width:93%;background:var(--ok);border-radius:4px"></div></div><span class="cap">Taux d'activation 93 %</span></div>
+    <div class="card kpi"><span class="cap">Invitations en attente</span><span class="n">37</span><span class="cap">9 expirent dans moins de 48 h</span></div>
+    <div class="card kpi"><span class="cap">Questions à l'Assistant IA (7 jours)</span><span class="n">1 268</span><span class="cap">86 % d'avis utiles · 3 % sans réponse trouvée</span></div>
+    <div class="card kpi"><span class="cap">Signalements en attente</span><span class="n" style="color:${openReports() ? "var(--err)" : "var(--ok)"}">${openReports()}</span><button class="btn btn-text btn-sm" type="button" data-act="go" data-a="admin-moderation" style="align-self:flex-start;padding:0">Traiter</button></div>
+  </section>
+  <div class="grid2"><section class="card"><h2 class="pad" style="font-size:17px;font-weight:500;padding-bottom:0">Messages envoyés par semaine</h2>
+    <div class="bars" role="img" aria-label="Messages par semaine, de 4 210 en S36 à 8 960 en S43">${weeks.map(([w, v]) => `<div class="bar" title="${w} : ${fr(v)} messages"><span class="v">${(v / 1000).toFixed(1).replace(".", ",")}k</span><div class="b" style="height:${Math.round(v / max * 82)}%"></div></div>`).join("")}</div>
+    <div class="xl" aria-hidden="true">${weeks.map(([w]) => `<span>${w}</span>`).join("")}</div></section>
+  <section class="card"><h2 class="pad" style="font-size:17px;font-weight:500;padding-bottom:8px">Utilisateurs actifs par profil</h2><div class="pad" style="display:flex;flex-direction:column;gap:12px;padding-top:4px">${prof.map(([l, v]) => `<div class="hrow"><span>${l}</span><div class="htr"><div class="hf" style="width:${Math.max(2, Math.round(v / 2610 * 100))}%"></div></div><span style="text-align:right;font-weight:500;font-variant-numeric:tabular-nums">${fr(v)}</span></div>`).join("")}</div></section></div>`;
+}
+function vAnnees() {
+  const yrs = [["2025/2026", "01/09/2025", "31/07/2026", "Archivée", ""], ["2026/2027", "01/09/2026", "31/07/2027", "Active", "c-ok"], ["2027/2028", "01/09/2027", "31/07/2028", "En préparation", "c-warn"]];
+  return head("Années universitaires", "Une seule année est active : elle détermine les comptes autorisés et les groupes générés.", ["14"], `<button class="btn btn-primary" type="button" data-act="toast" data-a="Année 2028/2029 créée en préparation (démo).">${ico("plus")}Nouvelle année</button>`) +
+  `<section class="card">${tbl(["Année", "Début", "Fin", "Statut", ""], yrs.map(([a, d, f, s, c]) => `<tr><td style="font-weight:500">${a}</td><td class="muted">${d}</td><td class="muted">${f}</td><td><span class="chip ${c}">${s}</span></td><td style="text-align:right">${s === "En préparation" ? `<button class="btn btn-text btn-sm" type="button" data-act="toast" data-a="L'activation se fait le 01/09/2027 : l'année en cours sera archivée.">Activer</button>` : ""}</td></tr>`))}</section>`;
+}
+function vRef() {
+  const rows = [["Informatique", "Licence Informatique", "L1, L2, L3", "6 classes"], ["Informatique", "Master Génie logiciel", "M1, M2", "2 classes"], ["Mathématiques", "Licence Mathématiques", "L1, L2, L3", "4 classes"], ["Gestion", "Licence Gestion", "L1, L2, L3", "6 classes"]];
+  return head("Référentiels académiques", "Départements, filières, niveaux et classes : la base des groupes organisationnels.", ["16"], `<button class="btn btn-primary" type="button" data-act="toast" data-a="Filière ajoutée (démo).">${ico("plus")}Ajouter une filière</button>`) +
+  `<section class="card">${tbl(["Département", "Filière", "Niveaux", "Classes"], rows.map((r) => `<tr>${r.map((c, i) => `<td${i ? ' class="muted"' : ' style="font-weight:500"'}>${c}</td>`).join("")}</tr>`))}</section>`;
+}
+function vComptes() {
+  const rows = [["LI2-2026-0457", "Yassine Ben Salah", "Étudiant", "L2 Info A", "Activé"], ["LI2-2026-0311", "Amine Trabelsi", "Étudiant", "L2 Info A", "Activé"], ["LI2-2026-0499", "Rania Gharbi", "Étudiant", "L2 Info B", "En attente"], ["ENS-0142", "Sarra Ben Ali", "Enseignant", "Informatique", "Activé"], ["ENS-0175", "Hatem Bouzid", "Enseignant", "Mathématiques", "Lien expiré"], ["ADM-0012", "Fatma Zribi", "Administration", "Scolarité", "En attente"]];
+  const cls = { "Activé": "c-ok", "En attente": "c-warn", "Lien expiré": "c-err" };
+  const f = S.compFilter, shown = rows.filter((r) => f === "Tous" || (f === "Activés" ? r[4] === "Activé" : r[4] !== "Activé"));
+  return head("Comptes autorisés", "Liste de l'année 2026/2027 · 3 060 personnes autorisées · 214 pas encore activées", ["15"], `<button class="btn btn-primary" type="button" data-act="dlg" data-a="import">${ico("upload")}Importer un fichier CSV</button>`) +
+  `<section class="card"><div class="pad chips" style="padding-bottom:12px">${["Tous", "Activés", "Non activés"].map((x) => `<button class="fchip" type="button" data-act="compf" data-a="${x}" aria-pressed="${f === x}">${x}</button>`).join("")}</div>
+  ${tbl(["Matricule", "Nom", "Profil", "Rattachement", "Statut", ""], shown.map(([m, n, p, r, s]) => `<tr><td class="muted" style="font-family:var(--mono);font-size:12px">${m}</td><td style="font-weight:500">${n}</td><td>${p}</td><td class="muted">${r}</td><td><span class="chip ${cls[s]}">${s}</span></td><td style="text-align:right">${s !== "Activé" ? `<button class="btn btn-text btn-sm" type="button" data-act="toast" data-a="E-mail d'activation renvoyé à ${n}.">Relancer</button>` : ""}</td></tr>`), 720)}</section>`;
+}
+function vDroits() {
+  const u = ADM_USERS.find((x) => x.k === S.selUser), r = S.rights[u.k], susp = S.susp[u.k];
+  return head("Utilisateurs et droits", "Les droits s'ajoutent au profil. Un utilisateur ne modifie jamais ses propres droits.", ["37"]) +
+  `<div class="md"><section class="card md-list"><div class="pad" style="padding-bottom:12px"><strong>Utilisateurs</strong></div>${ADM_USERS.map((x) => `<button class="u${x.k === u.k ? " on" : ""}" type="button" data-act="selu" data-a="${x.k}">${av(x.ini, x.c, "width:34px;height:34px;font-size:12px")}<span class="grow"><span style="display:block;font-weight:500">${x.name}</span><span class="cap">${x.prof} · ${Object.values(S.rights[x.k]).filter(Boolean).length} droits</span></span>${S.susp[x.k] ? '<span class="chip c-warn">Suspendu</span>' : ""}</button>`).join("")}</section>
+  <section class="card md-det pad" style="display:flex;flex-direction:column;gap:18px"><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">${av(u.ini, u.c, "width:52px;height:52px;font-size:18px")}<div class="grow"><h2 style="font-size:20px;font-weight:500">${u.name}</h2><span class="muted">${u.prof} · ${u.mail}</span></div><span class="chip ${susp ? "c-warn" : "c-ok"}">${susp ? "Suspendu jusqu'au " + susp : "Actif"}</span></div>
+    <div class="rights" role="group" aria-label="Droits">${RIGHTS.map(([k, l, d]) => `<label class="right"><input type="checkbox" data-act="right" data-a="${k}"${r[k] ? " checked" : ""}${u.k === "lh" && k === "users" ? " disabled" : ""}><span><span style="display:block;font-weight:500">${l}</span><span class="cap">${d}</span></span></label>`).join("")}</div>
+    <div class="alert">${ico("info")}<span>Le droit « Gérer les utilisateurs » ne peut pas être retiré au dernier compte qui le possède.</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px"><button class="btn btn-primary" type="button" data-act="toast" data-a="Droits enregistrés et ajoutés à l'historique.">Enregistrer les droits</button><span class="grow"></span>${susp ? `<button class="btn btn-outline" type="button" data-act="unsusp">Lever la suspension</button>` : `<button class="btn btn-outline" type="button" data-act="dlg" data-a="suspend">Suspendre</button>`}</div></section></div>`;
+}
+function vVisib() {
+  const rows = [["Classe", "Toute l'année"], ["Matière", "30 jours"], ["Groupe privé", "90 jours"], ["Channel", "30 jours"]];
+  const opts = ["7 jours", "30 jours", "90 jours", "Toute l'année"];
+  return head("Visibilité et stockage", "Durée pendant laquelle les messages restent visibles, par type d'espace. Les messages épinglés n'expirent pas.", ["48", "29"]) +
+  `<section class="card">${tbl(["Type d'espace", "Messages et fichiers visibles", "Taille max. d'un fichier"], rows.map(([t, v], i) => `<tr><td style="font-weight:500">${t}</td><td><select class="inp" id="vis-${i}" style="max-width:220px;padding:8px 12px" aria-label="Durée pour ${t}">${opts.map((o) => `<option${o === v ? " selected" : ""}>${o}</option>`).join("")}</select></td><td class="muted">10 Mo</td></tr>`), 520)}
+  <div class="pad" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line)"><span class="cap grow">Purge automatique chaque nuit à 03:00. Dernière exécution : 1 284 messages et 96 fichiers supprimés.</span><button class="btn btn-primary" type="button" data-act="toast" data-a="Règles enregistrées. Elles s'appliquent dès la prochaine purge.">Enregistrer</button></div></section>`;
+}
+function vGroupes() {
+  const rows = [["L2 Informatique – Groupe A", "Classe", "52"], ["Bases de données · L2 Info A", "Matière", "48"], ["Développement Web · L2 Info A", "Matière", "46"], ["L2 Informatique – Groupe B", "Classe", "50"], ["Licence Informatique – Enseignants", "Département", "31"]];
+  return head("Groupes organisationnels", "Générés à partir des référentiels et des comptes autorisés. Les membres sont ajoutés et retirés automatiquement.", ["17"], `<button class="btn btn-primary" type="button" data-act="gen"${S.groupsGenerated ? " disabled" : ""}>${S.groupsGenerated ? "Groupes à jour" : "Générer les groupes de 2026/2027"}</button>`) +
+  (S.groupsGenerated ? `<div class="alert" style="background:var(--ok-soft)">${ico("check", "color:var(--ok)")}<span>286 groupes vérifiés : 4 créés, 12 membres ajoutés, 3 retirés (changement de classe).</span></div>` : "") +
+  `<section class="card">${tbl(["Groupe", "Type", "Membres", "Source"], rows.map(([n, t, m]) => `<tr><td style="font-weight:500">${n}</td><td><span class="chip c-primary">${t}</span></td><td class="muted">${m}</td><td class="cap">Généré · 2026/2027</td></tr>`))}</section>`;
+}
+function vModeration() {
+  const open = S.reports.filter((r) => r.st === "open"), done = S.reports.filter((r) => r.st !== "open");
+  const lab = { kept: ["Conservé", ""], deleted: ["Message supprimé", "c-err"], warned: ["Auteur averti", "c-warn"] };
+  return head("Modération", `${open.length} signalement${open.length > 1 ? "s" : ""} en attente`, ["36", "35"]) +
+  `<section class="card">${open.length ? open.map((r) => `<article class="rep"><div class="grow" style="display:flex;flex-direction:column;gap:8px;min-width:240px"><div class="chips"><span class="chip c-err">${r.reason}</span><span class="cap" style="align-self:center">${r.where} · ${r.date} · ${r.n} signalement${r.n > 1 ? "s" : ""}</span></div><div class="quote">${esc(r.text)}</div><span class="cap">Auteur : ${esc(r.author)}${r.comment ? " · Commentaire : " + esc(r.comment) : ""}</span></div>
+    <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap"><button class="btn btn-outline btn-sm" type="button" data-act="mod" data-a="${r.id}" data-b="kept">Conserver</button><button class="btn btn-outline btn-sm" type="button" data-act="mod" data-a="${r.id}" data-b="warned">Avertir l'auteur</button><button class="btn btn-danger btn-sm" type="button" data-act="mod" data-a="${r.id}" data-b="deleted">Supprimer le message</button></div></article>`).join("") : `<div class="empty">Aucun signalement en attente.</div>`}</section>
+  ${done.length ? `<section class="card pad" style="display:flex;flex-direction:column;gap:4px"><strong>Traités dans cette session</strong>${done.map((r) => `<div class="row"><span class="grow">${esc(r.text)}</span><span class="chip ${lab[r.st][1]}">${lab[r.st][0]}</span></div>`).join("")}</section>` : ""}`;
+}
+function vHisto() {
+  return head("Historique des opérations", "Toutes les actions d'administration sont tracées, avec leur auteur.", ["30"]) +
+  `<section class="card">${tbl(["Date", "Auteur", "Action", "Détail"], S.log.map(([d, a, ac, de]) => `<tr><td class="muted" style="white-space:nowrap;font-variant-numeric:tabular-nums">${d}</td><td>${a}</td><td style="font-weight:500">${ac}</td><td class="muted">${esc(de)}</td></tr>`), 720)}</section>`;
+}
+
+/* ===== Contenu de la version ===== */
+function vContenu() {
+  const all = Object.values(US), screens = all.filter((u) => u.v).length;
+  const sprints = [["S0", "4 au 7 novembre", "Socle technique et conception"], ["S1", "8 au 13 novembre", "Comptes, paramétrage, espaces, discussion"], ["S2", "14 au 19 novembre", "Échanges pédagogiques, fichiers, IA, modération"], ["S3", "20 au 24 novembre", "Administration, recherche, qualité, livraison"]];
+  return head("Contenu de la version 1.0", "Ce que l'équipe livre le 26 novembre 2026 : chaque user story du Jira et l'écran où elle se voit dans ce prototype.", null) +
+  `<section class="vstats">${[["User stories", all.length], ["Avec un écran", screens], ["Techniques (sans écran)", all.length - screens], ["Sprints", 4]].map(([l, n]) => `<div class="card kpi"><span class="cap">${l}</span><span class="n">${n}</span></div>`).join("")}</section>
+  ${sprints.map(([s, d, t]) => {
+    const list = all.filter((u) => u.s === s);
+    return `<section class="card"><div class="sprint-h"><h2>Sprint ${s.slice(1)} · ${t}</h2><span class="cap">${d} · ${list.length} stories</span></div>${tbl(["Story", "Titre", "Où la voir"], list.map((u) => `<tr><td style="white-space:nowrap"><a class="jira" href="${JURL}${u.k}" target="_blank" rel="noopener">US-${u.c} · SCRUM-${u.k}</a></td><td>${u.t}</td><td>${u.v ? `<button class="btn btn-text btn-sm" type="button" data-act="open" data-a="${u.v}" style="padding:0 6px">Voir l'écran ${ico("chevron")}</button>` : `<span class="tech">${u.c === "40" ? "Toute l'application (testez en largeur téléphone)" : "Travail technique : pas d'écran"}</span>`}</td></tr>`), 620)}</section>`;
+  }).join("")}`;
+}
+
+/* ===== Dialogues ===== */
+function dlgHtml() {
+  const d = S.dialog; if (!d) return "";
+  let h = "";
+  if (d.type === "report") h = `<form class="dlg" data-submit="report" role="dialog" aria-modal="true" aria-labelledby="dt"><h2 id="dt">Signaler ce message</h2>${J("35")}
+    <div>${["Propos irrespectueux ou harcèlement", "Spam ou publicité", "Triche ou fraude", "Contenu inapproprié", "Autre"].map((r, i) => `<label class="pick"><input type="radio" name="reason" value="${r}"${i === 0 ? " checked" : ""}>${r}</label>`).join("")}</div>
+    <div class="fld"><label for="rep-c">Commentaire (facultatif)</label><textarea class="inp" id="rep-c" name="c" rows="2"></textarea></div>
+    <p class="cap">Le signalement est anonyme pour l'auteur du message. Il est transmis à la modération (voir le profil Administration).</p>
+    <div class="dlg-act"><button class="btn btn-text" type="button" data-act="close">Annuler</button><button class="btn btn-primary" type="submit">Envoyer le signalement</button></div></form>`;
+  if (d.type === "create") h = `<form class="dlg" data-submit="create" role="dialog" aria-modal="true" aria-labelledby="dt"><h2 id="dt">Créer un groupe privé</h2>${J("19")}
+    <div class="fld"><label for="cg-n">Nom du groupe</label><input class="inp" id="cg-n" name="n" value="Projet intégration – Équipe 4" required></div>
+    <div class="fld"><label for="cg-d">Description</label><input class="inp" id="cg-d" name="d" value="Préparation du projet de fin de semestre"></div>
+    <div><strong style="display:block;margin-bottom:4px">Inviter</strong>${MEMBERS.slice(2).filter((m) => m[0] !== me().ini).map((m, i) => `<label class="pick"><input type="checkbox" name="m"${i < 2 ? " checked" : ""}>${av(m[0], m[1], "width:30px;height:30px;font-size:12px")}${m[2]}</label>`).join("")}</div>
+    <div class="dlg-act"><button class="btn btn-text" type="button" data-act="close">Annuler</button><button class="btn btn-primary" type="submit">Créer et envoyer les invitations</button></div></form>`;
+  if (d.type === "invite") h = `<form class="dlg" data-submit="invite" role="dialog" aria-modal="true" aria-labelledby="dt"><h2 id="dt">Inviter des membres</h2>${J("19", "20")}
+    ${[["AB", "#01579B", "Aya Ben Amor", "Étudiante · L2 Info B", ""], ["MB", "#B45309", "Mehdi Ben Youssef", "Étudiant · L3 Info", ""], ["LB", "#C62828", "Mme Leila Ben Hmida", "Enseignante · Réseaux", "Déjà invitée"]].map(([i, c, n, m, note], k) => `<label class="pick"><input type="checkbox"${k === 0 ? " checked" : ""}${note ? " disabled" : ""}>${av(i, c, "width:30px;height:30px;font-size:12px")}<span class="grow">${n}<span class="cap" style="display:block">${m}</span></span>${note ? `<span class="chip">${note}</span>` : ""}</label>`).join("")}
+    <div class="dlg-act"><button class="btn btn-text" type="button" data-act="close">Annuler</button><button class="btn btn-primary" type="submit">Envoyer les invitations</button></div></form>`;
+  if (d.type === "import") h = `<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt"><h2 id="dt">Importer des comptes autorisés</h2>${J("15")}
+    ${S.imp === "choose" ? `<p class="muted">Fichier CSV avec les colonnes : matricule, nom, prénom, e-mail, profil, classe.</p><button class="file" type="button" data-act="imp" data-a="preview">${ico("upload", "color:var(--primary)")}Choisir « comptes-L2-2026.csv » (démo)</button>`
+    : `<div class="alert alert-warn">${ico("alert")}<span><strong>312 lignes lues · 309 valides · 3 erreurs</strong><br>Ligne 14 : adresse e-mail invalide · Ligne 87 : classe « L2 Info C » inconnue · Ligne 203 : matricule en double.</span></div><p class="cap">Les lignes en erreur ne sont pas importées. Les 309 personnes valides pourront créer leur compte.</p>`}
+    <div class="dlg-act"><button class="btn btn-text" type="button" data-act="close">Annuler</button><button class="btn btn-primary" type="button" data-act="imp" data-a="done"${S.imp === "choose" ? " disabled" : ""}>Importer 309 comptes</button></div></div>`;
+  if (d.type === "suspend") { const u = ADM_USERS.find((x) => x.k === S.selUser);
+    h = `<form class="dlg" data-submit="suspend" role="dialog" aria-modal="true" aria-labelledby="dt"><h2 id="dt">Suspendre ${u.name}</h2>${J("37")}<p class="muted">La personne ne peut plus se connecter pendant la suspension. Le compte est réactivé automatiquement à la fin.</p>
+    <div class="fld"><label for="su-d">Durée</label><select class="inp" id="su-d" name="d">${[1, 3, 7, 15, 30].map((n) => `<option value="${n}"${n === 7 ? " selected" : ""}>${n} jour${n > 1 ? "s" : ""}</option>`).join("")}</select></div>
+    <div class="fld"><label for="su-m">Motif (obligatoire)</label><textarea class="inp" id="su-m" name="m" rows="3" placeholder="Ex. : messages répétés hors charte malgré un avertissement"></textarea><span class="err-msg" id="su-err" hidden>Indiquez un motif d'au moins 5 caractères.</span></div>
+    <div class="dlg-act"><button class="btn btn-text" type="button" data-act="close">Annuler</button><button class="btn btn-primary" type="submit">Suspendre le compte</button></div></form>`; }
+  return `<div class="overlay" data-act="scrim">${h}</div>`;
+}
+
+/* ===== Rendu et actions ===== */
+const VIEWS = { connexion: vAuth, accueil: vHome, espace: vSpace, channels: vChannels, notifications: vNotifs, recherche: vSearch, profil: vProfil, contenu: vContenu,
+  "admin-dashboard": vDash, "admin-annees": vAnnees, "admin-referentiels": vRef, "admin-comptes": vComptes, "admin-droits": vDroits, "admin-visibilite": vVisib, "admin-groupes": vGroupes, "admin-moderation": vModeration, "admin-historique": vHisto };
+const $ = (id) => document.getElementById(id);
+function render() {
+  document.body.classList.toggle("show-jira", S.jira);
+  document.body.dataset.mode = S.view === "connexion" ? "auth" : "app";
+  $("strip").innerHTML = stripHtml();
+  $("appbar").innerHTML = barHtml();
+  $("drawer").innerHTML = drawerHtml();
+  $("bnav").innerHTML = bnavHtml();
+  $("main").innerHTML = S.view.startsWith("admin") && S.role !== "admin" ? vForbidden() : (VIEWS[S.view] || vHome)();
+  $("dlg").innerHTML = dlgHtml();
+  const f = $("dlg").querySelector("input,textarea,select,button.file"); if (f) f.focus();
+}
+function go(view, b) {
+  if (view === "espace") { if (b) S.space = b; if (!b || !S.tab) S.tab = S.tab || "discussion"; }
+  S.view = view; S.dialog = null;
+  try { history.replaceState(null, "", "#" + view); } catch (e) { /* ignoré */ }
+  render(); window.scrollTo(0, 0);
+}
+let tId;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(tId); tId = setTimeout(() => { t.hidden = true; }, 3600); }
+function ask(text, key) {
+  const q = (text || "").trim(); if (!q || S.quota <= 0) return;
+  const s = q.toLowerCase();
+  const k = key || (/3fn|forme normale|normal/.test(s) ? "fn" : /dépendance|dependance|\bdf\b/.test(s) ? "df" : /tp ?2|rendre|date limite/.test(s) ? "tp" : "none");
+  const idx = S.ai.length; S.ai.push({ k, q, done: false, fb: "" }); S.quota--; render();
+  setTimeout(() => { if (S.ai[idx]) { S.ai[idx].done = true; if (S.view === "espace" && S.tab === "assistant") render(); } }, 1300);
+}
+const ACT = {
+  role: (a) => { S.role = a; if (S.view === "connexion") { render(); return; } if (a === "admin" && S.view === "accueil") S.view = "admin-dashboard"; render(); toast("Vous voyez maintenant l'application en tant que : " + me().sub.split(" · ")[0] + "."); },
+  jira: () => { S.jira = !S.jira; render(); },
+  go: (a, b) => go(a, b),
+  open: (a) => { const [v, sub] = a.split(":"); if (v.startsWith("admin")) S.role = "admin"; if (v === "connexion") S.authMode = sub || "login"; if (v === "espace") { S.tab = sub; S.space = "bd"; } go(v); },
+  auth: (a) => { S.authMode = a; render(); },
+  logout: () => { S.authMode = "login"; go("connexion"); toast("Vous êtes déconnecté."); },
+  tab: (a) => { S.tab = a; render(); },
+  dlg: (a, b) => { S.dialog = { type: a, id: b }; if (a === "import") S.imp = "choose"; render(); },
+  close: () => { S.dialog = null; render(); },
+  scrim: (a, b, t, e) => { if (e.target === t) ACT.close(); },
+  toast: (a) => toast(a),
+  dl: (a) => toast(`Téléchargement de « ${a} » : lien protégé, valable 5 minutes (démo).`),
+  pin: (a) => { const m = S.msgs.find((x) => x.id === Number(a)); m.pinned = !m.pinned; render(); toast(m.pinned ? "Message épinglé : il n'expirera pas." : "Message désépinglé."); },
+  attach: () => { S.att = ["requetes-tp2-binome.sql", "12 Ko"]; render(); $("draft").focus(); },
+  unattach: () => { S.att = null; render(); },
+  sum: () => { S.sum = "loading"; render(); setTimeout(() => { S.sum = "done"; if (S.view === "espace" && S.tab === "discussion") render(); }, 1500); },
+  sugg: (a) => ask(QA[a].q, a),
+  fb: (a, b) => { const e = S.ai[Number(a)]; e.fb = e.fb === b ? "" : b; render(); },
+  aiOn: () => { S.aiOn = !S.aiOn; render(); toast(S.aiOn ? "Assistant activé pour les étudiants." : "Assistant désactivé pour les étudiants."); },
+  chap: (a) => { S.openCh[a] = !S.openCh[a]; render(); },
+  join: (a) => { const c = S.channels[Number(a)]; if (c.st === "joined") { c.st = ""; toast(`Vous avez quitté ${c.n}.`); } else if (c.mode === "Sur demande") { c.st = "req"; toast("Demande envoyée aux gestionnaires du channel."); } else { c.st = "joined"; toast(`Vous avez rejoint ${c.n}.`); } render(); },
+  read: (a) => { S.notifs.find((n) => n.id === Number(a)).unread = false; render(); },
+  allRead: () => { S.notifs.forEach((n) => { n.unread = false; }); render(); },
+  invite: (a, b) => { const n = S.notifs.find((x) => x.id === Number(a)); n.state = b; n.unread = false; render(); toast(b === "ok" ? "Invitation acceptée : « Révisions BD » est dans vos espaces." : "Invitation refusée."); },
+  ptab: (a) => { S.profileTab = a; render(); },
+  pref: (a, b) => { const p = S.prefs[Number(a)]; p[Number(b)] = !p[Number(b)]; },
+  compf: (a) => { S.compFilter = a; render(); },
+  imp: (a) => { if (a === "done") { S.dialog = null; S.log.unshift(["Maintenant", "Leila Haddad", "Import de comptes autorisés", "comptes-L2-2026.csv · 309 lignes"]); render(); toast("309 comptes autorisés importés."); } else { S.imp = a; render(); } },
+  selu: (a) => { S.selUser = a; render(); },
+  right: (a) => { const r = S.rights[S.selUser]; r[a] = r[a] ? 0 : 1; },
+  unsusp: () => { S.susp[S.selUser] = ""; render(); toast("Suspension levée."); },
+  gen: () => { S.groupsGenerated = true; render(); toast("Groupes de 2026/2027 générés."); },
+  mod: (a, b) => { const r = S.reports.find((x) => x.id === a); r.st = b; S.log.unshift(["Maintenant", "Leila Haddad", "Signalement traité", { kept: "Conservé", deleted: "Message supprimé", warned: "Auteur averti" }[b] + " · " + r.where]); render(); toast("Signalement traité. L'auteur du signalement est notifié."); }
+};
+const SUBMIT = {
+  login: () => { go(S.role === "admin" ? "admin-dashboard" : "accueil"); toast(`Connecté en tant que ${me().name}.`); },
+  register: (f) => { const mail = f.querySelector("#r-mail").value.trim(); const err = $("r-err"); if (!/@univ\.tn$/i.test(mail)) { err.hidden = false; return; } S.authMode = "sent"; render(); },
+  activate: () => { if (!pwdChecks(S.pwd).every((c) => c[1])) return; S.role = "etudiant"; go("accueil"); toast("Compte activé. Vous avez rejoint 4 espaces automatiquement."); },
+  forgot: () => { S.authMode = "forgotSent"; render(); },
+  search: (f) => { S.search = f.q.value; go("recherche"); },
+  send: (f) => { const t = f.t.value.trim(); if (!t && !S.att) return; const u = me(); S.msgs.push({ id: Date.now(), ini: u.ini, c: u.color, name: u.name, role: isT() ? "Enseignante" : "", time: "À l'instant", text: t || "Pièce jointe", file: S.att, days: 30 }); if (S.att) S.files.unshift([S.att[0], u.name, "Aujourd'hui", S.att[1]]); S.att = null; render(); },
+  ask: (f) => ask(f.q.value),
+  annonce: (f) => { S.annonces.unshift([f.t.value, f.b.value, "Aujourd'hui"]); render(); toast("Annonce publiée. Les 48 membres sont notifiés."); },
+  report: (f) => { const m = S.msgs.find((x) => x.id === Number(S.dialog.id)); m.reported = true; S.reports.unshift({ id: "r" + Date.now(), where: curSpace().name, author: m.name, text: m.text, reason: f.reason.value, comment: f.c.value.trim(), date: "À l'instant", n: 1, st: "open" }); S.dialog = null; render(); toast("Signalement envoyé à la modération. Merci."); },
+  create: (f) => { const n = f.n.value.trim() || "Nouveau groupe"; const id = "g" + Date.now(); SPACES.push({ id, name: n, short: n, type: "Groupe privé", icon: "lock", members: 1, unread: 0, last: "Groupe créé à l'instant." }); S.dialog = null; S.tab = "discussion"; go("espace", id); toast("Groupe créé. Les invitations sont envoyées."); },
+  invite: () => { S.dialog = null; render(); toast("Invitation envoyée. Elle expire dans 14 jours."); },
+  suspend: (f) => { const m = f.m.value.trim(); if (m.length < 5) { $("su-err").hidden = false; return; } const d = new Date(2026, 10, 26); d.setDate(d.getDate() + Number(f.d.value)); const u = ADM_USERS.find((x) => x.k === S.selUser); S.susp[S.selUser] = d.toLocaleDateString("fr-FR"); S.log.unshift(["Maintenant", "Leila Haddad", "Compte suspendu", u.name + " · " + m]); S.dialog = null; render(); toast("Compte suspendu. Le motif est enregistré dans l'historique."); },
+  pwdchange: () => { if (pwdChecks(S.pwd).every((c) => c[1])) toast("Mot de passe modifié. Vos autres sessions sont déconnectées."); }
+};
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-act]"); if (!t) return;
+  if (t.tagName === "INPUT") return;
+  const fn = ACT[t.dataset.act]; if (fn) fn(t.dataset.a, t.dataset.b, t, e);
+});
+document.addEventListener("change", (e) => {
+  const t = e.target; if (t.tagName === "INPUT" && t.dataset.act && ACT[t.dataset.act]) ACT[t.dataset.act](t.dataset.a, t.dataset.b, t, e);
+});
+document.addEventListener("input", (e) => {
+  const t = e.target, live = t.dataset && t.dataset.live;
+  if (live === "pwd") { S.pwd = t.value; $("rules-box").innerHTML = rulesHtml(); const b = $("act-btn"); if (b) b.disabled = !pwdChecks(S.pwd).every((c) => c[1]); }
+  if (live === "search") { S.search = t.value; $("results").innerHTML = searchResults(); }
+});
+document.addEventListener("submit", (e) => {
+  const f = e.target.closest("[data-submit]"); if (!f) return;
+  e.preventDefault(); SUBMIT[f.dataset.submit](f);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && S.dialog) ACT.close();
+  if (e.key === "Enter" && !e.shiftKey && e.target.tagName === "TEXTAREA" && (e.target.id === "draft" || e.target.id === "ai-q")) { e.preventDefault(); e.target.form.requestSubmit(); }
+});
+(function init() {
+  const h = location.hash.slice(1);
+  if (VIEWS[h]) { S.view = h; if (h.startsWith("admin")) S.role = "admin"; }
+  render();
+})();
+</script>
+
+</html>
