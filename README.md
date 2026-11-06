@@ -2,7 +2,9 @@
 
 Application de communication universitaire : espaces de classe et de matière, groupes privés, channels, et un Assistant IA qui répond à partir des supports de cours.
 
-Projet étudiant 2026/2027 · livraison le 26/11/2026.
+Projet étudiant 2026/2027 · livraison le **19/11/2026** (gel du code le 17/11 à 18 h).
+
+📚 **Documentation complète : [`docs/`](docs/README.md)**. On y trouve l'architecture, le contrat d'API, le schéma SQL, les diagrammes, le déploiement, le plan de tests, la démo et le guide utilisateur. Ce README couvre seulement l'installation locale.
 
 ## Présentation
 
@@ -166,7 +168,7 @@ Si vous changez le port du backend, mettez aussi à jour cette valeur puis relan
 | `could not find driver` ou erreur PostgreSQL | Activez l'extension `pdo_pgsql` dans `php.ini`, puis redémarrez le terminal. |
 | `composer install` échoue sur `symfony/* requires php >=8.4.1` | Passez à PHP 8.4.1 ou plus. N'utilisez pas `--ignore-platform-req`. |
 | `SQLSTATE[08006]` / connexion refusée | Attendez que PostgreSQL soit `healthy` (`docker compose ps`) puis relancez `php artisan migrate --seed`. |
-| Port `5432` déjà utilisé | Arrêtez le PostgreSQL local ou changez le port publié dans `docker-compose.yml` et `backend/.env`. |
+| Port `5432` déjà utilisé, ou `authentification par mot de passe échouée pour l'utilisateur « uniconnect »` | Un PostgreSQL installé sur Windows (service `postgresql-x64-16`) occupe le port 5432, et Laravel se connecte à lui au lieu de Docker. Arrêtez ce service, ou publiez le conteneur sur un autre port (`"5433:5432"` dans `docker-compose.yml`) et mettez `DB_PORT=5433` dans `backend/.env`. Voir le commentaire de SCRUM-25. |
 | Port `8000` ou `5173` déjà utilisé | Arrêtez le processus concerné, ou utilisez `php artisan serve --port=8001` et adaptez `VITE_API_URL`. |
 | Les tests frontend échouent sur `localStorage` | Utilisez Node.js 22 ou 24 (Node 26 est concerné). |
 
