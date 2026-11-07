@@ -17,7 +17,7 @@ use Smalot\PdfParser\Parser;
  * (secours : Groq) et affiche la réponse avec les pages citées.
  *
  * Prérequis : base PostgreSQL et, dans .env (lus par config/services.php, SCRUM-43) :
- *   GEMINI_API_KEY, GEMINI_MODEL, GROQ_API_KEY, GROQ_MODEL (défaut llama-3.3-70b-versatile).
+ *   GEMINI_API_KEY, GEMINI_MODEL, GROQ_API_KEY, GROQ_MODEL (défaut openai/gpt-oss-120b).
  *
  * Exemples :
  *   php artisan ia:poc chemin/chap03.pdf "Quels sont les attributs d'un curseur explicite ?"
@@ -369,13 +369,14 @@ class IaPoc extends Command
 
     /**
      * Extrait les numéros cités ([2], [1][3] ou [1, 3]) et garde ceux qui existent, sans doublon.
+     * Accepte aussi 【2】 et 【2†…】, la notation que les modèles gpt-oss de Groq utilisent parfois.
      *
      * @param  list<array{numero: int, page: int, contenu: string, score: float}>  $extraits
      * @return list<array{numero: int, page: int, contenu: string, score: float}>
      */
     private function lireCitations(string $texte, array $extraits): array
     {
-        preg_match_all('/\[(\d+(?:\s*,\s*\d+)*)\]/', $texte, $m);
+        preg_match_all('/[\[【](\d+(?:\s*,\s*\d+)*)(?:†[^\]】]*)?[\]】]/u', $texte, $m);
 
         $numeros = [];
         foreach ($m[1] as $groupe) {
