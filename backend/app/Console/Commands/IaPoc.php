@@ -16,7 +16,7 @@ use Smalot\PdfParser\Parser;
  * PostgreSQL (dictionnaire french), envoie les 6 meilleurs extraits numérotés à Gemini
  * (secours : Groq) et affiche la réponse avec les pages citées.
  *
- * Prérequis : base PostgreSQL, `composer require smalot/pdfparser`, et dans .env (SCRUM-43) :
+ * Prérequis : base PostgreSQL et, dans .env (lus par config/services.php, SCRUM-43) :
  *   GEMINI_API_KEY, GEMINI_MODEL, GROQ_API_KEY, GROQ_MODEL (défaut llama-3.3-70b-versatile).
  *
  * Exemples :
@@ -279,8 +279,8 @@ class IaPoc extends Command
      */
     private function appelerGemini(string $systeme, string $message): array
     {
-        $cle = env('GEMINI_API_KEY');
-        $modele = env('GEMINI_MODEL');
+        $cle = config('services.gemini.key');
+        $modele = config('services.gemini.model');
         if (empty($cle) || empty($modele)) {
             throw new RuntimeException('Gemini non configuré (GEMINI_API_KEY ou GEMINI_MODEL vide)');
         }
@@ -289,7 +289,7 @@ class IaPoc extends Command
             $r = Http::withHeaders(['x-goog-api-key' => $cle])
                 ->acceptJson()
                 ->timeout(self::TIMEOUT)
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$modele}:generateContent", [
+                ->post(config('services.gemini.url')."/models/{$modele}:generateContent", [
                     'systemInstruction' => ['parts' => [['text' => $systeme]]],
                     'contents' => [['role' => 'user', 'parts' => [['text' => $message]]]],
                     'generationConfig' => ['temperature' => 0.2],
@@ -324,8 +324,8 @@ class IaPoc extends Command
      */
     private function appelerGroq(string $systeme, string $message): array
     {
-        $cle = env('GROQ_API_KEY');
-        $modele = env('GROQ_MODEL', 'llama-3.3-70b-versatile');
+        $cle = config('services.groq.key');
+        $modele = config('services.groq.model');
         if (empty($cle)) {
             throw new RuntimeException('Groq non configuré (GROQ_API_KEY vide) : aucune IA disponible.');
         }
@@ -334,7 +334,7 @@ class IaPoc extends Command
             $r = Http::withToken($cle)
                 ->acceptJson()
                 ->timeout(self::TIMEOUT)
-                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                ->post(config('services.groq.url').'/chat/completions', [
                     'model' => $modele,
                     'temperature' => 0.2,
                     'messages' => [
