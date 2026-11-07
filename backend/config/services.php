@@ -35,4 +35,30 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Assistant IA (offres gratuites, SCRUM-43)
+    |--------------------------------------------------------------------------
+    |
+    | Gemini est le fournisseur principal, Groq le secours en cas de quota
+    | dépassé (429). Les clés restent dans .env, jamais dans Git.
+    |
+    */
+
+    'llm' => [
+        'fournisseur' => env('LLM_PROVIDER', 'gemini'),
+    ],
+
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL'),
+        'url' => 'https://generativelanguage.googleapis.com/v1beta',
+    ],
+
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'url' => 'https://api.groq.com/openai/v1',
+    ],
+
 ];
