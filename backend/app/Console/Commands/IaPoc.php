@@ -10,7 +10,7 @@ use RuntimeException;
 use Smalot\PdfParser\Parser;
 
 /**
- * Preuve de concept de l'Assistant IA (SCRUM-44, US-06).
+ * Preuve de concept de l'Assistant IA (SCRUM-44, US-06) et mesures (SCRUM-45).
  *
  * Lit un PDF de cours, le découpe en fragments, les indexe en recherche plein texte
  * PostgreSQL (dictionnaire french), envoie les 6 meilleurs extraits numérotés à Gemini
@@ -23,12 +23,19 @@ use Smalot\PdfParser\Parser;
  *   php artisan ia:poc chemin/chap03.pdf "Quels sont les attributs d'un curseur explicite ?"
  *   php artisan ia:poc chemin/chap03.pdf "..." --details   (affiche les extraits retenus)
  *   php artisan ia:poc chemin/chap03.pdf "..." --groq      (force Groq pour tester le secours)
+ *
+ * Mesures SCRUM-45 :
+ *   php artisan ia:poc chemin/chap03.pdf --lot=tests/ia/poc-10-questions.json --pause=5
+ *   php artisan ia:poc chemin/chap03.pdf "Quels sont les attributs d'un curseur ?" --repeter=20
  */
 class IaPoc extends Command
 {
     protected $signature = 'ia:poc
         {fichier : Chemin du PDF de cours}
-        {question : Question posée à l\'assistant}
+        {question? : Question posée à l\'assistant}
+        {--lot= : Fichier JSON de questions à enchaîner (même format que tests/ia/questions.json)}
+        {--repeter=1 : Poser la même question N fois (pour voir quand arrive l\'erreur 429)}
+        {--pause=0 : Secondes d\'attente entre deux questions (évite la limite par minute)}
         {--groq : Appeler directement Groq (test du secours)}
         {--details : Afficher les extraits envoyés à l\'IA}';
 
@@ -42,10 +49,14 @@ class IaPoc extends Command
 
     private const REPONSE_INCONNUE = 'JE_NE_SAIS_PAS';
 
+    // Besoin du quota gratuit à couvrir (SCRUM-45) : 6 testeurs × 20 questions par jour.
+    private const TESTEURS = 6;
+
+    private const QUESTIONS_PAR_TESTEUR = 20;
+
     public function handle(): int
     {
         $chemin = (string) $this->argument('fichier');
-        $question = trim((string) $this->argument('question'));
         $nomDocument = basename($chemin);
 
         if (! is_file($chemin)) {
@@ -53,13 +64,20 @@ class IaPoc extends Command
 
             return self::FAILURE;
         }
+
+        try {
+            $questions = $this->listeDesQuestions();
+        } catch (RuntimeException $e) {
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        }
+
         if (DB::connection()->getDriverName() !== 'pgsql') {
             $this->error('ia:poc a besoin de PostgreSQL (recherche plein texte). Vérifie DB_CONNECTION=pgsql dans .env.');
 
             return self::FAILURE;
         }
-
-        $debut = microtime(true);
 
         // 1. Extraire le texte page par page, puis 2. découper en fragments.
         $pages = $this->extrairePages($chemin);
@@ -71,18 +89,108 @@ class IaPoc extends Command
         }
         $this->info(sprintf('%d page(s) lue(s), %d fragment(s) créé(s).', count($pages), count($fragments)));
 
-        // 3. Indexer dans une table temporaire, puis 4. chercher les meilleurs extraits.
+        // 3. Indexer une seule fois dans une table temporaire, même pour plusieurs questions.
         $this->indexer($fragments);
+
+        // Une seule question : affichage détaillé. Plusieurs : une ligne par question puis un bilan.
+        if (count($questions) === 1) {
+            $resultat = $this->poser($questions[0]['question'], $nomDocument, true);
+
+            return $resultat['statut'] === 'ERREUR' ? self::FAILURE : self::SUCCESS;
+        }
+
+        $pause = max(0, (int) $this->option('pause'));
+        $resultats = [];
+        foreach ($questions as $i => $q) {
+            if ($i > 0 && $pause > 0) {
+                sleep($pause);
+            }
+
+            $resultat = $q + $this->poser($q['question'], $nomDocument, false);
+            $resultat['correct'] = $this->estCorrect($resultat);
+            $resultats[] = $resultat;
+
+            $this->line(sprintf(
+                '%2d/%d  %-13s %-30s %5.2f s  %s',
+                $i + 1,
+                count($questions),
+                $resultat['statut'],
+                $resultat['fournisseur'],
+                $resultat['duree'],
+                $resultat['erreur'] ?? mb_strimwidth($q['question'], 0, 50, '…')
+            ));
+        }
+
+        $this->afficherBilan($resultats);
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * Questions à poser : le fichier --lot, ou l'argument question répété --repeter fois.
+     *
+     * @return list<array{question: string, page: ?int, hors_sujet: ?bool}>
+     */
+    private function listeDesQuestions(): array
+    {
+        $lot = $this->option('lot');
+        if ($lot !== null) {
+            if (! is_file($lot)) {
+                throw new RuntimeException("Fichier de questions introuvable : {$lot}");
+            }
+            $donnees = json_decode((string) file_get_contents($lot), true);
+            if (! is_array($donnees) || $donnees === []) {
+                throw new RuntimeException("Fichier de questions vide ou JSON invalide : {$lot}");
+            }
+
+            return array_map(fn (array $q) => [
+                'question' => trim((string) ($q['question'] ?? '')),
+                'page' => isset($q['page']) ? (int) $q['page'] : null,
+                'hors_sujet' => isset($q['hors_sujet']) ? (bool) $q['hors_sujet'] : null,
+            ], array_values($donnees));
+        }
+
+        $question = trim((string) $this->argument('question'));
+        if ($question === '') {
+            throw new RuntimeException('Indique une question, ou un fichier de questions avec --lot=chemin.json');
+        }
+
+        return array_fill(0, max(1, (int) $this->option('repeter')), [
+            'question' => $question,
+            'page' => null,
+            'hors_sujet' => null,
+        ]);
+    }
+
+    /**
+     * Pose une question sur les fragments indexés et renvoie les mesures.
+     *
+     * @return array{statut: string, fournisseur: string, duree: float, tokens_entree: int, tokens_sortie: int, pages_citees: list<int>, erreur?: string}
+     */
+    private function poser(string $question, string $nomDocument, bool $afficher): array
+    {
+        $resultat = [
+            'statut' => 'SANS_SOURCE',
+            'fournisseur' => '-',
+            'duree' => 0.0,
+            'tokens_entree' => 0,
+            'tokens_sortie' => 0,
+            'pages_citees' => [],
+        ];
+
+        // 4. Chercher les meilleurs extraits.
         $extraits = $this->chercher($question);
 
         if ($extraits === []) {
             // Aucun extrait pertinent : on n'appelle pas l'IA (économise le quota gratuit).
-            $this->warn('Statut : SANS_SOURCE (aucun extrait pertinent trouvé, l\'IA n\'est pas appelée).');
+            if ($afficher) {
+                $this->warn('Statut : SANS_SOURCE (aucun extrait pertinent trouvé, l\'IA n\'est pas appelée).');
+            }
 
-            return self::SUCCESS;
+            return $resultat;
         }
 
-        if ($this->option('details')) {
+        if ($afficher && $this->option('details')) {
             $this->table(
                 ['N°', 'Page', 'Score', 'Début de l\'extrait'],
                 array_map(fn (array $e) => [
@@ -101,48 +209,151 @@ class IaPoc extends Command
         try {
             $reponse = $this->appelerIa($systeme, $message);
         } catch (RuntimeException $e) {
-            $this->error($e->getMessage());
+            if ($afficher) {
+                $this->error($e->getMessage());
+            }
 
-            return self::FAILURE;
+            return ['statut' => 'ERREUR', 'duree' => microtime(true) - $debutIa, 'erreur' => $e->getMessage()] + $resultat;
         }
-        $dureeIa = microtime(true) - $debutIa;
 
         // 7. Lire les citations [n] et les relier au document et à la page.
         $texte = trim($reponse['texte']);
         $citees = $this->lireCitations($texte, $extraits);
-        $statut = match (true) {
-            str_contains($texte, self::REPONSE_INCONNUE) => 'SANS_SOURCE',
-            $citees === [] => 'SANS_CITATION',
-            default => 'OK',
+
+        $resultat = [
+            'statut' => match (true) {
+                str_contains($texte, self::REPONSE_INCONNUE) => 'SANS_SOURCE',
+                $citees === [] => 'SANS_CITATION',
+                default => 'OK',
+            },
+            'fournisseur' => $reponse['fournisseur'],
+            'duree' => microtime(true) - $debutIa,
+            'tokens_entree' => $reponse['tokens_entree'],
+            'tokens_sortie' => $reponse['tokens_sortie'],
+            'pages_citees' => array_values(array_unique(array_column($citees, 'page'))),
+        ];
+
+        if ($afficher) {
+            $this->newLine();
+            $this->line("<options=bold>Réponse ({$reponse['fournisseur']}) :</>");
+            $this->line($texte);
+            $this->newLine();
+
+            if ($citees !== []) {
+                $this->line('<options=bold>Sources citées :</>');
+                foreach ($citees as $e) {
+                    $this->line(sprintf('  [%d] %s · p. %d', $e['numero'], $nomDocument, $e['page']));
+                }
+                $this->newLine();
+            }
+
+            $this->table(
+                ['Statut', 'Fournisseur', 'Durée IA (s)', 'Tokens entrée', 'Tokens sortie'],
+                [[
+                    $resultat['statut'],
+                    $resultat['fournisseur'],
+                    number_format($resultat['duree'], 2, ',', ''),
+                    $resultat['tokens_entree'],
+                    $resultat['tokens_sortie'],
+                ]]
+            );
+        }
+
+        return $resultat;
+    }
+
+    /**
+     * Hors sujet : correct si l'assistant refuse (SANS_SOURCE).
+     * Dans le sujet : correct si la page attendue fait partie des pages citées.
+     * Sans attendu (--repeter) : null.
+     *
+     * @param  array<string, mixed>  $r
+     */
+    private function estCorrect(array $r): ?bool
+    {
+        if ($r['statut'] === 'ERREUR') {
+            return false;
+        }
+        if ($r['hors_sujet'] === true) {
+            return $r['statut'] === 'SANS_SOURCE';
+        }
+        if ($r['page'] !== null) {
+            return in_array($r['page'], $r['pages_citees'], true);
+        }
+
+        return null;
+    }
+
+    /**
+     * Tableau des mesures et synthèse à copier en commentaire de SCRUM-22.
+     *
+     * @param  list<array<string, mixed>>  $resultats
+     */
+    private function afficherBilan(array $resultats): void
+    {
+        $oui = fn (?bool $v) => match ($v) {
+            true => 'oui',
+            false => 'non',
+            null => '-',
         };
 
         $this->newLine();
-        $this->line("<options=bold>Réponse ({$reponse['fournisseur']}) :</>");
-        $this->line($texte);
-        $this->newLine();
-
-        if ($citees !== []) {
-            $this->line('<options=bold>Sources citées :</>');
-            foreach ($citees as $e) {
-                $this->line(sprintf('  [%d] %s · p. %d', $e['numero'], $nomDocument, $e['page']));
-            }
-            $this->newLine();
-        }
-
-        // Mesures pour le tableau de SCRUM-45.
         $this->table(
-            ['Statut', 'Fournisseur', 'Durée IA (s)', 'Durée totale (s)', 'Tokens entrée', 'Tokens sortie'],
-            [[
-                $statut,
-                $reponse['fournisseur'],
-                number_format($dureeIa, 2, ',', ''),
-                number_format(microtime(true) - $debut, 2, ',', ''),
-                $reponse['tokens_entree'],
-                $reponse['tokens_sortie'],
-            ]]
+            ['N°', 'Question', 'Statut', 'Fournisseur', 'Durée (s)', 'Tokens E / S', 'Pages citées', 'Attendu', 'Correct'],
+            array_map(fn (array $r, int $i) => [
+                $i + 1,
+                mb_strimwidth($r['question'], 0, 40, '…'),
+                $r['statut'],
+                $r['fournisseur'],
+                number_format($r['duree'], 2, ',', ''),
+                $r['tokens_entree'].' / '.$r['tokens_sortie'],
+                $r['pages_citees'] === [] ? '-' : implode(', ', $r['pages_citees']),
+                $r['hors_sujet'] === true ? 'refus' : ($r['page'] ?? '-'),
+                $oui($r['correct']),
+            ], $resultats, array_keys($resultats))
         );
 
-        return self::SUCCESS;
+        // Moyennes calculées sur les questions où l'IA a vraiment répondu.
+        $appels = array_values(array_filter($resultats, fn (array $r) => $r['fournisseur'] !== '-' && $r['statut'] !== 'ERREUR'));
+        $nbAppels = count($appels);
+        $moyenne = fn (string $champ) => $nbAppels > 0 ? array_sum(array_column($appels, $champ)) / $nbAppels : 0;
+
+        $fournisseurs = array_count_values(array_map(
+            fn (array $r) => strtok($r['fournisseur'], ' '),
+            $appels
+        ));
+        $erreurs = count(array_filter($resultats, fn (array $r) => $r['statut'] === 'ERREUR'));
+
+        $dansLeSujet = array_filter($resultats, fn (array $r) => $r['hors_sujet'] === false && $r['page'] !== null);
+        $horsSujet = array_filter($resultats, fn (array $r) => $r['hors_sujet'] === true);
+        $nbCorrects = fn (array $liste) => count(array_filter($liste, fn (array $r) => $r['correct'] === true));
+
+        $this->line('<options=bold>Bilan</>');
+        $this->line(sprintf('  Questions posées        : %d (appels IA réussis : %d, erreurs : %d)', count($resultats), $nbAppels, $erreurs));
+        $this->line('  Fournisseurs            : '.($fournisseurs === [] ? '-' : implode(', ', array_map(
+            fn (string $f, int $n) => "{$f} × {$n}",
+            array_keys($fournisseurs),
+            $fournisseurs
+        ))));
+        if ($nbAppels > 0) {
+            $durees = array_column($appels, 'duree');
+            $this->line(sprintf('  Durée de réponse        : %.2f s en moyenne, %.2f s au maximum (objectif < 10 s)', $moyenne('duree'), max($durees)));
+            $this->line(sprintf('  Tokens par question     : %d en entrée, %d en sortie (moyenne)', round($moyenne('tokens_entree')), round($moyenne('tokens_sortie'))));
+        }
+        if ($dansLeSujet !== []) {
+            $this->line(sprintf('  Sources correctes       : %d / %d', $nbCorrects($dansLeSujet), count($dansLeSujet)));
+        }
+        if ($horsSujet !== []) {
+            $this->line(sprintf('  Refus corrects          : %d / %d (hors sujet)', $nbCorrects($horsSujet), count($horsSujet)));
+        }
+        $this->line(sprintf(
+            '  Quota nécessaire        : %d testeurs × %d questions = %d questions/jour + la démo, à comparer',
+            self::TESTEURS,
+            self::QUESTIONS_PAR_TESTEUR,
+            self::TESTEURS * self::QUESTIONS_PAR_TESTEUR
+        ));
+        $this->line('                            aux limites gratuites par jour notées dans SCRUM-43 (1 question = 1 requête).');
+        $this->line('  Coût                    : 0 € (offres gratuites Gemini et Groq)');
     }
 
     /**
