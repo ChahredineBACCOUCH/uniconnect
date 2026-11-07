@@ -35,8 +35,11 @@ class IaPoc extends Command
     protected $description = 'Preuve de concept : question sur un PDF de cours, réponse IA gratuite avec pages citées';
 
     private const TAILLE_FRAGMENT = 1500;   // caractères environ par fragment
+
     private const NB_EXTRAITS = 6;          // extraits envoyés à l'IA
+
     private const TIMEOUT = 30;             // secondes par appel IA
+
     private const REPONSE_INCONNUE = 'JE_NE_SAIS_PAS';
 
     public function handle(): int
@@ -47,10 +50,12 @@ class IaPoc extends Command
 
         if (! is_file($chemin)) {
             $this->error("Fichier introuvable : {$chemin}");
+
             return self::FAILURE;
         }
         if (DB::connection()->getDriverName() !== 'pgsql') {
             $this->error('ia:poc a besoin de PostgreSQL (recherche plein texte). Vérifie DB_CONNECTION=pgsql dans .env.');
+
             return self::FAILURE;
         }
 
@@ -61,6 +66,7 @@ class IaPoc extends Command
         $fragments = $this->decouper($pages);
         if ($fragments === []) {
             $this->error('Aucun texte extrait du PDF (document scanné ?).');
+
             return self::FAILURE;
         }
         $this->info(sprintf('%d page(s) lue(s), %d fragment(s) créé(s).', count($pages), count($fragments)));
@@ -72,6 +78,7 @@ class IaPoc extends Command
         if ($extraits === []) {
             // Aucun extrait pertinent : on n'appelle pas l'IA (économise le quota gratuit).
             $this->warn('Statut : SANS_SOURCE (aucun extrait pertinent trouvé, l\'IA n\'est pas appelée).');
+
             return self::SUCCESS;
         }
 
@@ -95,6 +102,7 @@ class IaPoc extends Command
             $reponse = $this->appelerIa($systeme, $message);
         } catch (RuntimeException $e) {
             $this->error($e->getMessage());
+
             return self::FAILURE;
         }
         $dureeIa = microtime(true) - $debutIa;
@@ -143,7 +151,7 @@ class IaPoc extends Command
     private function extrairePages(string $chemin): array
     {
         $pages = [];
-        foreach ((new Parser())->parseFile($chemin)->getPages() as $index => $page) {
+        foreach ((new Parser)->parseFile($chemin)->getPages() as $index => $page) {
             $brut = $page->getText();
             $texte = trim(preg_replace('/\s+/u', ' ', $brut) ?? preg_replace('/\s+/', ' ', $brut));
             if ($texte !== '') {
