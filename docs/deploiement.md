@@ -21,6 +21,15 @@ flowchart LR
 
 Les conditions des offres gratuites changent souvent : vérifiez-les au moment de créer les comptes.
 
+## 0. Production actuelle (mise en place le 08/11, SCRUM-31 et SCRUM-32)
+
+| Élément | Valeur |
+|---|---|
+| Frontend (Vercel) | https://uniconnect-six-lake.vercel.app |
+| API (Render, service `uniconnect-api`, Frankfurt, offre Free) | https://uniconnect-api-qov1.onrender.com · santé : `/api/health` |
+| Base (Neon, Frankfurt) | chaîne de connexion uniquement dans la variable Render `DB_URL` |
+| Déploiement | automatique à chaque fusion sur `main` (Render et Vercel) |
+
 ## 1. Base de données (Neon)
 
 1. Créez un compte sur neon.tech, puis un projet `uniconnect` (PostgreSQL 16, région Europe).
@@ -31,12 +40,17 @@ Les conditions des offres gratuites changent souvent : vérifiez-les au moment d
 
 Prérequis : `backend/Dockerfile` (SCRUM-30) avec nginx, php-fpm et supervisord.
 
-1. Sur render.com : **New → Web Service** → dépôt GitHub `uniconnect`.
-2. **Root Directory** : `backend` · **Runtime** : Docker · **Branch** : `main` · **Auto-Deploy** : oui.
+1. Sur render.com : **New → Web Service** → dépôt GitHub `uniconnect`, **en passant par la connexion GitHub** de Render. Si le service est créé à partir de l'URL publique du dépôt, Render n'est pas prévenu des fusions et l'Auto-Deploy ne se déclenche pas : Settings → Build & Deploy → *Git Credentials* doit afficher votre compte.
+2. **Runtime** : Docker · **Dockerfile Path** : `backend/Dockerfile` · **Docker Build Context** : `backend` · **Branch** : `main` · **Auto-Deploy** : On Commit.
 3. **Health Check Path** : `/api/health`.
 4. Ajoutez les variables d'environnement (tableau ci-dessous).
-5. **Pre-Deploy Command**, ou au démarrage du conteneur : `php artisan migrate --force`.
+5. Les migrations sont lancées au démarrage du conteneur par `backend/docker/start.sh` (`php artisan migrate --force`) : pas besoin de *Pre-Deploy Command*.
 6. Vérifiez que `https://<service>.onrender.com/api/health` renvoie `"db": "ok"`.
+
+Problèmes déjà rencontrés :
+
+- `could not open certificate file "/root/.postgresql/postgresql.crt": Permission denied` dans les logs, et le worker de queue qui redémarre en boucle : les processus `www-data` avaient `HOME=/root`. Corrigé dans `backend/docker/supervisord.conf` (`environment=HOME="/var/www"`, PR #25).
+- Le premier build a planté pendant `composer install` (*Segmentation fault*) : erreur intermittente côté Render, **Manual Deploy → Deploy latest commit** suffit.
 
 ## 3. Frontend (Vercel)
 
@@ -44,7 +58,7 @@ Prérequis : `backend/Dockerfile` (SCRUM-30) avec nginx, php-fpm et supervisord.
 2. **Root Directory** : `frontend` · **Framework Preset** : Vite · Build : `npm run build` · Output : `dist`.
 3. Variable : `VITE_API_URL=https://<service>.onrender.com/api` (URL de l'API déployée en SCRUM-31), à cocher pour **Production** et **Preview** afin que les URL d'aperçu des PR appellent aussi l'API.
 4. Les réécritures SPA sont versionnées dans `frontend/vercel.json` : un rafraîchissement sur `/espaces/3` renvoie `index.html` au lieu d'une 404.
-5. Chaque PR vers `main` reçoit automatiquement une **Preview URL** Vercel (activée par défaut sur un projet Git), commentée sur la PR pour la relecture.
+5. Chaque PR vers `main` reçoit automatiquement une **Preview URL** Vercel (activée par défaut sur un projet Git), commentée sur la PR pour la relecture. Ces aperçus sont protégés par la connexion Vercel : pour que toute l'équipe puisse les ouvrir, Settings → **Deployment Protection** → désactiver *Vercel Authentication*.
 6. Côté API, mettez l'URL Vercel dans `FRONTEND_URL` : elle sert pour CORS et pour les liens des e-mails (SCRUM-33).
 
 ## 4. Variables d'environnement
@@ -69,22 +83,23 @@ Prérequis : `backend/Dockerfile` (SCRUM-30) avec nginx, php-fpm et supervisord.
 | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_BUCKET`, `AWS_ENDPOINT`, `AWS_USE_PATH_STYLE_ENDPOINT` | Stockage compatible S3 (**secrets**) |
 | `LLM_PROVIDER` | `gemini` |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | Clé gratuite Gemini (**secret**) et nom du modèle Flash |
-| `GROQ_API_KEY`, `GROQ_MODEL` | Clé gratuite Groq (**secret**), `llama-3.3-70b-versatile` |
+| `GROQ_API_KEY`, `GROQ_MODEL` | Clé gratuite Groq (**secret**), `openai/gpt-oss-120b` (`llama-3.3-70b-versatile` n'existe plus) |
 | `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION` | `database` |
 | `LOG_CHANNEL` | `stderr` (les logs s'affichent dans Render) |
+| `PORT` | `80` (nginx écoute sur le port 80 dans le conteneur) |
 
 ### Vercel (frontend)
 
 | Variable | Valeur |
 |---|---|
-| `VITE_API_URL` | `https://<service>.onrender.com/api` |
+| `VITE_API_URL` | `https://uniconnect-api-qov1.onrender.com/api` (intégrée au moment du build : après un changement, **Redeploy**) |
 
 ## 5. Déployer
 
 - **Fusionner une PR dans `main` suffit** : Render et Vercel déploient automatiquement.
 - Suivre un déploiement : Render → service → **Events / Logs** ; Vercel → projet → **Deployments**.
 - Après chaque déploiement, vérifiez : `/api/health` (`db: ok`), puis la connexion avec un compte de démo.
-- Données de démonstration en production : `php artisan db:seed --class=DemoSeeder --force`, depuis le **Shell** de Render (SCRUM-188).
+- Données de démonstration en production : `php artisan db:seed --class=DemoSeeder --force`, depuis le **Shell** de Render (SCRUM-188). Le Shell est en root : lancez plutôt `su -s /bin/sh www-data -c "php artisan db:seed --class=DemoSeeder --force"` pour ne pas créer de fichiers appartenant à root dans `storage/`.
 
 ## 6. Revenir en arrière
 
