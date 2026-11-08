@@ -31,6 +31,20 @@ class DemoSeeder extends Seeder
 
     private const NB_ENSEIGNANTS = 4;
 
+    // Noms fixes plutôt que Faker : Faker est une dépendance de développement
+    // (require-dev), absente en production (composer install --no-dev). Le seeder
+    // doit pouvoir tourner sur Render pour la démo, et les données restent identiques
+    // d'un lancement à l'autre.
+    private const PRENOMS = [
+        'Yasmine', 'Mehdi', 'Salma', 'Karim', 'Ines', 'Omar', 'Rania', 'Youssef',
+        'Nour', 'Hamza', 'Lina', 'Adam', 'Mariem', 'Aziz', 'Sarra', 'Bilel',
+    ];
+
+    private const NOMS = [
+        'Trabelsi', 'Ben Salah', 'Gharbi', 'Mansouri', 'Jebali', 'Hammami', 'Chaouch',
+        'Ayari', 'Bouazizi', 'Khelifi', 'Ferchichi', 'Saidi', 'Riahi',
+    ];
+
     public function run(): void
     {
         DB::transaction(function () {
@@ -201,8 +215,8 @@ class DemoSeeder extends Seeder
             CompteAutorise::updateOrCreate(
                 ['matricule' => $matricule],
                 [
-                    'nom' => fake()->lastName(),
-                    'prenom' => fake()->firstName(),
+                    'nom' => $this->nom($i),
+                    'prenom' => $this->prenom($i),
                     'email' => sprintf('etu2026-%03d@uniconnect.test', $i),
                     'profil' => Profil::ETUDIANT,
                     'classe_id' => $classes[$codesClasses[($i - 1) % $nbClasses]]->id,
@@ -217,8 +231,8 @@ class DemoSeeder extends Seeder
             CompteAutorise::updateOrCreate(
                 ['matricule' => $matricule],
                 [
-                    'nom' => fake()->lastName(),
-                    'prenom' => fake()->firstName(),
+                    'nom' => $this->nom(self::NB_ETUDIANTS + $i),
+                    'prenom' => $this->prenom(self::NB_ETUDIANTS + $i),
                     'email' => sprintf('ens2026-%03d@uniconnect.test', $i),
                     'profil' => Profil::ENSEIGNANT,
                     'classe_id' => null,
@@ -303,5 +317,16 @@ class DemoSeeder extends Seeder
         $compte->update(['user_id' => $user->id]);
 
         return $user;
+    }
+
+    // 16 prénoms et 13 noms : les combinaisons ne se répètent pas avant 208 comptes.
+    private function prenom(int $rang): string
+    {
+        return self::PRENOMS[($rang - 1) % count(self::PRENOMS)];
+    }
+
+    private function nom(int $rang): string
+    {
+        return self::NOMS[($rang - 1) % count(self::NOMS)];
     }
 }

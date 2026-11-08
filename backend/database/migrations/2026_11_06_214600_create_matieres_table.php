@@ -21,7 +21,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        DB::statement('ALTER TABLE matieres ADD CHECK (semestre BETWEEN 1 AND 2)');
+        // SQLite (tests locaux) ne sait pas ajouter une contrainte CHECK après coup.
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE matieres ADD CHECK (semestre BETWEEN 1 AND 2)');
+        }
     }
 
     /**
