@@ -21,7 +21,10 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        DB::statement('ALTER TABLE annees_universitaires ADD CHECK (date_fin > date_debut)');
+        // SQLite (tests locaux) ne sait pas ajouter une contrainte CHECK après coup.
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE annees_universitaires ADD CHECK (date_fin > date_debut)');
+        }
 
         // Une seule année universitaire peut être active à la fois.
         DB::statement('CREATE UNIQUE INDEX annee_une_seule_active ON annees_universitaires (active) WHERE active');
