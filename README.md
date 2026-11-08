@@ -147,6 +147,7 @@ Le seeder crée également 40 entrées dans `comptes_autorises` : 35 étudiants 
 |---|---|
 | `npm run lint` | Lance oxlint puis ESLint. **Corrige automatiquement** les fichiers. |
 | `npm run test` | Lance les tests Vitest une seule fois. |
+| `npm run check:lint` | Même vérification que `lint`, **sans rien modifier** (c'est ce que lance la CI). |
 | `npm run test:unit` | Lance Vitest en mode watch. |
 | `npm run build` | Construit l'application pour la production. |
 | `npm run dev` | Lance le serveur de développement Vite. |
@@ -167,9 +168,11 @@ Le seeder crée également 40 entrées dans `comptes_autorises` : 35 étudiants 
 - Branche par ticket, créée depuis `main` : `feat/SCRUM-xx-description`.
 - Commits : `SCRUM-xx: message` (message court et à l'impératif).
 - Pas de push direct sur `main` : Pull Request obligatoire avec **1 relecture** avant fusion.
+- La CI GitHub Actions (`.github/workflows/`) lance sur chaque PR les jobs **backend** (Pint + tests sur PostgreSQL 16) et **frontend** (lint, build, Vitest). Les deux doivent être verts pour fusionner.
+- La branche doit être à jour avec `main` (bouton **Update branch**). Une mise à jour annule l'approbation : il faut la redemander. On fusionne uniquement avec **Squash and merge**.
 - Aucun secret dans Git : les clés vont dans `.env` (ignoré) ; seul `.env.example` est versionné.
 - Ne jamais committer `vendor/`, `node_modules/`, `dist/` ni les fichiers `.env`.
-- Avant d'ouvrir une PR : lancer les tests et le lint (`php artisan test`, `vendor/bin/pint --test`, `npm run lint`, `npm run test`).
+- Avant d'ouvrir une PR : lancer les tests et le lint (`php artisan test`, `vendor/bin/pint --test`, `npm run check:lint`, `npm run test`).
 
 ## Dépannage
 
