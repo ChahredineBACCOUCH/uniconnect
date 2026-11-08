@@ -1,0 +1,91 @@
+# SCRUM-27 · Tests Laravel automatiques sur chaque Pull Request.
+#
+# Pas de filtre `paths` : ce job doit tourner sur TOUTES les PR, car il devient
+# obligatoire sur main (SCRUM-29). Avec un filtre, une PR qui ne touche pas backend/
+# attendrait indéfiniment un job qui ne démarre jamais, et ne pourrait pas être fusionnée.
+name: CI backend
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Même base que la production (PostgreSQL 16), pas SQLite.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: uniconnect_test
+          POSTGRES_USER: uniconnect
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U uniconnect -d uniconnect_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # Ces variables passent avant .env et phpunit.xml : les tests utilisent PostgreSQL.
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: uniconnect_test
+      DB_USERNAME: uniconnect
+      DB_PASSWORD: secret
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, mbstring, fileinfo
+          coverage: none
+          tools: composer:v2
+
+      - name: Dossier du cache Composer
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Installer les dépendances
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Préparer .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Vérifier le formatage (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Lancer les tests
+        run: php artisan test
