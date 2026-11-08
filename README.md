@@ -80,10 +80,7 @@ php artisan serve
 
 Le fichier `backend/.env.example` est déjà configuré pour la base PostgreSQL et Mailpit de `docker-compose.yml`.
 
-Le seeder crée un compte de démonstration :
-
-- e-mail : `test@example.com`
-- mot de passe : `password`
+Le seeder remplit la base avec des données de démonstration : année 2026/2027, référentiel académique, 40 comptes autorisés et 3 comptes déjà activés. Voir la section [Comptes de démo](#comptes-de-démo).
 
 Le backend tourne sur <http://localhost:8000>. Laissez ce terminal ouvert.
 
@@ -113,6 +110,20 @@ Si vous changez le port du backend, mettez aussi à jour cette valeur puis relan
 1. Ouvrez <http://localhost:8000/api/health> : la réponse doit contenir `"status": "ok"` et `"db": "ok"`.
 2. Ouvrez <http://localhost:5173> : l'application frontend doit s'afficher.
 3. Ouvrez <http://localhost:8025> : l'interface Mailpit doit être accessible.
+
+## Comptes de démo
+
+`php artisan migrate:fresh --seed` exécute `DemoSeeder` et crée trois comptes déjà activés. Ils utilisent tous le mot de passe **`Demo1234!`**.
+
+| Profil | E-mail | Mot de passe |
+|---|---|---|
+| Étudiant | `etudiant@demo.uniconnect` | `Demo1234!` |
+| Enseignant | `enseignant@demo.uniconnect` | `Demo1234!` |
+| Administration | `admin@demo.uniconnect` | `Demo1234!` |
+
+Le compte administration possède tous les droits : `GERER_PARAMETRAGE`, `GERER_UTILISATEURS`, `CREER_GROUPE_ORGA`, `CREER_GROUPE_PRIVE`, `CREER_CHANNEL`, `MODERER` et `CONSULTER_TABLEAU_BORD`.
+
+Le seeder crée également 40 entrées dans `comptes_autorises` : 35 étudiants répartis dans les 3 classes (L2 Info A, L2 Info B, L3 Info), 4 enseignants et 1 membre de l'administration. Les 3 comptes ci-dessus sont activés ; les 37 autres restent à l'état `NON_CREE`.
 
 ## Commandes utiles
 
