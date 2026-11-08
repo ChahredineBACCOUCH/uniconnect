@@ -40,14 +40,12 @@ Prérequis : `backend/Dockerfile` (SCRUM-30) avec nginx, php-fpm et supervisord.
 
 ## 3. Frontend (Vercel)
 
-1. Sur vercel.com : **Add New → Project** → dépôt `uniconnect`.
-2. **Root Directory** : `frontend` · Framework : Vite · Build : `npm run build` · Output : `dist`.
-3. Variable : `VITE_API_URL=https://<service>.onrender.com/api`.
-4. Pour que les rafraîchissements de page fonctionnent avec Vue Router, ajoutez `frontend/vercel.json` :
-   ```json
-   { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
-   ```
-5. Côté API, mettez l'URL Vercel dans `FRONTEND_URL` : elle sert pour CORS et pour les liens des e-mails (SCRUM-33).
+1. Sur vercel.com : **Add New → Project** → importe le dépôt `uniconnect`.
+2. **Root Directory** : `frontend` · **Framework Preset** : Vite · Build : `npm run build` · Output : `dist`.
+3. Variable : `VITE_API_URL=https://<service>.onrender.com/api` (URL de l'API déployée en SCRUM-31), à cocher pour **Production** et **Preview** afin que les URL d'aperçu des PR appellent aussi l'API.
+4. Les réécritures SPA sont versionnées dans `frontend/vercel.json` : un rafraîchissement sur `/espaces/3` renvoie `index.html` au lieu d'une 404.
+5. Chaque PR vers `main` reçoit automatiquement une **Preview URL** Vercel (activée par défaut sur un projet Git), commentée sur la PR pour la relecture.
+6. Côté API, mettez l'URL Vercel dans `FRONTEND_URL` : elle sert pour CORS et pour les liens des e-mails (SCRUM-33).
 
 ## 4. Variables d'environnement
 
