@@ -1,0 +1,53 @@
+# SCRUM-28 · Lint, build et tests Vitest du frontend sur chaque Pull Request.
+#
+# Pas de filtre `paths` : ce job devient obligatoire sur main (SCRUM-29) et doit donc
+# tourner sur toutes les PR (voir l'explication dans backend.yml).
+name: CI frontend
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      # package.json exige Node ^22.18 ou >= 24.12 (Node 20 ne suffit pas).
+      - name: Installer Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      # `npm run lint` corrige les fichiers (--fix) : en CI on vérifie sans rien modifier.
+      - name: Lint (oxlint + ESLint)
+        run: npm run check:lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests (Vitest)
+        run: npm run test
