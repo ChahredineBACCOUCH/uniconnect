@@ -1,0 +1,12 @@
+[
+  { "question": "Quelle est la différence entre un curseur explicite et un curseur implicite ?", "document": "chap03.pdf", "page": 1, "hors_sujet": false },
+  { "question": "Quelles sont les étapes pour utiliser un curseur explicite ?", "document": "chap03.pdf", "page": 1, "hors_sujet": false },
+  { "question": "Que se passe-t-il au moment où on ouvre un curseur avec OPEN ?", "document": "chap03.pdf", "page": 2, "hors_sujet": false },
+  { "question": "Combien de lignes l'instruction FETCH récupère-t-elle à chaque appel ?", "document": "chap03.pdf", "page": 2, "hors_sujet": false },
+  { "question": "Quels sont les attributs d'un curseur explicite ?", "document": "chap03.pdf", "page": 3, "hors_sujet": false },
+  { "question": "Comment parcourir toutes les lignes d'un curseur sans écrire soi-même OPEN, FETCH et CLOSE ?", "document": "chap03.pdf", "page": 4, "hors_sujet": false },
+  { "question": "À quoi sert un curseur paramétré ?", "document": "chap03.pdf", "page": 4, "hors_sujet": false },
+  { "question": "À quoi sert la clause WHERE CURRENT OF ?", "document": "chap03.pdf", "page": 5, "hors_sujet": false },
+  { "question": "Quelle est la météo demain ?", "document": null, "page": null, "hors_sujet": true },
+  { "question": "Qui a gagné la Coupe du monde de football 2022 ?", "document": null, "page": null, "hors_sujet": true }
+]
