@@ -2,15 +2,23 @@
 
 namespace Tests\Feature;
 
+use App\Enums\EtatCompte;
+use App\Mail\ActivationCompte;
 use App\Models\AnneeUniversitaire;
 use App\Models\CompteAutorise;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
  * SCRUM-62 : vérifier qu'une personne a le droit de s'inscrire (elle doit être
  * dans la liste des comptes autorisés) avant de créer son compte.
+ * SCRUM-63 : si elle est éligible, le compte est créé en attente et l'e-mail
+ * d'activation (lien signé 48 h vers la page Vue) est envoyé.
  *
  * Base de test : sqlite en mémoire (voir phpunit.xml), jamais la base de données réelle.
  */
@@ -88,8 +96,9 @@ class EligibiliteInscriptionTest extends TestCase
         $this->assertSame(1, User::count());
     }
 
-    public function test_personne_eligible_rec_une_reponse_positive(): void
+    public function test_personne_eligible_cree_un_compte_en_attente_et_recoit_un_email(): void
     {
+        Mail::fake();
         $this->anneeActive();
 
         CompteAutorise::create([
@@ -102,10 +111,72 @@ class EligibiliteInscriptionTest extends TestCase
 
         $response = $this->postJson(self::URL, self::CORPS);
 
-        $response->assertStatus(200)
-            ->assertJsonPath('message', 'Vous êtes autorisé à créer un compte.');
+        $response->assertStatus(201)
+            ->assertJsonPath('message', 'E-mail envoyé');
 
-        $this->assertSame(0, User::count());
+        // Compte créé mais pas encore actif.
+        $user = User::sole();
+        $this->assertSame(EtatCompte::EN_ATTENTE, $user->etat);
+        $this->assertSame('LI2-2026-0457', $user->matricule);
+        $this->assertSame('Ben Salah', $user->nom);
+        $this->assertNull($user->password);
+
+        // La liste des comptes autorisés est mise à jour dans la foulée.
+        $autorise = CompteAutorise::sole();
+        $this->assertSame(EtatCompte::EN_ATTENTE, $autorise->etat);
+        $this->assertSame($user->id, $autorise->user_id);
+
+        Mail::assertSent(ActivationCompte::class, fn (ActivationCompte $mail) => $mail->hasTo($user->email));
+    }
+
+    public function test_le_lien_d_activation_est_signe_valide_48h_et_pointe_vers_la_page_vue(): void
+    {
+        Mail::fake();
+        $this->anneeActive();
+        CompteAutorise::create([
+            'matricule' => 'LI2-2026-0457',
+            'nom' => 'Ben Salah',
+            'prenom' => 'Yassine',
+            'email' => 'yassine.bensalah@univ.tn',
+            'profil' => 'ETUDIANT',
+        ]);
+
+        $this->postJson(self::URL, self::CORPS)->assertStatus(201);
+
+        $lien = null;
+        Mail::assertSent(ActivationCompte::class, function (ActivationCompte $mail) use (&$lien) {
+            $lien = $mail->lien;
+
+            return true;
+        });
+
+        $user = User::sole();
+
+        // Le lien de l'e-mail ouvre la page Vue /activation/{id}?expires=…&signature=…
+        $this->assertMatchesRegularExpression(
+            '#^'.preg_quote(config('app.frontend_url').'/activation/'.$user->id, '#').'\?expires=\d+&signature=#',
+            $lien,
+        );
+
+        // La même signature reste valide sur l'URL backend équivalente…
+        $lienBackend = Str::replace(
+            config('app.frontend_url').'/activation',
+            URL::to('/api/auth/activation'),
+            $lien,
+        );
+        $this->assertTrue(URL::hasValidSignature(Request::create($lienBackend)));
+
+        // …et la route backend signée redirige bien vers la page Vue.
+        $requete = parse_url($lien, PHP_URL_QUERY);
+        $this->get($lienBackend)->assertRedirect(
+            config('app.frontend_url').'/activation/'.$user->id.'?'.$requete,
+        );
+    }
+
+    public function test_un_tampon_de_signature_invalide_est_rejete(): void
+    {
+        $this->get(URL::to('/api/auth/activation/1?expires='.now()->addHour()->getTimestamp().'&signature=nimporte-quoi'))
+            ->assertForbidden();
     }
 
     public function test_formulaire_invalide_renvoie_422_avec_messages_francais(): void

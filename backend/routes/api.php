@@ -24,5 +24,18 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// SCRUM-62 : contrôle d'éligibilité avant création de compte.
-Route::post('/auth/register', RegisterController::class);
+// SCRUM-62/63 : contrôle d'éligibilité, création du compte en attente et
+// envoi de l'e-mail d'activation.
+Route::post('/auth/register', [RegisterController::class, 'store']);
+
+// Route signée (48 h) : elle sert à générer le lien avec
+// URL::temporarySignedRoute('activation', …, ['user' => $user->id]) et, lorsqu'on
+// clique dessus, à ouvrir la page Vue /activation/{id} avec les paramètres signés.
+Route::get('/auth/activation/{user}', function (Request $request, string $user) {
+    $requete = $request->getQueryString();
+
+    return redirect()->to(
+        rtrim((string) config('app.frontend_url'), '/').'/activation/'.$user
+        .($requete !== '' ? '?'.$requete : '')
+    );
+})->name('activation')->middleware('signed');
