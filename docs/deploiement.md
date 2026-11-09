@@ -1,27 +1,39 @@
-# Déploiement
+# Déploiement et retour arrière
+
+Ce document est le **mode d'emploi de la production**. Il permet à n'importe quel membre de l'équipe de :
+
+- comprendre où tourne l'application ;
+- redéployer une version après une fusion sur `main` ;
+- **revenir à la version précédente** si un déploiement casse quelque chose.
 
 Objectif : l'application est en ligne **avant le gel du 17/11 à 18 h**, avec uniquement des **offres gratuites**.
 
+## 1. Vue d'ensemble
+
 ```mermaid
 flowchart LR
-  GH["GitHub main"] -->|"déploiement auto"| VE["Vercel : frontend/"]
-  GH -->|"déploiement auto (Dockerfile)"| RE["Render : backend/"]
-  RE --> NE[("Neon : PostgreSQL 16")]
-  RE --> ST[("Stockage des fichiers")]
-  RE --> IA["Gemini / Groq"]
+  B["Navigateur"] -->|"HTTPS"| VE["Vercel<br/>frontend Vue"]
+  VE -->|"HTTPS + CORS"| RE["Render<br/>API Laravel (Docker)"]
+  RE -->|"SQL"| NE[("Neon<br/>PostgreSQL 16")]
+  RE -.->|"plus tard"| R2[("Cloudflare R2<br/>fichiers / PDF")]
+  RE -.->|"plus tard"| IA["Gemini<br/>Groq (secours)"]
 ```
+
+Le navigateur ne parle **jamais directement** à Render : il charge l'application servie par Vercel, qui appelle ensuite l'API Render. Les fichiers iront sur R2 et l'Assistant IA utilisera Gemini (Groq en secours) : ces deux briques ne sont pas encore branchées en production.
 
 | Service | Rôle | Offre | Point d'attention |
 |---|---|---|---|
 | **Vercel** | Frontend Vue | Hobby (gratuite) | Dossier racine du projet : `frontend` |
 | **Render** | API Laravel (Docker) | Free | Le service **s'endort après une période d'inactivité** : la première requête peut prendre environ une minute. Ouvrez `/api/health` 5 minutes avant la démo. |
 | **Neon** | PostgreSQL 16 | Free | La base se met en pause sans activité, puis redémarre toute seule en quelques secondes |
-| **Stockage des fichiers** | Pièces jointes, PDF de cours | Cloudflare R2 (prévu), ou une autre offre compatible S3 sans carte bancaire | Le disque de Render est **effacé à chaque déploiement** : ne stockez pas les fichiers dessus en production. Vérifiez si R2 demande une carte bancaire ; si oui, prenez une autre offre S3 gratuite qui n'en demande pas. |
-| **Gemini / Groq** | Assistant IA | Gratuites | Voir SCRUM-43 pour créer les clés |
+| **Cloudflare R2** | Pièces jointes, PDF de cours | Prévu (compatible S3, sans carte bancaire) | Le disque de Render est **effacé à chaque déploiement** : ne stockez pas les fichiers dessus en production. |
+| **Gemini / Groq** | Assistant IA | Gratuites | Gemini par défaut, Groq en secours. Voir SCRUM-43 pour créer les clés. |
 
 Les conditions des offres gratuites changent souvent : vérifiez-les au moment de créer les comptes.
 
-## 0. Production actuelle (mise en place le 08/11, SCRUM-31 et SCRUM-32)
+### Production actuelle
+
+Mise en place les 08/11 et 09/11 (SCRUM-31, SCRUM-32, SCRUM-33). État vérifié le 09/11/2026.
 
 | Élément | Valeur |
 |---|---|
@@ -30,85 +42,159 @@ Les conditions des offres gratuites changent souvent : vérifiez-les au moment d
 | Base (Neon, Frankfurt) | chaîne de connexion uniquement dans la variable Render `DB_URL` |
 | Déploiement | automatique à chaque fusion sur `main` (Render et Vercel) |
 
-## 1. Base de données (Neon)
+## 2. Variables d'environnement
 
-1. Créez un compte sur neon.tech, puis un projet `uniconnect` (PostgreSQL 16, région Europe).
-2. Copiez la **chaîne de connexion** (`postgresql://…`).
-3. Ne la collez **nulle part ailleurs** que dans les variables d'environnement de Render.
+⚠️ **Jamais de valeur secrète dans Git, Jira, WhatsApp ou ce fichier.** On liste ici les **noms** et leur rôle, jamais les valeurs. Les valeurs réelles se trouvent uniquement dans les tableaux de bord Render et Vercel.
 
-## 2. API (Render)
+- Les modèles pour le développement local sont [`backend/.env.example`](../backend/.env.example) et [`frontend/.env.example`](../frontend/.env.example). Ces fichiers ne contiennent aucun secret.
+- Sur Render : service `uniconnect-api` → onglet **Environment**. Toute modification déclenche un redéploiement.
+- Sur Vercel : projet → **Settings → Environment Variables**. `VITE_*` est **intégré au build** : après un changement, il faut **Redeploy**.
 
-Prérequis : `backend/Dockerfile` (SCRUM-30) avec nginx, php-fpm et supervisord.
+### 2.1 API — Render
 
-1. Sur render.com : **New → Web Service** → dépôt GitHub `uniconnect`, **en passant par la connexion GitHub** de Render. Si le service est créé à partir de l'URL publique du dépôt, Render n'est pas prévenu des fusions et l'Auto-Deploy ne se déclenche pas : Settings → Build & Deploy → *Git Credentials* doit afficher votre compte.
-2. **Runtime** : Docker · **Dockerfile Path** : `backend/Dockerfile` · **Docker Build Context** : `backend` · **Branch** : `main` · **Auto-Deploy** : On Commit.
-3. **Health Check Path** : `/api/health`.
-4. Ajoutez les variables d'environnement (tableau ci-dessous).
-5. Les migrations sont lancées au démarrage du conteneur par `backend/docker/start.sh` (`php artisan migrate --force`) : pas besoin de *Pre-Deploy Command*.
-6. Vérifiez que `https://<service>.onrender.com/api/health` renvoie `"db": "ok"`.
+| Variable | Où | Rôle | Secret |
+|---|---|---|---|
+| `APP_NAME` | Render | Nom affiché (`UniConnect`) | Non |
+| `APP_ENV` | Render | `production` | Non |
+| `APP_KEY` | Render | Clé de chiffrement Laravel, générée avec `php artisan key:generate --show` | **Oui** |
+| `APP_DEBUG` | Render | `false` — jamais `true` en production (sinon les erreurs exposent le code et les secrets) | Non |
+| `APP_URL` | Render | URL publique de l'API (`https://uniconnect-api-qov1.onrender.com`) | Non |
+| `APP_VERSION` | Render | Version exposée par `GET /api/health` (`1.0.0`) | Non |
+| `FRONTEND_URL` | Render | URL Vercel du frontend. Sert au **CORS** et aux liens dans les e-mails | Non |
+| `DB_CONNECTION` | Render | `pgsql` | Non |
+| `DB_URL` | Render | Chaîne de connexion Neon complète (`postgresql://…`). **Seul endroit où elle est stockée** | **Oui** |
+| `DB_SSLMODE` | Render | `require` si vous utilisez les variables séparées ci-dessous plutôt que `DB_URL` | Non |
+| `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Render | Variante de connexion Neon sans `DB_URL` (les deux méthodes ne se cumulent pas) | **Oui** pour `DB_PASSWORD` |
+| `SESSION_DRIVER` | Render | `database` | Non |
+| `CACHE_STORE` | Render | `database` | Non |
+| `QUEUE_CONNECTION` | Render | `database` — les e-mails et traitements passent par la file | Non |
+| `LOG_CHANNEL` | Render | `stderr` — les logs s'affichent directement dans Render | Non |
+| `PORT` | Render | `80` — nginx écoute sur le port 80 dans le conteneur | Non |
+| `MAIL_MAILER` | Render | Pilote d'envoi des e-mails (`smtp`) | Non |
+| `MAIL_HOST` | Render | Hôte SMTP du service gratuit choisi | Non |
+| `MAIL_PORT` | Render | Port SMTP (`587` en général) | Non |
+| `MAIL_SCHEME` | Render | `smtp` ou `smtps` selon le fournisseur (Laravel 13 n'utilise plus `MAIL_ENCRYPTION`) | Non |
+| `MAIL_USERNAME` | Render | Identifiant SMTP | Non |
+| `MAIL_PASSWORD` | Render | Mot de passe SMTP | **Oui** |
+| `MAIL_FROM_ADDRESS` | Render | Adresse d'expéditeur des e-mails d'activation | Non |
+| `MAIL_FROM_NAME` | Render | Nom d'expéditeur (`UniConnect`) | Non |
+| `FILESYSTEM_DISK` | Render | `s3` quand R2 sera branché (aujourd'hui : `local`, non persistant) | Non |
+| `AWS_ACCESS_KEY_ID` | Render | Identifiant R2 (prévu) | **Oui** |
+| `AWS_SECRET_ACCESS_KEY` | Render | Secret R2 (prévu) | **Oui** |
+| `AWS_DEFAULT_REGION` | Render | Région R2, `auto` (prévu) | Non |
+| `AWS_BUCKET` | Render | Nom du bucket R2 (prévu) | Non |
+| `AWS_ENDPOINT` | Render | Endpoint S3 de R2 (prévu) | Non |
+| `AWS_USE_PATH_STYLE_ENDPOINT` | Render | `true` pour R2 (prévu) | Non |
+| `LLM_PROVIDER` | Render | `gemini` par défaut, `groq` pour basculer sur le secours (prévu) | Non |
+| `GEMINI_API_KEY` | Render | Clé gratuite Google Gemini — **ne jamais la commiter ni la copier dans un ticket** (prévu) | **Oui** |
+| `GEMINI_MODEL` | Render | Modèle Gemini utilisé, `gemini-3.5-flash-lite` (prévu) | Non |
+| `GROQ_API_KEY` | Render | Clé gratuite Groq, utilisée en secours (prévu) | **Oui** |
+| `GROQ_MODEL` | Render | Modèle Groq de secours, `openai/gpt-oss-120b` (`llama-3.3-70b-versatile` n'existe plus) (prévu) | Non |
 
-Problèmes déjà rencontrés :
+> Les lignes marquées **prévu** concernent R2 et l'Assistant IA : ne les créez que lorsque la fonctionnalité est livrée. Les noms sont déjà fixés par `backend/config/filesystems.php` et `backend/.env.example`.
 
-- `could not open certificate file "/root/.postgresql/postgresql.crt": Permission denied` dans les logs, et le worker de queue qui redémarre en boucle : les processus `www-data` avaient `HOME=/root`. Corrigé dans `backend/docker/supervisord.conf` (`environment=HOME="/var/www"`, PR #25).
-- Le premier build a planté pendant `composer install` (*Segmentation fault*) : erreur intermittente côté Render, **Manual Deploy → Deploy latest commit** suffit.
+### 2.2 Frontend — Vercel
 
-## 3. Frontend (Vercel)
+| Variable | Où | Rôle | Secret |
+|---|---|---|---|
+| `VITE_API_URL` | Vercel | URL de l'API appelée par le navigateur : `https://uniconnect-api-qov1.onrender.com/api`. À définir pour **Production** *et* **Preview** | Non |
+| `VITE_SANS_CONNEXION` | Vercel | `false`. Réservé au développement local (`true` ouvre les pages sans connexion) ; ne pas l'activer en production | Non |
 
-1. Sur vercel.com : **Add New → Project** → importe le dépôt `uniconnect`.
-2. **Root Directory** : `frontend` · **Framework Preset** : Vite · Build : `npm run build` · Output : `dist`.
-3. Variable : `VITE_API_URL=https://<service>.onrender.com/api` (URL de l'API déployée en SCRUM-31), à cocher pour **Production** et **Preview** afin que les URL d'aperçu des PR appellent aussi l'API.
-4. Les réécritures SPA sont versionnées dans `frontend/vercel.json` : un rafraîchissement sur `/espaces/3` renvoie `index.html` au lieu d'une 404.
-5. Chaque PR vers `main` reçoit automatiquement une **Preview URL** Vercel (activée par défaut sur un projet Git), commentée sur la PR pour la relecture. Ces aperçus sont protégés par la connexion Vercel : pour que toute l'équipe puisse les ouvrir, Settings → **Deployment Protection** → désactiver *Vercel Authentication*.
-6. Côté API, mettez l'URL Vercel dans `FRONTEND_URL` : elle sert pour CORS et pour les liens des e-mails (SCRUM-33).
+`VITE_API_URL` est **figée au moment du build**. Si vous la changez, cliquez sur **Redeploy** : modifier la variable seule ne met pas à jour le site déjà en ligne.
 
-## 4. Variables d'environnement
+## 3. Déployer
 
-⚠️ **Jamais de valeur secrète dans Git, Jira, WhatsApp ou ce fichier.** On liste ici les noms, pas les valeurs.
+### 3.1 Déploiement normal
 
-### Render (backend)
+**Fusionner une Pull Request dans `main` suffit.** Render et Vercel détectent le commit et déploient automatiquement.
 
-| Variable | Valeur / rôle |
-|---|---|
-| `APP_NAME` | `UniConnect` |
-| `APP_ENV` | `production` |
-| `APP_KEY` | Clé générée avec `php artisan key:generate --show` (**secret**) |
-| `APP_DEBUG` | `false` (jamais `true` en production) |
-| `APP_URL` | URL Render de l'API |
-| `APP_VERSION` | `1.0.0` |
-| `FRONTEND_URL` | URL Vercel du frontend |
-| `DB_CONNECTION` | `pgsql` |
-| `DB_URL` | Chaîne de connexion Neon (**secret**). Ou `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, avec `DB_SSLMODE=require` |
-| `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | Service SMTP gratuit choisi pour les e-mails d'activation (**secret** pour le mot de passe) |
-| `FILESYSTEM_DISK` | `s3` |
-| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_BUCKET`, `AWS_ENDPOINT`, `AWS_USE_PATH_STYLE_ENDPOINT` | Stockage compatible S3 (**secrets**) |
-| `LLM_PROVIDER` | `gemini` |
-| `GEMINI_API_KEY`, `GEMINI_MODEL` | Clé gratuite Gemini (**secret**) et nom du modèle Flash |
-| `GROQ_API_KEY`, `GROQ_MODEL` | Clé gratuite Groq (**secret**), `openai/gpt-oss-120b` (`llama-3.3-70b-versatile` n'existe plus) |
-| `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION` | `database` |
-| `LOG_CHANNEL` | `stderr` (les logs s'affichent dans Render) |
-| `PORT` | `80` (nginx écoute sur le port 80 dans le conteneur) |
+1. La PR est relue et fusionnée dans `main` (bouton **Merge pull request** sur GitHub).
+2. Render reconstruit l'image Docker de l'API et redémarre le service. Les migrations sont lancées automatiquement au démarrage par `backend/docker/start.sh` (`php artisan migrate --force`) : **il n'y a pas de Pre-Deploy Command à configurer**.
+3. Vercel reconstruit le frontend et met à jour l'URL de production.
+4. Vérifiez le résultat (voir 3.3).
 
-### Vercel (frontend)
+> Si un service n'a pas bronché, vérifiez que le dépôt est bien connecté via **GitHub** (et non via l'URL publique) : Render ne reçoit alors pas les notifications de fusion.
 
-| Variable | Valeur |
-|---|---|
-| `VITE_API_URL` | `https://uniconnect-api-qov1.onrender.com/api` (intégrée au moment du build : après un changement, **Redeploy**) |
+### 3.2 Suivre les logs
 
-## 5. Déployer
+**Render (API)**
 
-- **Fusionner une PR dans `main` suffit** : Render et Vercel déploient automatiquement.
-- Suivre un déploiement : Render → service → **Events / Logs** ; Vercel → projet → **Deployments**.
-- Après chaque déploiement, vérifiez : `/api/health` (`db: ok`), puis la connexion avec un compte de démo.
-- Données de démonstration en production : `php artisan db:seed --class=DemoSeeder --force`, depuis le **Shell** de Render (SCRUM-188). Le Shell est en root : lancez plutôt `su -s /bin/sh www-data -c "php artisan db:seed --class=DemoSeeder --force"` pour ne pas créer de fichiers appartenant à root dans `storage/`.
+- **Logs** : journal en direct du conteneur (requêtes, erreurs Laravel, worker de file, scheduler). C'est là qu'apparaissent les erreurs de migration ou de connexion à Neon.
+- **Events** : historique des déploiements, avec le commit et le statut.
+- Un onglet **Build Logs** séparé montre la construction Docker ; les erreurs de `composer install` ou de `npm` y figurent.
+- Cherchez en priorité `Migration`, `ERROR`, `SQLSTATE`, `Segmentation fault`.
 
-## 6. Revenir en arrière
+**Vercel (frontend)**
+
+- **Deployments** : chaque déploiement avec son commit, son auteur et son statut (*Building*, *Ready*, *Error*).
+- Cliquez sur un déploiement → **Building** / **Build Logs** pour voir la compilation Vite.
+- L'URL de production est toujours `https://uniconnect-six-lake.vercel.app` ; chaque PR reçoit en plus une **Preview URL** commentée sur la PR.
+
+### 3.3 Vérifier après un déploiement
+
+1. `https://uniconnect-api-qov1.onrender.com/api/health` doit répondre `200` avec `"db": "ok"`.
+2. Ouvrez le frontend et vérifiez qu'il se charge (une première requête peut réveiller Render, comptez jusqu'à une minute).
+3. Rafraîchissez une route profonde, par exemple `/espaces/3` : elle doit renvoyer l'application et non une 404 (réécritures SPA de `frontend/vercel.json`).
+4. Connectez-vous avec un compte de démo et vérifiez qu'un appel à l'API fonctionne (aucune erreur CORS dans la console du navigateur).
+5. Si une erreur apparaît, passez à la section 4 (retour arrière) sans attendre.
+
+### 3.4 Redéployer manuellement
+
+Utile pour relancer un build après une erreur intermittente, ou pour appliquer un changement de variable d'environnement.
+
+- **Render** : service → bouton **Manual Deploy** → **Deploy latest commit**. Pour repartir de zéro, utilisez **Clear build cache & deploy**.
+- **Vercel** : **Deployments** → déploiement de son choix → **⋯** → **Redeploy**.
+
+### 3.5 Données de démonstration
+
+Depuis le **Shell** de Render (SCRUM-188) :
+
+```sh
+su -s /bin/sh www-data -c "php artisan db:seed --class=DemoSeeder --force"
+```
+
+Le Shell s'ouvre en `root` : passez par `www-data` pour ne pas créer de fichiers appartenant à `root` dans `storage/`.
+
+## 4. Revenir en arrière
+
+Le retour arrière se fait **service par service** : revenir sur Render ne change pas le frontend, et inversement.
 
 | Problème | Action |
 |---|---|
-| Le dernier déploiement de l'API casse tout | Render → **Deploys** → choisir le déploiement précédent → **Rollback** |
-| Le frontend est cassé | Vercel → **Deployments** → version précédente → **⋯ → Promote to Production** |
-| Une migration a abîmé des données | Neon → **Branches / Restore** pour revenir à un instant précédent (selon la durée de conservation de l'offre gratuite). Corrigez ensuite le code par une PR. |
-| Une clé a fuité (dans Git ou un message) | **Révoquez-la immédiatement** dans la console du service (Gemini, Groq, Neon…), créez-en une nouvelle et mettez-la à jour dans Render. Supprimer le commit ne suffit pas. |
+| **Le dernier déploiement de l'API casse tout** | Render → service → **Deploys** → repérez le dernier déploiement *Live* **avant** le problème → **Rollback**. Render redéploie cette version, sans reconstruction. |
+| **Le frontend est cassé** | Vercel → projet → **Deployments** → ouvrez le déploiement précédent qui fonctionnait → **⋯** → **Promote to Production**. L'URL de production bascule immédiatement, sans rebuild. |
+| **Seule une variable d'environnement a changé** | Corrigez la variable dans Render ou Vercel, puis redéployez (3.4). Un *Rollback* Render ne restaure pas les variables d'environnement. |
+| **Une migration a abîmé des données** | Neon → **Branches / Restore** pour revenir à un instant précédent (la durée de conservation dépend de l'offre gratuite). Corrigez ensuite le code par une PR. Le rollback Render ne défait **pas** les migrations déjà exécutées. |
+| **Une clé a fuité** (Git, ticket, message) | **Révoquez-la immédiatement** dans la console du service (Gemini, Groq, Neon, SMTP…), créez-en une nouvelle et mettez-la à jour dans Render. Supprimer le commit ne suffit pas : l'historique Git reste. |
+
+À savoir avant de cliquer sur *Rollback* :
+
+- Le rollback Render ou Vercel revient à un **commit précédent**, mais ne modifie **pas** `main`. Le prochain merge sur `main` redéploiera le code cassé : ouvrez tout de suite une **PR de revert** (ou corrigez le bug) pour que `main` redevienne sain.
+- Un rollback Render peut échouer si la base a déjà appliqué une migration incompatible avec l'ancien code. Dans ce cas, restaurez la base (Neon) ou corrigez le code et redéployez.
+- Après un rollback, revalidez avec la liste de la section 3.3.
+
+## 5. Relecture par un membre non impliqué
+
+Cette procédure doit être testée par **un membre qui n'a pas participé au déploiement**, puis validée ici avant de clôturer SCRUM-34.
+
+- [ ] J'ai trouvé les URLs de production et l'endpoint `/api/health` sans aide.
+- [ ] J'ai identifié où se trouve chaque variable d'environnement (Render ou Vercel), sans qu'on me donne de valeur secrète.
+- [ ] J'ai compris qu'une fusion sur `main` suffit à déployer, et où suivre les logs Render et Vercel.
+- [ ] J'ai compris comment revenir en arrière sur Render (*Deploys → Rollback*) et sur Vercel (*Deployments → Promote to Production*).
+- [ ] J'ai compris qu'il faut une PR de revert pour que `main` redevienne sain après un rollback.
+- [ ] J'ai repéré la procédure en cas de fuite de clé.
+
+| Relu par | Date | Remarque |
+|---|---|---|
+| _à compléter_ | | |
+
+## 6. Problèmes déjà rencontrés
+
+- `could not open certificate file "/root/.postgresql/postgresql.crt": Permission denied` dans les logs, et worker de queue qui redémarre en boucle : les processus `www-data` avaient `HOME=/root`. Corrigé dans `backend/docker/supervisord.conf` (`environment=HOME="/var/www"`, PR #25).
+- Le premier build a planté pendant `composer install` (*Segmentation fault*) : erreur intermittente côté Render, **Manual Deploy → Deploy latest commit** suffit.
+- Ordre des déploiements lors d'un changement d'URL : déployez d'abord l'API, puis mettez à jour `VITE_API_URL` côté Vercel et redéployez le frontend. Sinon le navigateur appelle une ancienne API.
+- CORS : `FRONTEND_URL` doit contenir l'URL Vercel **sans slash final**. Les Preview URLs sont autorisées par le motif défini dans `backend/config/cors.php`, lié au compte Vercel de l'équipe : si le compte ou le nom du projet change, mettez à jour ce motif.
+- Rappel : toute modification de `VITE_API_URL` exige un **Redeploy** Vercel (variable intégrée au build).
 
 ## 7. Avant la démo du 19/11
 
