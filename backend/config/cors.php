@@ -19,10 +19,14 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL')],
+    // Le front de cet environnement : http://localhost:5173 en local,
+    // l'URL Vercel de production sur Render (SCRUM-33).
+    'allowed_origins' => array_filter([env('FRONTEND_URL')]),
 
+    // Aperçus Vercel des PR, limités aux déploiements du compte de l'équipe
+    // (un motif « uniconnect-*.vercel.app » accepterait aussi le projet d'un inconnu).
     'allowed_origins_patterns' => [
-        '#^https://uniconnect-.*\.vercel\.app$#',
+        '#^https://uniconnect-[a-z0-9-]+-chahredinebaccouche-2264s-projects\.vercel\.app$#',
     ],
 
     'allowed_headers' => ['*'],
