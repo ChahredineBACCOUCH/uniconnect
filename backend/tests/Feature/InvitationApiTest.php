@@ -5,8 +5,13 @@ namespace Tests\Feature;
 use App\Enums\EtatInvitation;
 use App\Enums\RoleMembre;
 use App\Models\Adhesion;
+use App\Models\AnneeUniversitaire;
+use App\Models\Classe;
+use App\Models\Departement;
 use App\Models\Espace;
+use App\Models\Filiere;
 use App\Models\Invitation;
+use App\Models\Niveau;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -58,8 +63,17 @@ class InvitationApiTest extends TestCase
 
     public function test_on_ne_peut_pas_inviter_dans_un_groupe_organisationnel(): void
     {
-        [$espace, $proprietaire] = $this->groupePrive(['type' => 'CHANNEL', 'mode_acces' => 'OUVERT']);
-        $espace->update(['type' => 'ORGANISATIONNEL']);
+        // Un groupe organisationnel exige une année et une classe (contrainte CHECK PostgreSQL).
+        $annee = AnneeUniversitaire::create(['libelle' => '2026/2027', 'date_debut' => '2026-09-01', 'date_fin' => '2027-06-30', 'active' => true]);
+        $departement = Departement::create(['code' => 'INFO', 'libelle' => 'Informatique']);
+        $filiere = Filiere::create(['code' => 'GL', 'libelle' => 'Génie Logiciel', 'departement_id' => $departement->id]);
+        $niveau = Niveau::create(['code' => 'L2', 'libelle' => 'Licence 2']);
+        $classe = Classe::create(['code' => 'L2-A', 'libelle' => 'L2 A', 'annee_id' => $annee->id, 'filiere_id' => $filiere->id, 'niveau_id' => $niveau->id]);
+        [$espace, $proprietaire] = $this->groupePrive([
+            'type' => 'ORGANISATIONNEL',
+            'annee_id' => $annee->id,
+            'classe_id' => $classe->id,
+        ]);
 
         Sanctum::actingAs($proprietaire);
 
@@ -222,10 +236,12 @@ class InvitationApiTest extends TestCase
 
     public function test_la_recherche_de_personnes_ne_renvoie_que_les_comptes_actifs(): void
     {
-        $moi = User::factory()->create(['nom' => 'Ben Salah', 'prenom' => 'Yassine', 'etat' => 'ACTIF']);
-        $actif = User::factory()->create(['nom' => 'Ben Ali', 'prenom' => 'Sarra', 'etat' => 'ACTIF']);
+        // Profil ENSEIGNANT : un étudiant actif doit avoir une classe (contrainte CHECK
+        // PostgreSQL), ce qui n'a pas d'importance pour la recherche.
+        $moi = User::factory()->create(['nom' => 'Ben Salah', 'prenom' => 'Yassine', 'profil' => 'ENSEIGNANT', 'etat' => 'ACTIF']);
+        $actif = User::factory()->create(['nom' => 'Ben Ali', 'prenom' => 'Sarra', 'profil' => 'ENSEIGNANT', 'etat' => 'ACTIF']);
         User::factory()->create(['nom' => 'Ben Amor', 'prenom' => 'Karim', 'etat' => 'EN_ATTENTE']);
-        User::factory()->create(['nom' => 'Trabelsi', 'prenom' => 'Ines', 'etat' => 'ACTIF']);
+        User::factory()->create(['nom' => 'Trabelsi', 'prenom' => 'Ines', 'profil' => 'ENSEIGNANT', 'etat' => 'ACTIF']);
 
         Sanctum::actingAs($moi);
 
