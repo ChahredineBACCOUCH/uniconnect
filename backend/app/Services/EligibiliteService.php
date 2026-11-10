@@ -35,9 +35,14 @@ class EligibiliteService
             return self::PLATEFORME_FERMEE;
         }
 
+        $matricule = trim($matricule);
+
+        // Une adresse e-mail ne dépend pas de la casse : « Yassine.BenSalah@univ.tn »
+        // doit correspondre à « yassine.bensalah@univ.tn » (PostgreSQL compare en
+        // respectant la casse, d'où lower() des deux côtés).
         $figureSurLaListe = CompteAutorise::query()
             ->where('matricule', $matricule)
-            ->where('email', $email)
+            ->whereRaw('lower(email) = ?', [mb_strtolower(trim($email))])
             ->exists();
 
         if (! $figureSurLaListe) {
