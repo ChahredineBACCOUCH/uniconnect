@@ -44,8 +44,12 @@ Route::get('/auth/activation/{user}', function (Request $request, string $user) 
     );
 })->name('activation')->middleware('signed');
 
-// SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
 Route::middleware('auth:sanctum')->group(function () {
+    // SCRUM-87 : créer un groupe privé, modifier ses informations.
+    Route::post('/espaces', [EspaceController::class, 'store']);
+    Route::patch('/espaces/{espace}', [EspaceController::class, 'update']);
+
+    // SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
     Route::get('/espaces/{espace}', [EspaceController::class, 'show']);
     Route::get('/espaces/{espace}/messages', [MessageController::class, 'index']);
     Route::post('/espaces/{espace}/messages', [MessageController::class, 'store']);
