@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\EspaceController;
+use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UtilisateurController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -44,8 +47,28 @@ Route::get('/auth/activation/{user}', function (Request $request, string $user) 
     );
 })->name('activation')->middleware('signed');
 
-// SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
 Route::middleware('auth:sanctum')->group(function () {
+    // SCRUM-87 : créer un groupe privé, modifier ses informations.
+    Route::post('/espaces', [EspaceController::class, 'store']);
+    Route::patch('/espaces/{espace}', [EspaceController::class, 'update']);
+
+    // SCRUM-88 : invitations et recherche de personnes à inviter.
+    Route::get('/utilisateurs', [UtilisateurController::class, 'index']);
+    Route::post('/espaces/{espace}/invitations', [InvitationController::class, 'store']);
+    Route::get('/espaces/{espace}/invitations', [InvitationController::class, 'indexEspace']);
+    Route::get('/me/invitations', [InvitationController::class, 'mesInvitations']);
+    Route::post('/invitations/{invitation}/accepter', [InvitationController::class, 'accepter']);
+    Route::post('/invitations/{invitation}/refuser', [InvitationController::class, 'refuser']);
+    Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+
+    // SCRUM-90 : membres (lister, changer de rôle, retirer, transférer, quitter).
+    Route::get('/espaces/{espace}/membres', [MembreController::class, 'index']);
+    Route::patch('/espaces/{espace}/membres/{user}', [MembreController::class, 'update']);
+    Route::delete('/espaces/{espace}/membres/{user}', [MembreController::class, 'destroy']);
+    Route::post('/espaces/{espace}/transferer', [MembreController::class, 'transferer']);
+    Route::post('/espaces/{espace}/quitter', [MembreController::class, 'quitter']);
+
+    // SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
     Route::get('/espaces/{espace}', [EspaceController::class, 'show']);
     Route::get('/espaces/{espace}/messages', [MessageController::class, 'index']);
     Route::post('/espaces/{espace}/messages', [MessageController::class, 'store']);
