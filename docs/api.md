@@ -67,11 +67,11 @@ Si une route doit changer, modifiez ce fichier **dans la même PR** et prévenez
 | POST | `/auth/register` | public | `{ matricule, nom, prenom, email, accepte_charte }` → **201** `{ message }` + e-mail d'activation | 422 (pas sur la liste, e-mail ≠ liste, charte non cochée), 409 (compte déjà créé), 422 (aucune année active) | SCRUM-63 |
 | POST | `/auth/activate` | public | `{ id, hash, expires, signature, password, password_confirmation }` (paramètres du lien signé) → **200** `{ token, user }` | 403 (lien invalide), 410 (lien expiré), 422 (mot de passe trop faible) | SCRUM-66 |
 | POST | `/auth/activation/renvoyer` | public | `{ email }` → **202** `{ message }` (toujours le même message) | 429 | SCRUM-66 |
-| POST | `/login` | public | `{ email, password }` → **200** `{ token, user }` | 422 (identifiants incorrects), 423 (bloqué 15 min), 403 (suspendu ou désactivé) | SCRUM-69 |
-| POST | `/logout` | connecté | — → **204** (le jeton est supprimé) | — | SCRUM-69 |
-| GET | `/user` ✅ | connecté | → `Utilisateur` | 401 | SCRUM-69 |
+| POST | `/auth/login` | public | `{ email, password }` → **200** `{ token, user }` | 422 (identifiants incorrects), 423 (bloqué 15 min après 5 échecs), 403 (suspendu ou désactivé) | SCRUM-69 |
+| POST | `/auth/logout` | connecté | — → **204** (le jeton est supprimé) | — | SCRUM-69 |
+| GET | `/me` | connecté | → `Utilisateur` | 401 | SCRUM-69 |
 
-> Les noms `/login`, `/logout` et `/user` sont déjà utilisés par le frontend (`AUTH_ROUTES` dans `frontend/src/stores/auth.js`).
+> Les noms `/auth/login`, `/auth/logout` et `/me` sont utilisés par le frontend (`AUTH_ROUTES` dans `frontend/src/stores/auth.js`).
 > Règles du mot de passe : 8 caractères minimum, au moins une majuscule, une minuscule et un chiffre.
 
 ## 3. Espaces
