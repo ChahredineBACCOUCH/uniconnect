@@ -25,7 +25,7 @@ class StoreEspaceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom' => ['required', 'string', 'max:80'],
+            'nom' => ['required', 'string', 'min:3', 'max:80'],
             'description' => ['nullable', 'string', 'max:1000'],
             'duree_visibilite_heures' => [
                 'nullable',
@@ -33,6 +33,8 @@ class StoreEspaceRequest extends FormRequest
                 Rule::in(config('uniconnect.durees_visibilite_heures')),
             ],
             'duree_courte_autorisee' => ['sometimes', 'boolean'],
+            // Maquette E06 « Droit de publication » : true = gestionnaires seulement.
+            'mode_annonce' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -43,7 +45,9 @@ class StoreEspaceRequest extends FormRequest
     {
         return [
             'nom.required' => "Le nom de l'espace est obligatoire.",
+            'nom.min' => 'Le nom doit contenir au moins 3 caractères.',
             'nom.max' => 'Le nom ne doit pas dépasser 80 caractères.',
+            'mode_annonce.boolean' => 'Le droit de publication est invalide.',
             'description.max' => 'La description ne doit pas dépasser 1 000 caractères.',
             'duree_visibilite_heures.integer' => 'La durée de visibilité est invalide.',
             'duree_visibilite_heures.in' => "Cette durée de visibilité n'est pas proposée par la plateforme.",

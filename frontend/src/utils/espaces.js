@@ -216,5 +216,57 @@ export function messageErreur(error, defaut = 'Une erreur est survenue. Réessay
     if (premier) return premier
   }
 
-  return error.message ?? error.response?.data?.message ?? defaut
+  // Le message français de l'API d'abord : `error.message` d'Axios vaut sinon
+  // « Request failed with status code 403 », illisible pour l'utilisateur.
+  return error.response?.data?.message ?? error.message ?? defaut
+}
+
+const LIBELLES_PROFIL = {
+  ETUDIANT: 'Étudiant',
+  ENSEIGNANT: 'Enseignant',
+  ADMINISTRATION: 'Administration',
+}
+
+export function libelleProfil(profil) {
+  return LIBELLES_PROFIL[profil] ?? 'Membre'
+}
+
+const formateurDate = new Intl.DateTimeFormat('fr-FR', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
+
+/** Date courte « 10 nov. 2026 » pour les listes de membres et d'invitations. */
+export function formaterDate(iso) {
+  if (!iso) return ''
+  return formateurDate.format(new Date(iso))
+}
+
+/** Durées de visibilité proposées à la création d'un groupe privé (config/uniconnect.php). */
+export const DUREES_CREATION = [
+  { valeur: 168, libelle: '7 jours', detail: 'Par défaut' },
+  { valeur: 24, libelle: '24 heures', detail: null },
+  { valeur: 720, libelle: '30 jours', detail: null },
+  { valeur: null, libelle: 'Illimitée', detail: 'Les messages ne disparaissent jamais' },
+]
+
+/**
+ * Actions possibles sur un membre, selon le rôle de l'utilisateur connecté
+ * (règles de MembreController) : le propriétaire gère tout, un co-gestionnaire
+ * ne peut que retirer de simples membres, personne n'agit sur le propriétaire
+ * ni sur soi-même.
+ */
+export function actionsMembre(monRole, membre, monId) {
+  if (!membre || membre.user.id === monId || membre.role === 'PROPRIETAIRE') return []
+
+  if (monRole === 'PROPRIETAIRE') {
+    return [membre.role === 'MEMBRE' ? 'nommer' : 'retrograder', 'transferer', 'retirer']
+  }
+
+  if (monRole === 'CO_GESTIONNAIRE' && membre.role === 'MEMBRE') {
+    return ['retirer']
+  }
+
+  return []
 }

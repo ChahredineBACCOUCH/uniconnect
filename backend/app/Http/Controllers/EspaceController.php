@@ -56,6 +56,7 @@ class EspaceController extends Controller
                     ? $donnees['duree_visibilite_heures']
                     : config('uniconnect.duree_defaut_heures.PRIVE'),
                 'duree_courte_autorisee' => $donnees['duree_courte_autorisee'] ?? false,
+                'mode_annonce' => $donnees['mode_annonce'] ?? false,
                 'created_by' => $user->id,
             ]);
 
