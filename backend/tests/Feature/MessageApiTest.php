@@ -294,6 +294,43 @@ class MessageApiTest extends TestCase
         $this->assertDatabaseMissing('messages', ['id' => $message->id]);
     }
 
+    public function test_un_auteur_retire_de_l_espace_ne_peut_plus_modifier_ni_supprimer(): void
+    {
+        $espace = $this->creerEspace();
+        $auteur = $this->creerMembre($espace);
+        $message = $this->creerMessage($espace, $auteur, 'Écrit avant le retrait');
+
+        // L'auteur est retiré de l'espace (US-20) : il perd tout accès aux messages.
+        Adhesion::query()->where('espace_id', $espace->id)->where('user_id', $auteur->id)->delete();
+
+        Sanctum::actingAs($auteur);
+
+        $this->patchJson("/api/messages/{$message->id}", ['contenu' => 'Modifié après retrait'])
+            ->assertForbidden();
+
+        $this->deleteJson("/api/messages/{$message->id}")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('messages', ['id' => $message->id, 'contenu' => 'Écrit avant le retrait']);
+    }
+
+    public function test_un_message_d_un_espace_archive_ne_peut_plus_etre_modifie_ni_supprime(): void
+    {
+        $espace = $this->creerEspace(['etat' => 'ARCHIVE']);
+        $auteur = $this->creerMembre($espace);
+        $message = $this->creerMessage($espace, $auteur, 'Archivé');
+
+        Sanctum::actingAs($auteur);
+
+        $this->patchJson("/api/messages/{$message->id}", ['contenu' => 'Modifié'])
+            ->assertForbidden();
+
+        $this->deleteJson("/api/messages/{$message->id}")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('messages', ['id' => $message->id, 'contenu' => 'Archivé']);
+    }
+
     public function test_les_routes_exigent_une_authentification(): void
     {
         $espace = $this->creerEspace();
