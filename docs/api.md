@@ -82,7 +82,7 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
 | GET | `/me/espaces` | connecté | → `{ data: EspaceResume[] }`, groupés côté front (classe, matières, groupes privés) | SCRUM-85 |
-| GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, role, nb_membres, assistant: { actif, instructions } }` | SCRUM-94 |
+| GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, etat, role, nb_membres, duree_visibilite_heures, duree_courte_autorisee, mode_annonce, assistant: { actif, instructions } }` | SCRUM-94, 95 |
 | POST | `/espaces` | droit `CREER_GROUPE_PRIVE` | `{ nom, description?, invites?: [user_id] }` → **201** `EspaceResume` (le créateur devient `PROPRIETAIRE`) | SCRUM-87 |
 | PATCH | `/espaces/{id}` | propriétaire / co-gestionnaire | `{ nom?, description? }` → espace | SCRUM-87 |
 | PATCH | `/espaces/{id}/assistant` | enseignant propriétaire / co-gestionnaire | `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }` | SCRUM-145 |

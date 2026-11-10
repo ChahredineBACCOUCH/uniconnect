@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '../layouts/AppLayout.vue'
 import AuthLayout from '../layouts/AuthLayout.vue'
 import HomeView from '../views/HomeView.vue'
+import EspaceView from '../views/espaces/EspaceView.vue'
 import PlaceholderView from '../views/PlaceholderView.vue'
 import { authGuard } from './guards'
 
@@ -40,7 +41,7 @@ const router = createRouter({
         {
           path: 'espaces/:id/:onglet?',
           name: 'espace',
-          component: PlaceholderView,
+          component: EspaceView,
           meta: { title: 'Espace' },
         },
         {
