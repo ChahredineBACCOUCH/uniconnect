@@ -64,7 +64,7 @@ Si une route doit changer, modifiez ce fichier **dans la même PR** et prévenez
 
 | Méthode | Route | Accès | Corps → Réponse | Erreurs | Ticket |
 |---|---|---|---|---|---|
-| POST | `/auth/register` | public | `{ matricule, nom, prenom, email, accepte_charte }` → **201** `{ message }` + e-mail d'activation | 422 (pas sur la liste, e-mail ≠ liste, charte non cochée), 409 (compte déjà créé), 422 (aucune année active) | SCRUM-63 |
+| POST | `/auth/register` | public | `{ matricule, nom, prenom, email, charte }` → **201** `{ message }` + e-mail d'activation | 422 `{ message, code, errors }` : `code` vaut `PLATEFORME_FERMEE`, `NON_AUTORISE` ou `DEJA_INSCRIT` ; `errors` est vide sauf pour `NON_AUTORISE` (`{ email: [message] }`) | SCRUM-63 |
 | POST | `/auth/activate` | public | `{ id, hash, expires, signature, password, password_confirmation }` (paramètres du lien signé) → **200** `{ token, user }` | 403 (lien invalide), 410 (lien expiré), 422 (mot de passe trop faible) | SCRUM-66 |
 | POST | `/auth/activation/renvoyer` | public | `{ email }` → **202** `{ message }` (toujours le même message) | 429 | SCRUM-66 |
 | POST | `/login` | public | `{ email, password }` → **200** `{ token, user }` | 422 (identifiants incorrects), 423 (bloqué 15 min), 403 (suspendu ou désactivé) | SCRUM-69 |
