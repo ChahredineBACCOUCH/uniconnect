@@ -30,6 +30,15 @@ export default defineConfig([
     files: ['src/**/__tests__/*'],
   },
 
+  {
+    // Le nom « Composer.vue » est imposé par la maquette E05 (SCRUM-95).
+    name: 'app/composer-component-name',
+    files: ['src/components/espaces/Composer.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,
