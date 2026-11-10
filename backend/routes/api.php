@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EspaceController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UtilisateurController;
@@ -59,6 +60,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/invitations/{invitation}/accepter', [InvitationController::class, 'accepter']);
     Route::post('/invitations/{invitation}/refuser', [InvitationController::class, 'refuser']);
     Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+
+    // SCRUM-90 : membres (lister, changer de rôle, retirer, transférer, quitter).
+    Route::get('/espaces/{espace}/membres', [MembreController::class, 'index']);
+    Route::patch('/espaces/{espace}/membres/{user}', [MembreController::class, 'update']);
+    Route::delete('/espaces/{espace}/membres/{user}', [MembreController::class, 'destroy']);
+    Route::post('/espaces/{espace}/transferer', [MembreController::class, 'transferer']);
+    Route::post('/espaces/{espace}/quitter', [MembreController::class, 'quitter']);
 
     // SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
     Route::get('/espaces/{espace}', [EspaceController::class, 'show']);

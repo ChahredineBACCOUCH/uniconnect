@@ -83,8 +83,8 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 |---|---|---|---|---|
 | GET | `/me/espaces` | connecté | → `{ data: EspaceResume[] }`, groupés côté front (classe, matières, groupes privés) | SCRUM-85 |
 | GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, etat, role, nb_membres, duree_visibilite_heures, duree_courte_autorisee, mode_annonce, assistant: { actif, instructions } }` | SCRUM-94, 95 |
-| POST | `/espaces` | droit `CREER_GROUPE_PRIVE` | `{ nom, description?, invites?: [user_id] }` → **201** `EspaceResume` (le créateur devient `PROPRIETAIRE`) | SCRUM-87 |
-| PATCH | `/espaces/{id}` | propriétaire / co-gestionnaire | `{ nom?, description? }` → espace | SCRUM-87 |
+| POST | `/espaces` | droit `CREER_GROUPE_PRIVE` | `{ nom, description?, duree_visibilite_heures?, duree_courte_autorisee? }` → **201** `{ data: espace }` (même format que `GET /espaces/{id}`, le créateur devient `PROPRIETAIRE`). `duree_visibilite_heures` parmi `24`, `168`, `720` ; absente = 168 (7 jours) ; `null` = illimitée. Sans le droit → **403**. Les invités s'ajoutent ensuite avec `POST /espaces/{id}/invitations` | SCRUM-87 |
+| PATCH | `/espaces/{id}` | propriétaire / co-gestionnaire | `{ nom?, description? }` → `{ data: espace }` ; **403** si l'espace est archivé | SCRUM-87 |
 | PATCH | `/espaces/{id}/assistant` | enseignant propriétaire / co-gestionnaire | `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }` | SCRUM-145 |
 | POST | `/espaces/{id}/lu` | membre | `{ dernier_message_id }` → **204** (remet `non_lus` à 0) | SCRUM-95 |
 
@@ -92,16 +92,18 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/utilisateurs?q=ben` | connecté | → `{ data: [{ id, nom, prenom, profil, classe }] }`, 10 maximum (pour inviter) | SCRUM-88 |
-| POST | `/espaces/{id}/invitations` | propriétaire / co-gestionnaire | `{ user_ids: [..] }` → **201** `{ creees: n, deja_membres: [..], deja_invites: [..] }` | SCRUM-88 |
-| GET | `/me/invitations` | connecté | → `{ data: [{ id, espace: { id, nom }, invite_par, expire_le }] }` | SCRUM-88 |
-| POST | `/invitations/{id}/accepter` | invité | → **200** `EspaceResume` | SCRUM-88 |
-| POST | `/invitations/{id}/refuser` | invité | → **204** | SCRUM-88 |
-| DELETE | `/invitations/{id}` | auteur de l'invitation | → **204** (annulée) | SCRUM-88 |
-| GET | `/espaces/{id}/membres` | membre | → `{ data: [{ user: {id, nom, prenom, profil}, role, depuis }] }` | SCRUM-90 |
-| PATCH | `/espaces/{id}/membres/{userId}` | propriétaire | `{ role: "CO_GESTIONNAIRE" \| "MEMBRE" }` → membre | SCRUM-90 |
-| DELETE | `/espaces/{id}/membres/{userId}` | propriétaire / co-gestionnaire | → **204** (accès coupé immédiatement) | SCRUM-90 |
-| POST | `/espaces/{id}/quitter` | membre d'un groupe privé | → **204** (403 pour un groupe organisationnel ; 409 pour le dernier propriétaire) | SCRUM-90 |
+| GET | `/utilisateurs?q=ben` | connecté | → `{ data: [{ id, nom, prenom, profil, classe }] }`, comptes **actifs** uniquement, 10 maximum, sans l'utilisateur connecté ; `q` d'au moins 2 caractères (sinon 422). Cherche dans le nom, le prénom et « prénom nom » | SCRUM-88 |
+| POST | `/espaces/{id}/invitations` | propriétaire / co-gestionnaire | `{ user_ids: [..] }` (1 à 50) → **201** `{ creees: n, deja_membres: [..], deja_invites: [..] }`. Expire au bout de 14 jours. **403** espace archivé ; **422** groupe organisationnel | SCRUM-88 |
+| GET | `/espaces/{id}/invitations` | propriétaire / co-gestionnaire | → `{ data: [{ id, etat, invite, invite_par, expire_le, cree_le }] }` (en attente), pour les annuler depuis E07 | SCRUM-88 |
+| GET | `/me/invitations` | connecté | → `{ data: [{ id, etat, espace: { id, nom }, invite_par, expire_le, cree_le }] }` (en attente, non expirées) | SCRUM-88 |
+| POST | `/invitations/{id}/accepter` | invité | → **200** `{ data: espace }` (rôle `MEMBRE`) ; **422** si expirée ou déjà traitée ; **403** si ce n'est pas l'invité | SCRUM-88 |
+| POST | `/invitations/{id}/refuser` | invité | → **204** ; **422** si expirée ou déjà traitée | SCRUM-88 |
+| DELETE | `/invitations/{id}` | auteur de l'invitation ou propriétaire de l'espace | → **204** (annulée) ; **422** si elle n'est plus en attente | SCRUM-88 |
+| GET | `/espaces/{id}/membres?q=` | membre | → `{ data: [{ user: {id, nom, prenom, profil}, role, depuis }] }`, propriétaire puis co-gestionnaires puis membres | SCRUM-90 |
+| PATCH | `/espaces/{id}/membres/{userId}` | propriétaire | `{ role: "CO_GESTIONNAIRE" \| "MEMBRE" }` → `{ data: membre }` ; **422** pour le propriétaire (passer par `/transferer`) | SCRUM-90 |
+| DELETE | `/espaces/{id}/membres/{userId}` | propriétaire / co-gestionnaire | → **204** (accès coupé immédiatement). **422** pour le propriétaire ou soi-même (utiliser `/quitter`) ; **403** si un co-gestionnaire retire un autre co-gestionnaire | SCRUM-90 |
+| POST | `/espaces/{id}/transferer` | propriétaire | `{ user_id }` (membre de l'espace) → `{ data: membre }` ; l'ancien propriétaire devient co-gestionnaire | SCRUM-90 |
+| POST | `/espaces/{id}/quitter` | membre | → **204**. **403** pour un groupe organisationnel. Si le propriétaire part : la propriété passe au plus ancien co-gestionnaire, sinon à un compte de l'administration ; **409** s'il n'y en a aucun | SCRUM-90 |
 
 ## 5. Messages et pièces jointes
 
