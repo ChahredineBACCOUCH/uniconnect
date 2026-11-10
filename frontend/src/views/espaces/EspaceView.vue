@@ -98,6 +98,19 @@ async function chargerEspace() {
   }
 }
 
+/*
+ * Rechargement discret de l'en-tête (rôle, nombre de membres) demandé par un
+ * onglet après une action : l'onglet reste affiché, sans squelette de chargement.
+ */
+async function rafraichirEspace() {
+  try {
+    espace.value = await recupererEspace(route.params.id)
+  } catch {
+    // L'utilisateur n'a peut-être plus accès (ex. il vient de quitter) : rechargement complet.
+    await chargerEspace()
+  }
+}
+
 function changerOnglet(valeur) {
   onglet.value = ongletValide(valeur)
 }
@@ -118,6 +131,17 @@ function changerOnglet(valeur) {
     </v-alert>
 
     <template v-else-if="espace">
+      <!-- SCRUM-89 : l'espace a été créé mais l'envoi des invitations a échoué. -->
+      <v-alert
+        v-if="route.query.avertissement"
+        type="warning"
+        variant="tonal"
+        density="compact"
+        closable
+      >
+        {{ route.query.avertissement }}
+      </v-alert>
+
       <header class="espace__entete">
         <span class="espace__icone">
           <v-icon :icon="iconeEspace(espace.type)" size="28" />
@@ -186,7 +210,12 @@ function changerOnglet(valeur) {
       </v-tabs>
 
       <section class="espace__contenu" :aria-label="`Onglet ${ongletActif.libelle}`">
-        <component :is="composantActif" :key="`${espace.id}-${onglet}`" :espace="espace" />
+        <component
+          :is="composantActif"
+          :key="`${espace.id}-${onglet}`"
+          :espace="espace"
+          @actualiser="rafraichirEspace"
+        />
       </section>
     </template>
   </div>
