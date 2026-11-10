@@ -64,4 +64,12 @@ describe('client http', () => {
     await expect(rejet).rejects.toBeInstanceOf(ValidationError)
     await expect(rejet).rejects.toMatchObject({ message: 'Données invalides.', errors })
   })
+
+  it('422 : conserve le code de refus renvoyé par l’API', async () => {
+    const rejet = onResponseError(
+      erreurHttp(422, { message: 'Plateforme fermée.', errors: {}, code: 'PLATEFORME_FERMEE' }),
+    )
+
+    await expect(rejet).rejects.toMatchObject({ code: 'PLATEFORME_FERMEE' })
+  })
 })

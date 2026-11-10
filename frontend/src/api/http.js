@@ -16,12 +16,15 @@ const http = axios.create({
  * Erreur 422 renvoyée par Laravel quand un formulaire est invalide.
  * `errors` a la forme { champ: ['message', ...] } : les formulaires l'utilisent
  * pour afficher chaque message sous le bon champ.
+ * `code` est le motif du refus quand l'API en renvoie un (ex. PLATEFORME_FERMEE) :
+ * la page s'en sert pour bloquer le formulaire.
  */
 export class ValidationError extends Error {
-  constructor(message, errors) {
+  constructor(message, errors, code = null) {
     super(message)
     this.name = 'ValidationError'
     this.errors = errors
+    this.code = code
   }
 }
 
@@ -60,6 +63,7 @@ http.interceptors.response.use(
         new ValidationError(
           data.message ?? 'Le formulaire contient des erreurs.',
           data.errors ?? {},
+          data.code ?? null,
         ),
       )
     }
