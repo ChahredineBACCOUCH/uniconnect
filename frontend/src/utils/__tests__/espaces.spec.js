@@ -8,6 +8,10 @@ import {
   grouperMessagesParJour,
   libelleDuree,
   libelleVisibilite,
+  actionsMembre,
+  DUREES_CREATION,
+  formaterDate,
+  libelleProfil,
   messageErreur,
   nomAuteur,
   optionsDuree,
@@ -96,7 +100,13 @@ describe('utilitaires de l’espace', () => {
   })
 
   it('affiche « Vous » pour l’auteur connecté et un badge pour les enseignants', () => {
-    const auteur = { id: 4, prenom: 'Sophie', nom: 'Martin', profil: 'ENSEIGNANT', badge: 'Enseignant' }
+    const auteur = {
+      id: 4,
+      prenom: 'Sophie',
+      nom: 'Martin',
+      profil: 'ENSEIGNANT',
+      badge: 'Enseignant',
+    }
 
     expect(nomAuteur(auteur, 4)).toBe('Vous')
     expect(nomAuteur(auteur, 9)).toBe('Sophie Martin')
@@ -112,5 +122,53 @@ describe('utilitaires de l’espace', () => {
 
     expect(messageErreur(validation)).toBe('Le contenu du message est obligatoire.')
     expect(messageErreur(new Error('Réseau'))).toBe('Réseau')
+  })
+
+  it('préfère le message français de l’API au message technique d’Axios', () => {
+    const erreurAxios = {
+      message: 'Request failed with status code 409',
+      response: { status: 409, data: { message: 'Impossible de quitter : aucun successeur.' } },
+    }
+
+    expect(messageErreur(erreurAxios)).toBe('Impossible de quitter : aucun successeur.')
+  })
+})
+
+describe('membres et invitations (SCRUM-89, SCRUM-91)', () => {
+  const membre = (id, role, profil = 'ETUDIANT') => ({
+    user: { id, nom: 'Nom', prenom: 'Prénom', profil },
+    role,
+  })
+
+  it('le propriétaire peut nommer, transférer et retirer un simple membre', () => {
+    expect(actionsMembre('PROPRIETAIRE', membre(2, 'MEMBRE'), 1)).toEqual([
+      'nommer',
+      'transferer',
+      'retirer',
+    ])
+    expect(actionsMembre('PROPRIETAIRE', membre(3, 'CO_GESTIONNAIRE'), 1)).toEqual([
+      'retrograder',
+      'transferer',
+      'retirer',
+    ])
+  })
+
+  it('un co-gestionnaire ne peut retirer que de simples membres', () => {
+    expect(actionsMembre('CO_GESTIONNAIRE', membre(2, 'MEMBRE'), 1)).toEqual(['retirer'])
+    expect(actionsMembre('CO_GESTIONNAIRE', membre(3, 'CO_GESTIONNAIRE'), 1)).toEqual([])
+  })
+
+  it('personne n’agit sur le propriétaire ni sur soi-même, et un membre n’a aucune action', () => {
+    expect(actionsMembre('CO_GESTIONNAIRE', membre(1, 'PROPRIETAIRE'), 2)).toEqual([])
+    expect(actionsMembre('PROPRIETAIRE', membre(1, 'PROPRIETAIRE'), 1)).toEqual([])
+    expect(actionsMembre('MEMBRE', membre(2, 'MEMBRE'), 1)).toEqual([])
+  })
+
+  it('affiche les profils et les durées de création', () => {
+    expect(libelleProfil('ENSEIGNANT')).toBe('Enseignant')
+    expect(libelleProfil('INCONNU')).toBe('Membre')
+    expect(DUREES_CREATION.map((d) => d.valeur)).toEqual([168, 24, 720, null])
+    expect(formaterDate(null)).toBe('')
+    expect(formaterDate('2026-11-10T12:00:00Z')).toContain('2026')
   })
 })

@@ -63,6 +63,28 @@ class CreationEspaceTest extends TestCase
             ->assertJsonPath('data.duree_visibilite_heures', null);
     }
 
+    public function test_le_droit_de_publication_gestionnaires_seulement_active_le_mode_annonce(): void
+    {
+        Sanctum::actingAs($this->avecDroit());
+
+        $this->postJson('/api/espaces', ['nom' => 'Annonces du projet', 'mode_annonce' => true])
+            ->assertCreated()
+            ->assertJsonPath('data.mode_annonce', true);
+
+        $this->postJson('/api/espaces', ['nom' => 'Discussion libre'])
+            ->assertCreated()
+            ->assertJsonPath('data.mode_annonce', false);
+    }
+
+    public function test_le_nom_doit_contenir_au_moins_3_caracteres(): void
+    {
+        Sanctum::actingAs($this->avecDroit());
+
+        $this->postJson('/api/espaces', ['nom' => 'BD'])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.nom.0', 'Le nom doit contenir au moins 3 caractères.');
+    }
+
     public function test_une_duree_non_proposee_est_refusee(): void
     {
         Sanctum::actingAs($this->avecDroit());

@@ -6,6 +6,7 @@ use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UtilisateurController;
+use App\Http\Resources\UtilisateurResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -25,8 +26,10 @@ Route::get('/health', function () {
     ]);
 });
 
+// Objet `Utilisateur` du contrat d'API (docs/api.md), sans enveloppe `data` :
+// le store Pinia `auth` le range tel quel dans `auth.user` (droits compris).
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json(UtilisateurResource::make($request->user())->resolve($request));
 })->middleware('auth:sanctum');
 
 // SCRUM-62/63 : contrôle d'éligibilité, création du compte en attente et

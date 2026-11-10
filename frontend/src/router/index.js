@@ -35,7 +35,7 @@ const router = createRouter({
         {
           path: 'espaces/nouveau',
           name: 'espace-nouveau',
-          component: PlaceholderView,
+          component: () => import('../views/espaces/CreerEspaceView.vue'),
           meta: { title: 'Créer un groupe privé', droit: 'CREER_GROUPE_PRIVE' },
         },
         {
