@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * SCRUM-62/63 : création du compte (pas encore actif) et envoi de l'e-mail
@@ -48,9 +49,11 @@ class RegisterController extends Controller
 
         /** @var User $user */
         $user = DB::transaction(function () use ($donnees): User {
+            // Même comparaison que EligibiliteService : e-mail sans tenir compte de la
+            // casse ni des espaces. On enregistre ensuite l'adresse de la liste.
             $autorise = CompteAutorise::query()
-                ->where('matricule', $donnees['matricule'])
-                ->where('email', $donnees['email'])
+                ->where('matricule', trim($donnees['matricule']))
+                ->whereRaw('lower(email) = ?', [mb_strtolower(trim($donnees['email']))])
                 ->sole();
 
             $user = User::create([
@@ -73,10 +76,24 @@ class RegisterController extends Controller
             return $user;
         });
 
-        Mail::to($user->email)->send(new ActivationCompte($user, $this->lienActivation($user)));
+        // Le compte est déjà créé : un échec d'envoi (SMTP indisponible) ne doit pas
+        // renvoyer une 500, sinon une nouvelle tentative répondrait DEJA_INSCRIT
+        // sans que la personne ait reçu de lien. On journalise et on l'oriente vers
+        // « Renvoyer le lien » (SCRUM-66).
+        try {
+            Mail::to($user->email)->send(new ActivationCompte($user, $this->lienActivation($user)));
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'message' => "Votre compte a été créé, mais l'e-mail d'activation n'a pas pu être envoyé. Utilisez « Renvoyer le lien » dans quelques minutes.",
+                'email_envoye' => false,
+            ], 201);
+        }
 
         return response()->json([
             'message' => 'E-mail envoyé',
+            'email_envoye' => true,
         ], 201);
     }
 

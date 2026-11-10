@@ -179,6 +179,48 @@ class EligibiliteInscriptionTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_un_email_saisi_avec_des_majuscules_cree_le_compte_avec_l_adresse_de_la_liste(): void
+    {
+        Mail::fake();
+        $this->anneeActive();
+        $this->compteAutorise();
+
+        $this->postJson(self::URL, array_merge(self::CORPS, ['email' => ' Yassine.BenSalah@UNIV.tn ']))
+            ->assertStatus(201)
+            ->assertJsonPath('email_envoye', true);
+
+        // On garde l'adresse de la liste des comptes autorisés, pas celle tapée.
+        $this->assertSame('yassine.bensalah@univ.tn', User::sole()->email);
+        Mail::assertSent(ActivationCompte::class, fn (ActivationCompte $mail) => $mail->hasTo('yassine.bensalah@univ.tn'));
+    }
+
+    public function test_un_echec_d_envoi_de_l_email_ne_renvoie_pas_d_erreur_500(): void
+    {
+        $this->anneeActive();
+        $this->compteAutorise();
+
+        // Le serveur SMTP est indisponible au moment de l'envoi.
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('SMTP indisponible'));
+
+        $this->postJson(self::URL, self::CORPS)
+            ->assertStatus(201)
+            ->assertJsonPath('email_envoye', false);
+
+        // Le compte est bien créé en attente : « Renvoyer le lien » (SCRUM-66) prendra le relais.
+        $this->assertSame(EtatCompte::EN_ATTENTE, User::sole()->etat);
+    }
+
+    public function test_la_route_d_inscription_est_limitee_a_10_essais_par_minute(): void
+    {
+        $this->anneeActive();
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->postJson(self::URL, self::CORPS)->assertStatus(422);
+        }
+
+        $this->postJson(self::URL, self::CORPS)->assertStatus(429);
+    }
+
     public function test_formulaire_invalide_renvoie_422_avec_messages_francais(): void
     {
         $response = $this->postJson(self::URL, [
@@ -190,6 +232,18 @@ class EligibiliteInscriptionTest extends TestCase
             ->assertJsonPath('errors.matricule.0', 'Le matricule est obligatoire.')
             ->assertJsonPath('errors.email.0', "Le format de l'adresse e-mail est invalide.")
             ->assertJsonPath('errors.charte.0', 'Vous devez accepter la charte pour créer un compte.');
+    }
+
+    /** Inscrit Yassine dans la liste des comptes autorisés. */
+    private function compteAutorise(): void
+    {
+        CompteAutorise::create([
+            'matricule' => 'LI2-2026-0457',
+            'nom' => 'Ben Salah',
+            'prenom' => 'Yassine',
+            'email' => 'yassine.bensalah@univ.tn',
+            'profil' => 'ETUDIANT',
+        ]);
     }
 
     /** Crée l'année universitaire active (une seule à la fois). */
