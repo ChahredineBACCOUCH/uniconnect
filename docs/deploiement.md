@@ -108,7 +108,7 @@ Mise en place les 08/11 et 09/11 (SCRUM-31, SCRUM-32, SCRUM-33). État vérifié
 
 **Fusionner une Pull Request dans `main` suffit.** Render et Vercel détectent le commit et déploient automatiquement.
 
-1. La PR est relue et fusionnée dans `main` (bouton **Merge pull request** sur GitHub).
+1. La PR est relue et fusionnée dans `main` (bouton **Squash and merge** sur GitHub : c'est le seul mode de fusion autorisé, SCRUM-29).
 2. Render reconstruit l'image Docker de l'API et redémarre le service. Les migrations sont lancées automatiquement au démarrage par `backend/docker/start.sh` (`php artisan migrate --force`) : **il n'y a pas de Pre-Deploy Command à configurer**.
 3. Vercel reconstruit le frontend et met à jour l'URL de production.
 4. Vérifiez le résultat (voir 3.3).
@@ -129,6 +129,7 @@ Mise en place les 08/11 et 09/11 (SCRUM-31, SCRUM-32, SCRUM-33). État vérifié
 - **Deployments** : chaque déploiement avec son commit, son auteur et son statut (*Building*, *Ready*, *Error*).
 - Cliquez sur un déploiement → **Building** / **Build Logs** pour voir la compilation Vite.
 - L'URL de production est toujours `https://uniconnect-six-lake.vercel.app` ; chaque PR reçoit en plus une **Preview URL** commentée sur la PR.
+- Les Preview URLs sont protégées par la connexion Vercel : un membre extérieur au projet Vercel est redirigé vers la page de connexion. Pour que toute l'équipe puisse les ouvrir : **Settings → Deployment Protection** → désactiver *Vercel Authentication* (ou inviter les membres dans l'équipe Vercel).
 
 ### 3.3 Vérifier après un déploiement
 
@@ -192,6 +193,7 @@ Cette procédure doit être testée par **un membre qui n'a pas participé au d�
 
 - `could not open certificate file "/root/.postgresql/postgresql.crt": Permission denied` dans les logs, et worker de queue qui redémarre en boucle : les processus `www-data` avaient `HOME=/root`. Corrigé dans `backend/docker/supervisord.conf` (`environment=HOME="/var/www"`, PR #25).
 - Le premier build a planté pendant `composer install` (*Segmentation fault*) : erreur intermittente côté Render, **Manual Deploy → Deploy latest commit** suffit.
+- Un autre build a échoué pendant `composer install` avec `curl error 28` / `curl error 56` (téléchargements depuis `api.github.com` trop lents) : problème réseau passager, même solution (relancer le déploiement).
 - Ordre des déploiements lors d'un changement d'URL : déployez d'abord l'API, puis mettez à jour `VITE_API_URL` côté Vercel et redéployez le frontend. Sinon le navigateur appelle une ancienne API.
 - CORS : `FRONTEND_URL` doit contenir l'URL Vercel **sans slash final**. Les Preview URLs sont autorisées par le motif défini dans `backend/config/cors.php`, lié au compte Vercel de l'équipe : si le compte ou le nom du projet change, mettez à jour ce motif.
 - Rappel : toute modification de `VITE_API_URL` exige un **Redeploy** Vercel (variable intégrée au build).
