@@ -82,7 +82,7 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
 | GET | `/me/espaces` | connecté | → `{ data: EspaceResume[] }`, groupés côté front (classe, matières, groupes privés) | SCRUM-85 |
-| GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, role, nb_membres, assistant: { actif, instructions } }` | SCRUM-94 |
+| GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, etat, role, nb_membres, duree_visibilite_heures, duree_courte_autorisee, mode_annonce, assistant: { actif, instructions } }` | SCRUM-94, 95 |
 | POST | `/espaces` | droit `CREER_GROUPE_PRIVE` | `{ nom, description?, invites?: [user_id] }` → **201** `EspaceResume` (le créateur devient `PROPRIETAIRE`) | SCRUM-87 |
 | PATCH | `/espaces/{id}` | propriétaire / co-gestionnaire | `{ nom?, description? }` → espace | SCRUM-87 |
 | PATCH | `/espaces/{id}/assistant` | enseignant propriétaire / co-gestionnaire | `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }` | SCRUM-145 |
@@ -105,15 +105,17 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 
 ## 5. Messages et pièces jointes
 
-Objet `Message` : `{ id, auteur: { id, nom, prenom, profil } | null, contenu, cree_le, modifie_le, pieces_jointes: [{ id, nom, mime, taille_octets }] }`.
+Objet `Message` : `{ id, auteur: { id, nom, prenom, profil, badge } | null, contenu, parent_id, expire_le, modifie, modifie_le, cree_le, pieces_jointes: [{ id, nom, mime, taille_octets }] }`.
 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/espaces/{id}/messages?avant_id=&apres_id=&limite=50` | membre | → `{ data: Message[] }`, du plus ancien au plus récent ; `apres_id` sert au rafraîchissement toutes les 5 s | SCRUM-94 |
-| POST | `/espaces/{id}/messages` | membre | multipart : `contenu`, `fichiers[]` (0 à 5) → **201** `Message` | SCRUM-94, 136 |
-| PATCH | `/messages/{id}` | auteur | `{ contenu }` → `Message` | SCRUM-94 |
-| DELETE | `/messages/{id}` | auteur, propriétaire, co-gestionnaire | → **204** | SCRUM-94 |
+| GET | `/espaces/{id}/messages?after_id=&limite=30` | membre | → `{ data: Message[], meta: { next_cursor, prev_cursor, per_page } }`, du plus ancien au plus récent ; pagination par curseur (`cursor`) ; `after_id` sert au rafraîchissement toutes les 5 s | SCRUM-94 |
+| POST | `/espaces/{id}/messages` | membre | `{ contenu, parent_id?, duree_visibilite_heures? }` (+ `fichiers[]` en SCRUM-136) → **201** `Message`. `expire_le` est calculé à l'envoi ; 403 si l'espace est archivé ou en mode annonce pour un membre simple. | SCRUM-94, 136 |
+| PATCH | `/messages/{id}` | auteur | `{ contenu }` → `Message` (remplit `modifie_le`) | SCRUM-94 |
+| DELETE | `/messages/{id}` | auteur | → **204** | SCRUM-94 |
 | GET | `/fichiers/{id}/telecharger` | membre de l'espace | → **302** vers un lien temporaire (5 min), ou envoi direct du fichier en local | SCRUM-137 |
+
+Chaque lecture met à jour `adhesions.dernier_message_lu_id` (le curseur ne recule jamais). Les messages masqués et les messages expirés ne sont pas renvoyés.
 
 Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_fichier_mo` ; formats autorisés : PDF, images, Office, ZIP. Un fichier trop gros ou interdit renvoie **422**.
 
