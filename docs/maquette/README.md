@@ -139,7 +139,7 @@ Légende : **Fichier** = composant Vue à créer · **API** = routes Laravel uti
 | Écran | Route | Fichier | API | États / règles | Jira |
 |---|---|---|---|---|---|
 | E01 Connexion | `/connexion` | `LoginView.vue` | `POST /api/login` | Erreur identifiants ; blocage après 5 échecs (15 min) ; compte suspendu | SCRUM-70 |
-| E02 Création de compte | `/inscription` | `RegisterView.vue` | `POST /api/auth/register` | Étapes « 1 Éligibilité — 2 Activation » ; alerte info « Seules les personnes figurant sur la liste des comptes autorisés… » ; erreur sous le champ e-mail si absent de la liste ; bandeau warning si aucune année active ; écran « Vérifiez votre boîte de réception » après envoi | SCRUM-64 |
+| E02 Création de compte | `/inscription` | `views/auth/InscriptionView.vue` | `POST /api/auth/register` | Étapes « 1 Éligibilité — 2 Activation » ; alerte info « Seules les personnes figurant sur la liste des comptes autorisés… » ; erreur sous le champ e-mail si absent de la liste ; bandeau warning si aucune année active ; écran « Vérifiez votre boîte de réception » après envoi | SCRUM-64 |
 | E03 Activation | `/activation/:token` | `ActivationView.vue` | `POST /api/auth/activate` | Jauge de force (4 barres) + 4 règles (8 caractères, majuscule, minuscule, chiffre) ; bouton désactivé tant que les règles ne sont pas remplies ; état « lien expiré » avec « Renvoyer un e-mail d'activation » | SCRUM-67 |
 | E01b Mot de passe oublié | `/mot-de-passe-oublie`, `/reinitialiser/:token` | `ForgotPasswordView.vue`, `ResetPasswordView.vue` | broker Laravel | Message neutre « Si un compte existe… » ; nouveau mot de passe avec les mêmes règles ; écran « Mot de passe modifié » | SCRUM-118 |
 

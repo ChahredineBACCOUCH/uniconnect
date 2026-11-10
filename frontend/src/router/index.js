@@ -121,7 +121,7 @@ const router = createRouter({
         {
           path: 'inscription',
           name: 'inscription',
-          component: () => import('../views/RegisterView.vue'),
+          component: () => import('../views/auth/InscriptionView.vue'),
         },
         {
           path: 'activation/:token',
