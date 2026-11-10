@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\EspaceController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UtilisateurController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +50,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // SCRUM-87 : créer un groupe privé, modifier ses informations.
     Route::post('/espaces', [EspaceController::class, 'store']);
     Route::patch('/espaces/{espace}', [EspaceController::class, 'update']);
+
+    // SCRUM-88 : invitations et recherche de personnes à inviter.
+    Route::get('/utilisateurs', [UtilisateurController::class, 'index']);
+    Route::post('/espaces/{espace}/invitations', [InvitationController::class, 'store']);
+    Route::get('/espaces/{espace}/invitations', [InvitationController::class, 'indexEspace']);
+    Route::get('/me/invitations', [InvitationController::class, 'mesInvitations']);
+    Route::post('/invitations/{invitation}/accepter', [InvitationController::class, 'accepter']);
+    Route::post('/invitations/{invitation}/refuser', [InvitationController::class, 'refuser']);
+    Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
 
     // SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
     Route::get('/espaces/{espace}', [EspaceController::class, 'show']);

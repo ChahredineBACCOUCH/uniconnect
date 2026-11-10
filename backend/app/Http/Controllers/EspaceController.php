@@ -11,7 +11,6 @@ use App\Http\Requests\UpdateEspaceRequest;
 use App\Http\Resources\EspaceResource;
 use App\Models\Adhesion;
 use App\Models\Espace;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +28,7 @@ class EspaceController extends Controller
     {
         $this->authorize('view', $espace);
 
-        return new EspaceResource($this->pourUtilisateur($espace, $request->user()));
+        return EspaceResource::pour($espace, $request->user());
     }
 
     /**
@@ -69,7 +68,7 @@ class EspaceController extends Controller
             return $espace;
         });
 
-        return (new EspaceResource($this->pourUtilisateur($espace, $user)))
+        return EspaceResource::pour($espace, $user)
             ->response()
             ->setStatusCode(201);
     }
@@ -87,17 +86,6 @@ class EspaceController extends Controller
 
         $espace->update($request->validated());
 
-        return new EspaceResource($this->pourUtilisateur($espace, $request->user()));
-    }
-
-    /** Ajoute les attributs calculés pour l'utilisateur courant (lus par EspaceResource). */
-    private function pourUtilisateur(Espace $espace, User $user): Espace
-    {
-        $espace->role = $espace->adhesions()
-            ->where('user_id', $user->id)
-            ->value('role');
-        $espace->nb_membres = $espace->adhesions()->count();
-
-        return $espace;
+        return EspaceResource::pour($espace, $request->user());
     }
 }

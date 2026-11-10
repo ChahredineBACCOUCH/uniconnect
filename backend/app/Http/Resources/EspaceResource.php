@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Espace;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -13,6 +14,20 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class EspaceResource extends JsonResource
 {
+    /**
+     * Espace vu par un utilisateur : ajoute son rôle et le nombre de membres
+     * (attributs lus par toArray()).
+     */
+    public static function pour(Espace $espace, User $user): self
+    {
+        $espace->role = $espace->adhesions()
+            ->where('user_id', $user->id)
+            ->value('role');
+        $espace->nb_membres = $espace->adhesions()->count();
+
+        return new self($espace);
+    }
+
     /**
      * @return array<string, mixed>
      */
