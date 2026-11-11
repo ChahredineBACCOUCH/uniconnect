@@ -73,6 +73,16 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    /*
+     * Ouvre une session avec le jeton renvoyé par l'API : c'est le cas après
+     * l'activation du compte (SCRUM-66), qui renvoie le jeton et l'utilisateur.
+     */
+    connecter(token, utilisateur) {
+      this.token = token ?? null
+      this.user = utilisateur ?? null
+      writeToken(this.token)
+    },
+
     // Vide la session sans appeler l'API (utilisé aussi par http.js en cas de 401).
     clearSession() {
       this.user = null
