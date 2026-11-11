@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\EspaceController;
+use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MembreController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UtilisateurController;
+use App\Http\Resources\UtilisateurResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +26,55 @@ Route::get('/health', function () {
     ]);
 });
 
+// Objet `Utilisateur` du contrat d'API (docs/api.md), sans enveloppe `data` :
+// le store Pinia `auth` le range tel quel dans `auth.user` (droits compris).
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json(UtilisateurResource::make($request->user())->resolve($request));
 })->middleware('auth:sanctum');
+
+// SCRUM-62/63 : contrôle d'éligibilité, création du compte en attente et
+// envoi de l'e-mail d'activation. Route publique : 10 essais par minute et par
+// adresse IP, pour empêcher de tester en masse qui figure dans la liste.
+Route::post('/auth/register', [RegisterController::class, 'store'])
+    ->middleware('throttle:10,1');
+
+// Route signée (48 h) : elle sert à générer le lien avec
+// URL::temporarySignedRoute('activation', …, ['user' => $user->id]) et, lorsqu'on
+// clique dessus, à ouvrir la page Vue /activation/{id} avec les paramètres signés.
+Route::get('/auth/activation/{user}', function (Request $request, string $user) {
+    $requete = $request->getQueryString();
+
+    return redirect()->to(
+        rtrim((string) config('app.frontend_url'), '/').'/activation/'.$user
+        .($requete !== '' ? '?'.$requete : '')
+    );
+})->name('activation')->middleware('signed');
+
+Route::middleware('auth:sanctum')->group(function () {
+    // SCRUM-87 : créer un groupe privé, modifier ses informations.
+    Route::post('/espaces', [EspaceController::class, 'store']);
+    Route::patch('/espaces/{espace}', [EspaceController::class, 'update']);
+
+    // SCRUM-88 : invitations et recherche de personnes à inviter.
+    Route::get('/utilisateurs', [UtilisateurController::class, 'index']);
+    Route::post('/espaces/{espace}/invitations', [InvitationController::class, 'store']);
+    Route::get('/espaces/{espace}/invitations', [InvitationController::class, 'indexEspace']);
+    Route::get('/me/invitations', [InvitationController::class, 'mesInvitations']);
+    Route::post('/invitations/{invitation}/accepter', [InvitationController::class, 'accepter']);
+    Route::post('/invitations/{invitation}/refuser', [InvitationController::class, 'refuser']);
+    Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy']);
+
+    // SCRUM-90 : membres (lister, changer de rôle, retirer, transférer, quitter).
+    Route::get('/espaces/{espace}/membres', [MembreController::class, 'index']);
+    Route::patch('/espaces/{espace}/membres/{user}', [MembreController::class, 'update']);
+    Route::delete('/espaces/{espace}/membres/{user}', [MembreController::class, 'destroy']);
+    Route::post('/espaces/{espace}/transferer', [MembreController::class, 'transferer']);
+    Route::post('/espaces/{espace}/quitter', [MembreController::class, 'quitter']);
+
+    // SCRUM-94 : discussion d'un espace (lecture, envoi, modification, suppression).
+    Route::get('/espaces/{espace}', [EspaceController::class, 'show']);
+    Route::get('/espaces/{espace}/messages', [MessageController::class, 'index']);
+    Route::post('/espaces/{espace}/messages', [MessageController::class, 'store']);
+    Route::patch('/messages/{message}', [MessageController::class, 'update']);
+    Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
+});

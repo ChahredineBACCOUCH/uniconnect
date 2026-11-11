@@ -40,6 +40,17 @@ describe('store auth', () => {
     expect(localStorage.getItem('uniconnect.token')).toBe('jeton-123')
   })
 
+  it('connecter ouvre une session avec le jeton renvoyé par l’API', () => {
+    const auth = useAuthStore()
+
+    auth.connecter('jeton-activation', ETUDIANT)
+
+    expect(auth.token).toBe('jeton-activation')
+    expect(auth.user).toEqual(ETUDIANT)
+    expect(auth.isAuthenticated).toBe(true)
+    expect(localStorage.getItem('uniconnect.token')).toBe('jeton-activation')
+  })
+
   it('vide le jeton après logout', async () => {
     http.post.mockResolvedValue({ data: { token: 'jeton-123', user: ETUDIANT } })
     const auth = useAuthStore()

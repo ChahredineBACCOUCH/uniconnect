@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '../layouts/AppLayout.vue'
 import AuthLayout from '../layouts/AuthLayout.vue'
 import HomeView from '../views/HomeView.vue'
+import EspaceView from '../views/espaces/EspaceView.vue'
 import PlaceholderView from '../views/PlaceholderView.vue'
 import { authGuard } from './guards'
 
@@ -34,7 +35,7 @@ const router = createRouter({
         {
           path: 'espaces/nouveau',
           name: 'espace-nouveau',
-          component: PlaceholderView,
+          component: () => import('../views/espaces/CreerEspaceView.vue'),
           meta: { title: 'Créer un groupe privé', droit: 'CREER_GROUPE_PRIVE' },
         },
         // Provisoire (SCRUM-142) : l'onglet Assistant IA seul, en attendant EspaceView (SCRUM-95).
@@ -47,7 +48,7 @@ const router = createRouter({
         {
           path: 'espaces/:id/:onglet?',
           name: 'espace',
-          component: PlaceholderView,
+          component: EspaceView,
           meta: { title: 'Espace' },
         },
         {
@@ -127,12 +128,12 @@ const router = createRouter({
         {
           path: 'inscription',
           name: 'inscription',
-          component: () => import('../views/RegisterView.vue'),
+          component: () => import('../views/auth/InscriptionView.vue'),
         },
         {
-          path: 'activation/:token',
+          path: 'activation/:id',
           name: 'activation',
-          component: () => import('../views/ActivationView.vue'),
+          component: () => import('../views/auth/ActivationView.vue'),
         },
       ],
     },
