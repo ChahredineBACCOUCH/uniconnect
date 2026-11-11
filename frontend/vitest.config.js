@@ -9,8 +9,14 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
-      // Vuetify importe ses fichiers CSS : Vitest doit le transformer pour monter ses composants.
-      server: { deps: { inline: ['vuetify'] } },
+      setupFiles: ['./src/tests/setup.js'],
+      server: {
+        deps: {
+          // Vuetify importe ses feuilles de style : Vite doit les transformer
+          // aussi dans les tests (sinon Node rejette les fichiers .css).
+          inline: ['vuetify'],
+        },
+      },
     },
   }),
 )
