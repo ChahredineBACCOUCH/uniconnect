@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\RessourceObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Un PDF est découpé en fragments pour l'Assistant IA (SCRUM-98).
  */
 #[Fillable(['chapitre_id', 'auteur_id', 'titre', 'description', 'chemin_fichier', 'url', 'mime', 'indexee_ia'])]
+#[ObservedBy(RessourceObserver::class)]
 class Ressource extends Model
 {
     protected $table = 'ressources';
