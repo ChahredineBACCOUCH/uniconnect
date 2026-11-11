@@ -7,31 +7,30 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 import http from '@/api/http'
-import AssistantTab from '../AssistantTab.vue'
+import AssistantIATab from '../AssistantIATab.vue'
 
 vi.mock('@/api/http', () => ({
   default: { post: vi.fn() },
 }))
 
-// jsdom ne fournit pas ResizeObserver, utilisé par certains composants Vuetify.
-globalThis.ResizeObserver ??= class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+const ESPACE = {
+  id: 3,
+  nom: 'Bases de données',
+  assistant: { actif: true, nb_documents_indexes: 2 },
 }
 
-function monter() {
+function monter(espace = ESPACE) {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [{ path: '/espaces/:id/:onglet?', name: 'espace', component: { template: '<div />' } }],
   })
-  return mount(AssistantTab, {
-    props: { espaceId: 3 },
+  return mount(AssistantIATab, {
+    props: { espace },
     global: { plugins: [createVuetify({ components, directives }), router] },
   })
 }
 
-describe('AssistantTab', () => {
+describe('AssistantIATab', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     setActivePinia(createPinia())
@@ -83,5 +82,50 @@ describe('AssistantTab', () => {
 
     expect(wrapper.text()).toContain("L'assistant est momentanément indisponible.")
     expect(wrapper.text()).toContain('Réessayer')
+  })
+
+  // SCRUM-144 : erreurs et états vides.
+  it('affiche le message de quota de l’API après une erreur 429, sans Réessayer', async () => {
+    const message = 'Vous avez atteint vos 20 questions du jour. Revenez demain à partir de 00:00.'
+    http.post.mockRejectedValue(
+      Object.assign(new Error('429'), { response: { status: 429, data: { message } } }),
+    )
+    const wrapper = monter()
+
+    await wrapper.find('textarea').setValue('Quels sont les attributs ?')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Quota atteint')
+    expect(wrapper.text()).toContain(message)
+    expect(wrapper.text()).not.toContain('Réessayer')
+    expect(wrapper.find('textarea').element.disabled).toBe(true)
+  })
+
+  it('indique quand le cours ne contient pas la réponse (SANS_SOURCE)', async () => {
+    http.post.mockResolvedValue({
+      data: {
+        conversation_id: 1,
+        echange_id: 2,
+        reponse: null,
+        statut: 'SANS_SOURCE',
+        sources: [],
+      },
+    })
+    const wrapper = monter()
+
+    await wrapper.find('textarea').setValue('Quelle est la météo demain ?')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Je n'ai pas trouvé de réponse fiable dans les ressources")
+  })
+
+  it('affiche un état vide quand aucun support n’est indexé', () => {
+    const wrapper = monter({ ...ESPACE, assistant: { actif: true, nb_documents_indexes: 0 } })
+
+    expect(wrapper.text()).toContain('Pas encore de supports de cours')
+    expect(wrapper.text()).not.toContain('Résume les notions clés du cours')
+    expect(wrapper.find('textarea').element.disabled).toBe(true)
   })
 })

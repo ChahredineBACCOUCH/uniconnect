@@ -38,13 +38,6 @@ const router = createRouter({
           component: () => import('../views/espaces/CreerEspaceView.vue'),
           meta: { title: 'Créer un groupe privé', droit: 'CREER_GROUPE_PRIVE' },
         },
-        // Provisoire (SCRUM-142) : l'onglet Assistant IA seul, en attendant EspaceView (SCRUM-95).
-        {
-          path: 'espaces/:id/assistant',
-          name: 'espace-assistant',
-          component: () => import('../views/AssistantIAView.vue'),
-          meta: { title: 'Assistant IA' },
-        },
         {
           path: 'espaces/:id/:onglet?',
           name: 'espace',
