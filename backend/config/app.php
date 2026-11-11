@@ -56,6 +56,10 @@ return [
 
     'version' => env('APP_VERSION', '1.0.0'),
 
+    // URL du frontend : les liens signés des e-mails pointent vers les pages Vue
+    // (ex. /activation/{id}). En local : le serveur Vite.
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
