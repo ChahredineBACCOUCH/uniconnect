@@ -4,9 +4,13 @@ namespace Tests\Feature;
 
 use App\Enums\RoleMembre;
 use App\Models\Adhesion;
+use App\Models\AssistantIA;
+use App\Models\Chapitre;
 use App\Models\Espace;
+use App\Models\Ressource;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -45,6 +49,25 @@ class EspaceApiTest extends TestCase
             ->where('espace_id', $espace->id)
             ->where('role', RoleMembre::PROPRIETAIRE->value)
             ->value('user_id'));
+    }
+
+    public function test_l_espace_renvoie_l_etat_de_son_assistant_ia(): void
+    {
+        Queue::fake(); // pas d'indexation réelle
+        $espace = $this->creerEspace();
+        $membre = $this->creerMembre($espace);
+        AssistantIA::create(['espace_id' => $espace->id, 'actif' => true, 'instructions' => 'Sois bref.']);
+        $chapitre = Chapitre::create(['espace_id' => $espace->id, 'titre' => 'Chapitre 1']);
+        Ressource::create(['chapitre_id' => $chapitre->id, 'titre' => 'Cours', 'chemin_fichier' => 'r/cours.pdf', 'indexee_ia' => true]);
+        Ressource::create(['chapitre_id' => $chapitre->id, 'titre' => 'Vidéo', 'url' => 'https://exemple.tn']);
+
+        Sanctum::actingAs($membre);
+
+        $this->getJson("/api/espaces/{$espace->id}")
+            ->assertOk()
+            ->assertJsonPath('data.assistant.actif', true)
+            ->assertJsonPath('data.assistant.instructions', 'Sois bref.')
+            ->assertJsonPath('data.assistant.nb_documents_indexes', 1);
     }
 
     public function test_un_non_membre_ne_peut_pas_consulter_l_espace(): void
