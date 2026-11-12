@@ -27,7 +27,7 @@ class ActivationController extends Controller
      * POST /api/auth/activate/{user} : la personne choisit son mot de passe,
      * son compte devient actif et elle reçoit un jeton pour être connectée.
      */
-    public function store(ActivateRequest $request, string $user): JsonResponse
+    public function store(ActivateRequest $request, string $user, RattachementService $rattachement): JsonResponse
     {
         $compte = User::findOrFail($user);
 
@@ -57,9 +57,7 @@ class ActivationController extends Controller
         }
 
         // Rattachement aux groupes de classe et de matières (SCRUM-68).
-        if (class_exists(RattachementService::class)) {
-            RattachementService::rattacher($compte);
-        }
+        $rattachement->rattacher($compte);
 
         // Jeton Sanctum : la personne est connectée directement.
         $token = $compte->createToken('activation')->plainTextToken;

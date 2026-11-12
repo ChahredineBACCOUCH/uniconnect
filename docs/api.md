@@ -178,8 +178,9 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | POST | `/admin/comptes-autorises/import/apercu` | `GERER_UTILISATEURS` | multipart `fichier` (Excel) → `{ total, valides, erreurs: [{ ligne, motif }], lignes }`, sans rien enregistrer | SCRUM-76 |
 | POST | `/admin/comptes-autorises/import/valider` | `GERER_UTILISATEURS` | `{ lignes: [...] }` issues de l'aperçu → **201** `{ importes, ignores, erreurs, import_id }` | SCRUM-76 |
 | GET | `/admin/comptes-autorises/import/modele` | `GERER_UTILISATEURS` | → modèle Excel `modele-import-comptes.xlsx` | SCRUM-76 |
-| POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | → `{ a_creer: [...], deja_existants: n }` | SCRUM-82 |
-| POST | `/admin/groupes/generer` | `CREER_GROUPE_ORGA` | → `{ crees: n, membres_ajoutes: n }`, peut être relancé sans doublons ; **422** s'il n'y a pas d'année active | SCRUM-82 |
+| GET | `/admin/groupes/apercu` | `CREER_GROUPE_ORGA` | → `{ annee, total, a_creer: [...], deja_existants: n, membres_a_ajouter: n }`, sans rien enregistrer ; **422** s'il n'y a pas d'année active | SCRUM-82 |
+| POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | même réponse que `GET /admin/groupes/apercu` (compatibilité) | SCRUM-82 |
+| POST | `/admin/groupes/generer` | `CREER_GROUPE_ORGA` | un groupe par classe + un par couple classe/matière → `{ annee, crees: n, deja_existants: n, membres_ajoutes: n }`, relançable sans doublon ; **422** s'il n'y a pas d'année active | SCRUM-82 |
 
 Référentiels : `code` unique (et `code` + `annee_id` pour une classe). `POST`/`PATCH /admin/matieres[/{id}]` acceptent aussi `classe_ids[]` et `enseignant_ids[]`, synchronisés sur les tables pivot. Supprimer un élément encore utilisé répond **409** `{ message: "Impossible de supprimer : élément utilisé. Vous pouvez le désactiver." }`, y compris une classe qui a des étudiants.
 
