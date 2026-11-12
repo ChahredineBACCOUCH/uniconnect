@@ -1,0 +1,18 @@
+meta {
+  name: 08 - Supprimer un compte lié (409)
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/admin/comptes-autorises/{{compteLieId}}
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("409 : l'autorisation est rattachée à un compte existant", function () {
+    expect(res.status).to.equal(409);
+    expect(res.body.message).to.include("déjà été créé");
+  });
+}

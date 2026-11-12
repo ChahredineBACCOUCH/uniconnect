@@ -1,0 +1,17 @@
+meta {
+  name: 06 - Supprimer un compte autorisé
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/admin/comptes-autorises/{{compteId}}
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("204 : autorisation supprimée", function () {
+    expect(res.status).to.equal(204);
+  });
+}

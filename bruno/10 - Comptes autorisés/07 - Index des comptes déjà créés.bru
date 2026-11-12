@@ -1,0 +1,26 @@
+meta {
+  name: 07 - Index des comptes déjà créés
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/admin/comptes-autorises?etat=ACTIF&par_page=1
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.length > 0) {
+    bru.setVar("compteLieId", res.body.data[0].id);
+  }
+}
+
+tests {
+  test("au moins un compte actif dans le jeu de démonstration", function () {
+    expect(
+      res.body.data.length,
+      "Lancez php artisan migrate:fresh --seed dans backend/ pour créer les comptes de démonstration."
+    ).to.be.greaterThan(0);
+  });
+}

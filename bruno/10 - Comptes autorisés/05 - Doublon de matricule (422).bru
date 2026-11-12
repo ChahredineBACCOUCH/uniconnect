@@ -1,0 +1,28 @@
+meta {
+  name: 05 - Doublon de matricule (422)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/admin/comptes-autorises
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "matricule": "{{matriculeCree}}",
+    "nom": "Doublon",
+    "prenom": "Test",
+    "email": "doublon@univ.test",
+    "profil": "ENSEIGNANT"
+  }
+}
+
+tests {
+  test("422 : le matricule est déjà autorisé", function () {
+    expect(res.status).to.equal(422);
+    expect(res.body.errors.matricule).to.be.an("array");
+  });
+}

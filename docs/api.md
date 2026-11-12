@@ -172,7 +172,8 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | GET/POST | `/admin/referentiels/{type}` | `GERER_PARAMETRAGE` | `type` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` | SCRUM-79 |
 | PATCH/DELETE | `/admin/referentiels/{type}/{id}` | `GERER_PARAMETRAGE` | suppression refusée (**409**) si l'élément est utilisé | SCRUM-79 |
 | GET | `/admin/comptes-autorises?profil=&classe_id=&etat=&q=` | `GERER_UTILISATEURS` | → liste paginée `{ id, matricule, nom, prenom, email, profil, classe, etat }` | SCRUM-75 |
-| POST/PATCH/DELETE | `/admin/comptes-autorises[/{id}]` | `GERER_UTILISATEURS` | création, modification, suppression unitaire | SCRUM-75 |
+| POST/PATCH/DELETE | `/admin/comptes-autorises[/{id}]` | `GERER_UTILISATEURS` | création, modification, suppression unitaire ; **409** si l'autorisation est déjà rattachée à un compte créé | SCRUM-75 |
+| POST | `/admin/comptes-autorises/{id}/desactiver` | `GERER_UTILISATEURS` | → autorisation à l'état `DESACTIVE` (aucune suppression) | SCRUM-75 |
 | POST | `/admin/comptes-autorises/import?apercu=1` | `GERER_UTILISATEURS` | multipart `fichier` (CSV) → `{ valides: n, erreurs: [{ ligne, motif }] }`, sans rien enregistrer | SCRUM-76 |
 | POST | `/admin/comptes-autorises/import` | `GERER_UTILISATEURS` | même fichier → **201** `{ importes: n, ignores: n }` | SCRUM-76 |
 | POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | → `{ a_creer: [...], deja_existants: n }` | SCRUM-82 |
