@@ -57,6 +57,41 @@ const navBas = [
   { title: 'Mon profil', icon: 'mdi-account-circle-outline', to: '/profil' },
 ]
 
+/*
+ * Section ADMINISTRATION : chaque entrée n'apparaît que si la personne a le
+ * droit correspondant (le serveur vérifie de toute façon, cf. policies).
+ */
+const navAdmin = computed(() => {
+  if (auth.user?.profil !== 'ADMINISTRATION') return []
+
+  return [
+    {
+      title: 'Années universitaires',
+      icon: 'mdi-calendar-range',
+      to: '/admin/annees',
+      droit: 'GERER_PARAMETRAGE',
+    },
+    {
+      title: 'Référentiels',
+      icon: 'mdi-school-outline',
+      to: '/admin/referentiels',
+      droit: 'GERER_PARAMETRAGE',
+    },
+    {
+      title: 'Comptes autorisés',
+      icon: 'mdi-account-multiple-outline',
+      to: '/admin/comptes',
+      droit: 'GERER_UTILISATEURS',
+    },
+    {
+      title: 'Groupes organisationnels',
+      icon: 'mdi-account-group-outline',
+      to: '/admin/groupes',
+      droit: 'CREER_GROUPE_ORGA',
+    },
+  ].filter((item) => auth.hasDroit(item.droit))
+})
+
 // Espaces du menu : chargés dès que la session est connue, vidés à la déconnexion.
 watch(
   () => auth.user?.id,
@@ -237,6 +272,18 @@ function onBottomNavChange(value) {
               <span class="nav-badge">{{ item.badge }}</span>
             </template>
           </v-list-item>
+
+          <template v-if="navAdmin.length">
+            <v-divider class="my-2" />
+            <v-list-subheader class="drawer-subheader">Administration</v-list-subheader>
+            <v-list-item
+              v-for="item in navAdmin"
+              :key="item.to"
+              :to="item.to"
+              :prepend-icon="item.icon"
+              :title="item.title"
+            />
+          </template>
         </v-list>
       </div>
     </v-navigation-drawer>

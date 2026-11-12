@@ -93,6 +93,7 @@ class AdminComptesAutorisesTest extends TestCase
         Sanctum::actingAs(User::factory()->create());
 
         $this->getJson('/api/admin/comptes-autorises')->assertForbidden();
+        $this->getJson('/api/admin/comptes-autorises/classes')->assertForbidden();
         $this->postJson('/api/admin/comptes-autorises', [
             'matricule' => 'MAT-2026-999',
             'nom' => 'Nom',
@@ -179,6 +180,53 @@ class AdminComptesAutorisesTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $ben->id);
+    }
+
+    public function test_les_classes_de_l_annee_active_sont_proposees(): void
+    {
+        $classe = $this->classe('L2-INFO-A');
+
+        $anneeInactive = AnneeUniversitaire::create([
+            'libelle' => '2025/2026',
+            'date_debut' => '2025-09-01',
+            'date_fin' => '2026-06-30',
+            'active' => false,
+        ]);
+
+        Classe::create([
+            'code' => 'L2-ANCIENNE',
+            'libelle' => 'Ancienne classe',
+            'filiere_id' => $classe->filiere_id,
+            'niveau_id' => $classe->niveau_id,
+            'annee_id' => $anneeInactive->id,
+        ]);
+
+        Classe::create([
+            'code' => 'L2-INACTIVE',
+            'libelle' => 'Classe désactivée',
+            'filiere_id' => $classe->filiere_id,
+            'niveau_id' => $classe->niveau_id,
+            'annee_id' => $classe->annee_id,
+            'actif' => false,
+        ]);
+
+        Sanctum::actingAs($this->administrateur());
+
+        $this->getJson('/api/admin/comptes-autorises/classes')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $classe->id)
+            ->assertJsonPath('data.0.code', 'L2-INFO-A')
+            ->assertJsonPath('data.0.libelle', 'L2 Informatique A');
+    }
+
+    public function test_sans_annee_active_aucune_classe_n_est_proposee(): void
+    {
+        Sanctum::actingAs($this->administrateur());
+
+        $this->getJson('/api/admin/comptes-autorises/classes')
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
     }
 
     public function test_l_administrateur_cree_un_etudiant_avec_sa_classe(): void

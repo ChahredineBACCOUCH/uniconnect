@@ -178,6 +178,7 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | POST | `/admin/comptes-autorises/import/apercu` | `GERER_UTILISATEURS` | multipart `fichier` (Excel) → `{ total, valides, erreurs: [{ ligne, motif }], lignes }`, sans rien enregistrer | SCRUM-76 |
 | POST | `/admin/comptes-autorises/import/valider` | `GERER_UTILISATEURS` | `{ lignes: [...] }` issues de l'aperçu → **201** `{ importes, ignores, erreurs, import_id }` | SCRUM-76 |
 | GET | `/admin/comptes-autorises/import/modele` | `GERER_UTILISATEURS` | → modèle Excel `modele-import-comptes.xlsx` | SCRUM-76 |
+| GET | `/admin/comptes-autorises/classes` | `GERER_UTILISATEURS` | → classes actives de l'année active `{ data: [{ id, code, libelle }] }` | SCRUM-77 |
 | POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | → `{ a_creer: [...], deja_existants: n }` | SCRUM-82 |
 | POST | `/admin/groupes/generer` | `CREER_GROUPE_ORGA` | → `{ crees: n, membres_ajoutes: n }`, peut être relancé sans doublons ; **422** s'il n'y a pas d'année active | SCRUM-82 |
 
