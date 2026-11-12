@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 /**
  * SCRUM-79 : comportement commun aux cinq référentiels pédagogiques
@@ -98,7 +99,11 @@ abstract class ReferentielController extends Controller
     {
         if (! $utilise) {
             try {
-                $element->delete();
+                // Transaction imbriquée : sous PostgreSQL, un échec de clé
+                // étrangère avorte la transaction courante. Le SAVEPOINT posé
+                // par `DB::transaction` permet de l'annuler sans casser une
+                // éventuelle transaction englobante (tests, requête HTTP).
+                DB::transaction(fn () => $element->delete());
             } catch (QueryException) {
                 // Clé étrangère en RESTRICT : l'élément est encore référencé.
                 $utilise = true;
