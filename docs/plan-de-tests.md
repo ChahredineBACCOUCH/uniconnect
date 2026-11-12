@@ -30,7 +30,7 @@ Créés par le seeder de démonstration (SCRUM-42 et SCRUM-188).
 | R5 | 5 mauvais mots de passe de suite | 423 pendant 15 min dès le 5ᵉ essai | SCRUM-69 |
 | R6 | Compte suspendu | Connexion refusée (403) | SCRUM-69 |
 | R7 | Deux années actives en même temps | Impossible : l'activation de l'une désactive l'autre | SCRUM-74 |
-| R8 | Import CSV avec doublon, e-mail invalide, classe inconnue | Lignes rejetées avec motif, aucune donnée importée lors de l'aperçu | SCRUM-78 |
+| R8 | Import Excel avec doublon, e-mail invalide, classe inconnue | Lignes rejetées avec motif, aucune donnée importée lors de l'aperçu | SCRUM-78 |
 | R9 | Génération des groupes lancée deux fois | Aucun doublon | SCRUM-84 |
 | R10 | Génération des groupes sans année active | 422 | SCRUM-84 |
 | R11 | Un non-membre lit les messages ou télécharge un fichier d'un espace | 403, même avec le lien direct | SCRUM-92, 96 |
@@ -74,7 +74,7 @@ Cochez chaque ligne dans le commentaire de SCRUM-176. Toute anomalie devient un 
 ### Administration (Leila)
 - [ ] A1 · Créer une année, puis l'activer → l'ancienne n'est plus active
 - [ ] A2 · Référentiels : ajouter une classe ; supprimer une filière utilisée → refusé
-- [ ] A3 · Import CSV : l'aperçu montre les erreurs ligne par ligne, puis l'import valide
+- [ ] A3 · Import Excel : l'aperçu montre les erreurs ligne par ligne, puis l'import valide
 - [ ] A4 · Générer les groupes → aperçu, puis création ; relancer → aucun doublon
 - [ ] A5 · Un étudiant n'a accès à aucun écran Admin
 

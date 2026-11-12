@@ -32,7 +32,7 @@ Le backend expose une route de santé (`GET /api/health`) qui vérifie aussi la 
 > `backend/composer.lock` contient des paquets Symfony 8.1 qui exigent PHP `>= 8.4.1`, et `frontend/package.json` impose Node `^22.18.0 || >=24.12.0`.
 > Utilisez PHP 8.4.1+ et une version LTS de Node.js (22 ou 24). Node.js 26 est actuellement déconseillé : les tests Vitest échouent à cause de `localStorage`.
 
-Extensions PHP nécessaires (à activer dans `php.ini` si besoin) : `pdo_pgsql`, `mbstring`, `openssl`, `fileinfo`, `pdo_sqlite` (pour les tests).
+Extensions PHP nécessaires (à activer dans `php.ini` si besoin) : `pdo_pgsql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `zip` (import Excel) et `pdo_sqlite` (pour les tests).
 
 ```bash
 php -m

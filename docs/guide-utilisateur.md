@@ -75,10 +75,10 @@ Menu **ADMINISTRATION** (visible seulement avec les droits correspondants) :
 |---|---|
 | **Années universitaires** | Créer l'année suivante, puis l'**activer** au bon moment (une seule année active à la fois) |
 | **Référentiels** | Départements, filières, niveaux, classes et matières. Un élément utilisé ne peut pas être supprimé. |
-| **Comptes autorisés** | Liste des personnes qui peuvent créer un compte. **Importer un fichier CSV** : un aperçu montre les erreurs ligne par ligne avant d'importer. |
+| **Comptes autorisés** | Liste des personnes qui peuvent créer un compte. **Importer un fichier Excel** : un aperçu montre les erreurs ligne par ligne avant d'importer. |
 | **Groupes organisationnels** | **Générer les groupes** de l'année active : un groupe par classe et un par matière. On peut relancer sans risque, sans créer de doublons. |
 
-Format du fichier CSV : `matricule;nom;prenom;email;profil;classe_code` (UTF-8, séparateur `;`, `profil` = ETUDIANT / ENSEIGNANT / ADMINISTRATION).
+Format du fichier Excel : colonnes `matricule`, `nom`, `prenom`, `email`, `profil`, `classe_code` (première feuille, `profil` = ETUDIANT / ENSEIGNANT / ADMINISTRATION).
 
 ---
 
