@@ -1,4 +1,19 @@
 <script setup>
+import { computed } from 'vue'
+
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+
+// Prénom de l'utilisateur connecté et date du jour (plus de valeurs de maquette en dur).
+const salutation = computed(() => (auth.user?.prenom ? `Bonjour ${auth.user.prenom}` : 'Bonjour'))
+const dateDuJour = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(new Date())
+
 const stats = [
   {
     value: 12,
@@ -35,12 +50,16 @@ const stats = [
   <div class="home">
     <header class="home-head">
       <div class="home-head__text">
-        <h1 class="text-h5 font-weight-medium">Bonjour Yassine</h1>
-        <p class="home-head__subtitle">
-          Lundi 13 octobre 2026 · Semestre 1 · Année 2026/2027
-        </p>
+        <h1 class="text-h5 font-weight-medium">{{ salutation }}</h1>
+        <p class="home-head__subtitle home-head__date">{{ dateDuJour }}</p>
       </div>
-      <v-btn variant="outlined" color="primary" prepend-icon="mdi-compass-outline" to="/channels" height="40">
+      <v-btn
+        variant="outlined"
+        color="primary"
+        prepend-icon="mdi-compass-outline"
+        to="/channels"
+        height="40"
+      >
         Explorer les channels
       </v-btn>
     </header>
@@ -156,5 +175,9 @@ const stats = [
   .home-stats {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.home-head__date::first-letter {
+  text-transform: uppercase;
 }
 </style>

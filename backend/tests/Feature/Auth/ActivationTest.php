@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\Droit;
 use App\Enums\EtatCompte;
 use App\Mail\ActivationCompte;
 use App\Models\AnneeUniversitaire;
@@ -47,6 +48,10 @@ class ActivationTest extends TestCase
 
         // Un jeton Sanctum est renvoyé pour connecter la personne directement.
         $this->assertDatabaseCount('personal_access_tokens', 1);
+
+        // Droits par défaut du profil (maquette A04) : créer un groupe privé (SCRUM-89).
+        $this->assertTrue($compte->possedeDroit(Droit::CREER_GROUPE_PRIVE));
+        $this->assertSame(1, $compte->droits()->count());
     }
 
     public function test_un_lien_expire_est_refuse(): void

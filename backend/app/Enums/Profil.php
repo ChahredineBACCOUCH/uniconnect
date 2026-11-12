@@ -19,4 +19,18 @@ enum Profil: string
             self::ADMINISTRATION => 'Administration',
         };
     }
+
+    /**
+     * Droits accordés à l'activation du compte (maquette A04 : « droits par défaut
+     * du profil »). Les autres droits sont donnés ensuite par l'administration.
+     *
+     * @return list<Droit>
+     */
+    public function droitsParDefaut(): array
+    {
+        return match ($this) {
+            self::ETUDIANT, self::ENSEIGNANT => [Droit::CREER_GROUPE_PRIVE],
+            self::ADMINISTRATION => [],
+        };
+    }
 }

@@ -244,7 +244,8 @@ class DemoSeeder extends Seeder
 
     /**
      * Crée les trois comptes de démonstration déjà activés (et les autorisations
-     * correspondantes), puis accorde tous les droits à l'administrateur.
+     * correspondantes) avec les droits par défaut de leur profil, puis accorde
+     * tous les droits à l'administrateur.
      *
      * @param  array<string, Classe>  $classes
      */
@@ -315,6 +316,11 @@ class DemoSeeder extends Seeder
         );
 
         $compte->update(['user_id' => $user->id]);
+
+        // Comme à l'activation : droits par défaut du profil (créer un groupe privé…).
+        foreach ($profil->droitsParDefaut() as $droit) {
+            $user->accorderDroit($droit);
+        }
 
         return $user;
     }
