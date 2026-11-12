@@ -172,6 +172,9 @@ Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
         Route::patch('classes/{classe}/desactiver', [ClasseController::class, 'desactiver'])
             ->name('admin.classes.desactiver');
 
+        Route::get('matieres/enseignants', [MatiereController::class, 'enseignants'])
+            ->name('admin.matieres.enseignants');
+
         Route::apiResource('matieres', MatiereController::class)
             ->parameters(['matieres' => 'matiere']);
         Route::patch('matieres/{matiere}/desactiver', [MatiereController::class, 'desactiver'])
