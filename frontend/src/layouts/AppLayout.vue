@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 import { useAuthStore } from '@/stores/auth'
+import { initiales, nomComplet, sousTitreProfil } from '@/utils/utilisateur'
 
 const route = useRoute()
 const router = useRouter()
@@ -25,18 +26,26 @@ watch(
 
 const search = ref('')
 const unreadNotifications = 4
-const user = {
-  initials: 'YB',
-  name: 'Yassine Ben Salah',
-  role: 'Étudiant · L2 Informatique',
-}
+// Utilisateur connecté (GET /me), et non plus le personnage de la maquette.
+const user = computed(() => ({
+  initials: initiales(auth.user),
+  name: nomComplet(auth.user),
+  role: sousTitreProfil(auth.user),
+}))
+// Même droit que la route /espaces/nouveau et POST /espaces (sinon page 403).
+const peutCreerEspace = computed(() => auth.hasDroit('CREER_GROUPE_PRIVE'))
 
 const navSections = [
   {
     title: null,
     items: [
       { title: 'Accueil', icon: 'mdi-home-outline', to: '/', exact: true },
-      { title: 'Notifications', icon: 'mdi-bell-outline', to: '/notifications', badge: unreadNotifications },
+      {
+        title: 'Notifications',
+        icon: 'mdi-bell-outline',
+        to: '/notifications',
+        badge: unreadNotifications,
+      },
     ],
   },
   {
@@ -107,11 +116,7 @@ function onBottomNavChange(value) {
 <template>
   <v-app>
     <v-app-bar flat height="64" color="surface" class="app-bar">
-      <v-app-bar-nav-icon
-        v-if="!mdAndUp"
-        aria-label="Ouvrir le menu"
-        @click="drawer = !drawer"
-      />
+      <v-app-bar-nav-icon v-if="!mdAndUp" aria-label="Ouvrir le menu" @click="drawer = !drawer" />
 
       <router-link to="/" class="brand" aria-label="UniConnect, accueil">
         <span class="brand-mark">
@@ -188,6 +193,7 @@ function onBottomNavChange(value) {
     >
       <div class="drawer-content">
         <v-btn
+          v-if="peutCreerEspace"
           block
           color="primary"
           variant="flat"

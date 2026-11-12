@@ -53,6 +53,12 @@ class DemoSeederTest extends TestCase
 
         $admin = User::where('email', 'admin@demo.uniconnect')->sole();
         $this->assertSame(count(Droit::cases()), $admin->droits()->count());
+
+        // Droits par défaut du profil : l'étudiant et l'enseignant peuvent créer un groupe privé.
+        foreach (['etudiant', 'enseignant'] as $prefixe) {
+            $user = User::where('email', "{$prefixe}@demo.uniconnect")->sole();
+            $this->assertSame([Droit::CREER_GROUPE_PRIVE], $user->droits->pluck('droit')->all());
+        }
     }
 
     public function test_le_seeder_peut_etre_relance_sans_doublon(): void

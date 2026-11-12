@@ -51,6 +51,11 @@ class ActivationController extends Controller
         // La liste des comptes autorisés suit l'état du compte.
         $compte->compteAutorise()->update(['etat' => EtatCompte::ACTIF]);
 
+        // Droits par défaut du profil (ex. créer un groupe privé, SCRUM-89).
+        foreach ($compte->profil->droitsParDefaut() as $droit) {
+            $compte->accorderDroit($droit);
+        }
+
         // Rattachement aux groupes de classe et de matières (SCRUM-68).
         if (class_exists(RattachementService::class)) {
             RattachementService::rattacher($compte);
