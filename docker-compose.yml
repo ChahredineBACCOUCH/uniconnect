@@ -8,7 +8,10 @@ services:
       POSTGRES_USER: uniconnect
       POSTGRES_PASSWORD: secret
     ports:
-      - "5432:5432"
+      # 5433 sur l'hôte : un PostgreSQL installé sur Windows (service
+      # postgresql-x64-16) occupe souvent déjà le port 5432, et Laravel
+      # se connecterait alors à lui au lieu du conteneur (voir README, SCRUM-25).
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
