@@ -180,6 +180,10 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | POST | `/admin/comptes-autorises/import/valider` | `GERER_UTILISATEURS` | `{ lignes: [...] }` issues de l'aperçu → **201** `{ importes, ignores, erreurs, import_id }` | SCRUM-76 |
 | GET | `/admin/comptes-autorises/import/modele` | `GERER_UTILISATEURS` | → modèle Excel `modele-import-comptes.xlsx` | SCRUM-76 |
 | GET | `/admin/comptes-autorises/classes` | `GERER_UTILISATEURS` | → classes actives de l'année active `{ data: [{ id, code, libelle }] }` | SCRUM-77 |
+| GET | `/admin/groupes?filiere_id=&niveau_id=&classe_id=&enseignant_id=` | `CREER_GROUPE_ORGA` | → `{ annee, data: [{ id, nom, type, etat, classe, matiere, classes, proprietaire, nombre_membres }], total }` pour l'écran A06. Un groupe de matière couvre toutes les classes de l'année qui suivent la matière ; sans année active : `200` `{ annee: null, data: [], total: 0 }` | SCRUM-83 |
+| GET | `/admin/groupes/filtres` | `CREER_GROUPE_ORGA` | → `{ annee, filieres, niveaux, classes, enseignants }` (options des filtres de A06 ; listes vides sans année active) | SCRUM-83 |
+| POST | `/admin/groupes/{id}/synchroniser` | `CREER_GROUPE_ORGA` | relance le rattachement d'un groupe → `{ groupe, membres_ajoutes }` (n'ajoute que les membres manquants) ; **409** si le groupe est archivé | SCRUM-83 |
+| POST | `/admin/groupes/{id}/archiver` | `CREER_GROUPE_ORGA` | → `{ groupe }` à l'état `ARCHIVE` (idempotent) | SCRUM-83 |
 | GET | `/admin/groupes/apercu` | `CREER_GROUPE_ORGA` | → `{ annee, total, a_creer: [...], deja_existants: n, membres_a_ajouter: n }`, sans rien enregistrer ; **422** s'il n'y a pas d'année active | SCRUM-82 |
 | POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | même réponse que `GET /admin/groupes/apercu` (compatibilité) | SCRUM-82 |
 | POST | `/admin/groupes/generer` | `CREER_GROUPE_ORGA` | un groupe par classe + un groupe par matière (toutes classes confondues) → `{ annee, crees: n, deja_existants: n, membres_ajoutes: n }`, relançable sans doublon ; **422** s'il n'y a pas d'année active | SCRUM-82 |

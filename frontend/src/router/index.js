@@ -99,7 +99,7 @@ const router = createRouter({
         {
           path: 'admin/groupes',
           name: 'admin-groupes',
-          component: PlaceholderView,
+          component: () => import('../views/admin/GroupesView.vue'),
           meta: {
             title: 'Groupes organisationnels',
             profil: 'ADMINISTRATION',

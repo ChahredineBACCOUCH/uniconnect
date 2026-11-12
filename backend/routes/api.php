@@ -182,12 +182,20 @@ Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
             ->name('admin.matieres.desactiver');
     });
 
-// SCRUM-82 : génération des groupes organisationnels de l'année active.
+// SCRUM-82 / SCRUM-83 : groupes organisationnels de l'année active.
 Route::middleware(['auth:sanctum', 'can:CREER_GROUPE_ORGA'])
     ->prefix('admin')
     ->group(function () {
+        Route::get('groupes', [GroupeController::class, 'index'])
+            ->name('admin.groupes.index');
+        Route::get('groupes/filtres', [GroupeController::class, 'filtres'])
+            ->name('admin.groupes.filtres');
         Route::get('groupes/apercu', [GroupeController::class, 'apercu'])
             ->name('admin.groupes.apercu');
         Route::post('groupes/generer', [GroupeController::class, 'generer'])
             ->name('admin.groupes.generer');
+        Route::post('groupes/{espace}/synchroniser', [GroupeController::class, 'synchroniser'])
+            ->name('admin.groupes.synchroniser');
+        Route::post('groupes/{espace}/archiver', [GroupeController::class, 'archiver'])
+            ->name('admin.groupes.archiver');
     });
