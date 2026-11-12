@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\AnneeUniversitaireFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['libelle', 'date_debut', 'date_fin', 'active'])]
 class AnneeUniversitaire extends Model
 {
+    /** @use HasFactory<AnneeUniversitaireFactory> */
+    use HasFactory;
+
     protected $table = 'annees_universitaires';
 
     protected function casts(): array
