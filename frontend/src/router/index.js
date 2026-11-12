@@ -116,7 +116,7 @@ const router = createRouter({
         {
           path: 'connexion',
           name: 'connexion',
-          component: () => import('../views/LoginView.vue'),
+          component: () => import('../views/auth/ConnexionView.vue'),
         },
         {
           path: 'inscription',

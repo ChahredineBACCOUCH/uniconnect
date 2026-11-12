@@ -40,6 +40,24 @@ describe('store auth', () => {
     expect(localStorage.getItem('uniconnect.token')).toBe('jeton-123')
   })
 
+  it('garde le jeton en sessionStorage quand la personne ne reste pas connectée', async () => {
+    http.post.mockResolvedValue({ data: { token: 'jeton-123', user: ETUDIANT } })
+    const auth = useAuthStore()
+
+    await auth.login('yassine.bensalah@univ.tn', 'Univ2026', false)
+
+    expect(sessionStorage.getItem('uniconnect.token')).toBe('jeton-123')
+    expect(localStorage.getItem('uniconnect.token')).toBeNull()
+  })
+
+  it('retrouve le jeton conservé en sessionStorage après un rechargement', () => {
+    sessionStorage.setItem('uniconnect.token', 'jeton-session')
+
+    const auth = useAuthStore()
+
+    expect(auth.token).toBe('jeton-session')
+  })
+
   it('connecter ouvre une session avec le jeton renvoyé par l’API', () => {
     const auth = useAuthStore()
 

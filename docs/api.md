@@ -65,14 +65,15 @@ Si une route doit changer, modifiez ce fichier **dans la même PR** et prévenez
 | Méthode | Route | Accès | Corps → Réponse | Erreurs | Ticket |
 |---|---|---|---|---|---|
 | POST | `/auth/register` | public | `{ matricule, nom, prenom, email, accepte_charte }` → **201** `{ message }` + e-mail d'activation | 422 (pas sur la liste, e-mail ≠ liste, charte non cochée), 409 (compte déjà créé), 422 (aucune année active) | SCRUM-63 |
-| POST | `/auth/activate` | public | `{ id, hash, expires, signature, password, password_confirmation }` (paramètres du lien signé) → **200** `{ token, user }` | 403 (lien invalide), 410 (lien expiré), 422 (mot de passe trop faible) | SCRUM-66 |
-| POST | `/auth/activation/renvoyer` | public | `{ email }` → **202** `{ message }` (toujours le même message) | 429 | SCRUM-66 |
-| POST | `/login` | public | `{ email, password }` → **200** `{ token, user }` | 422 (identifiants incorrects), 423 (bloqué 15 min), 403 (suspendu ou désactivé) | SCRUM-69 |
-| POST | `/logout` | connecté | — → **204** (le jeton est supprimé) | — | SCRUM-69 |
-| GET | `/user` ✅ | connecté | → `Utilisateur` | 401 | SCRUM-69 |
+| POST | `/auth/activate/{id}` | public | `?expires=…&signature=…` (paramètres du lien signé, à renvoyer tels quels) + `{ password, password_confirmation }` → **200** `{ token, user }` (jeton Sanctum : la personne est connectée) | 403 (lien invalide, expiré ou compte déjà activé), 422 (mot de passe trop faible) | SCRUM-66 |
+| POST | `/auth/activate/renvoyer` | public | `{ email }` → **202** `{ message }` (toujours le même message ; l'e-mail n'est renvoyé que si le compte est encore en attente d'activation) | 422 (e-mail invalide), 429 | SCRUM-66 |
+| POST | `/auth/login` | public | `{ email, password }` → **200** `{ token, user }` | 422 (identifiants incorrects), 423 (bloqué 15 min après 5 échecs), 403 (suspendu ou désactivé) | SCRUM-69 |
+| POST | `/auth/logout` | connecté | — → **204** (le jeton est supprimé) | — | SCRUM-69 |
+| GET | `/me` | connecté | → `Utilisateur` | 401 | SCRUM-69 |
 
-> Les noms `/login`, `/logout` et `/user` sont déjà utilisés par le frontend (`AUTH_ROUTES` dans `frontend/src/stores/auth.js`).
+> Les noms `/auth/login`, `/auth/logout` et `/me` sont utilisés par le frontend (`AUTH_ROUTES` dans `frontend/src/stores/auth.js`).
 > Règles du mot de passe : 8 caractères minimum, au moins une majuscule, une minuscule et un chiffre.
+> Le lien d'activation (page Vue `/activation/{id}`) est signé pour 48 h : le frontend renvoie ses paramètres `expires` et `signature` **dans la chaîne de requête** de `POST /auth/activate/{id}`, le contrôle de la signature et de l'expiration étant fait par le middleware `VerifierLienActivation`.
 
 ## 3. Espaces
 
@@ -165,7 +166,7 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | GET | `/admin/annees` | `GERER_PARAMETRAGE` | → liste `{ id, libelle, date_debut, date_fin, active }` | SCRUM-72 |
 | POST | `/admin/annees` | `GERER_PARAMETRAGE` | `{ libelle: "2027/2028", date_debut, date_fin }` → **201** | SCRUM-72 |
 | PATCH | `/admin/annees/{id}` | `GERER_PARAMETRAGE` | `{ libelle?, date_debut?, date_fin? }` → année | SCRUM-72 |
-| POST | `/admin/annees/{id}/activer` | `GERER_PARAMETRAGE` | → année active (l'ancienne est désactivée dans la même transaction) | SCRUM-72 |
+| POST | `/admin/annees/{id}/activer` | `GERER_PARAMETRAGE` | `{ archiver_precedente? }` → année active (l'ancienne est désactivée dans la même transaction ; `archiver_precedente` archive les espaces de l'ancienne année) | SCRUM-72 |
 | GET/POST | `/admin/referentiels/{type}` | `GERER_PARAMETRAGE` | `type` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` | SCRUM-79 |
 | PATCH/DELETE | `/admin/referentiels/{type}/{id}` | `GERER_PARAMETRAGE` | suppression refusée (**409**) si l'élément est utilisé | SCRUM-79 |
 | GET | `/admin/comptes-autorises?profil=&classe_id=&etat=&q=` | `GERER_UTILISATEURS` | → liste paginée `{ id, matricule, nom, prenom, email, profil, classe, etat }` | SCRUM-75 |
