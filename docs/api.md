@@ -65,7 +65,7 @@ Si une route doit changer, modifiez ce fichier **dans la même PR** et prévenez
 | Méthode | Route | Accès | Corps → Réponse | Erreurs | Ticket |
 |---|---|---|---|---|---|
 | POST | `/auth/register` | public | `{ matricule, nom, prenom, email, accepte_charte }` → **201** `{ message }` + e-mail d'activation | 422 (pas sur la liste, e-mail ≠ liste, charte non cochée), 409 (compte déjà créé), 422 (aucune année active) | SCRUM-63 |
-| POST | `/auth/activate/{id}` | public | `?expires=…&signature=…` (paramètres du lien signé, à renvoyer tels quels) + `{ password, password_confirmation }` → **200** `{ token, user }` (jeton Sanctum : la personne est connectée) | 403 (lien invalide, expiré ou compte déjà activé), 422 (mot de passe trop faible) | SCRUM-66 |
+| POST | `/auth/activate/{id}` | public | `?expires=…&signature=…` (paramètres du lien signé, à renvoyer tels quels) + `{ password, password_confirmation }` → **200** `{ token, user }` (jeton Sanctum : la personne est connectée). Rattache automatiquement l'étudiant à son groupe de classe et aux groupes de ses matières, et l'enseignant propriétaire aux groupes de ses matières | 403 (lien invalide, expiré ou compte déjà activé), 422 (mot de passe trop faible) | SCRUM-66, 68 |
 | POST | `/auth/activate/renvoyer` | public | `{ email }` → **202** `{ message }` (toujours le même message ; l'e-mail n'est renvoyé que si le compte est encore en attente d'activation) | 422 (e-mail invalide), 429 | SCRUM-66 |
 | POST | `/auth/login` | public | `{ email, password }` → **200** `{ token, user }` | 422 (identifiants incorrects), 423 (bloqué 15 min après 5 échecs), 403 (suspendu ou désactivé) | SCRUM-69 |
 | POST | `/auth/logout` | connecté | — → **204** (le jeton est supprimé) | — | SCRUM-69 |

@@ -90,6 +90,12 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /** Matières dont l'utilisateur est enseignant (table pivot `matiere_enseignant`). @return BelongsToMany<Matiere, $this> */
+    public function matieres(): BelongsToMany
+    {
+        return $this->belongsToMany(Matiere::class, 'matiere_enseignant');
+    }
+
     public function possedeDroit(Droit $droit): bool
     {
         if ($this->relationLoaded('droits')) {
