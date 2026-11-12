@@ -128,6 +128,39 @@ class GenerationGroupesService
     }
 
     /**
+     * Réaligne les membres d'un groupe sur les référentiels (relance le
+     * rattachement pour ce groupe) : ajoute les membres manquants sans retirer
+     * les existants.
+     *
+     * @return array{membres_ajoutes: int}
+     */
+    public function synchroniser(Espace $espace): array
+    {
+        $annee = $espace->annee;
+
+        if ($annee === null) {
+            return ['membres_ajoutes' => 0];
+        }
+
+        $groupe = collect($this->plan($annee))->first(
+            fn (array $groupe): bool => (int) $groupe['classe']?->id === (int) $espace->classe_id
+                && (int) $groupe['matiere']?->id === (int) $espace->matiere_id,
+        );
+
+        if ($groupe === null) {
+            return ['membres_ajoutes' => 0];
+        }
+
+        return [
+            'membres_ajoutes' => $this->ajouterMembres(
+                $espace,
+                $groupe['proprietaire'],
+                $groupe['etudiants'],
+            ),
+        ];
+    }
+
+    /**
      * Groupes attendus : un par classe, puis un par matière de l'année.
      *
      * @return list<array{
