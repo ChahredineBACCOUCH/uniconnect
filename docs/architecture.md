@@ -115,7 +115,7 @@ sequenceDiagram
 - Schéma complet : [`conception/schema.sql`](conception/schema.sql) (32 tables), diagramme : [`conception/diagramme-classes.png`](conception/diagramme-classes.png).
 - **Héritage du modèle UML** : une seule table `users`, avec une colonne `profil`, et une seule table `espaces`, avec une colonne `type` (`ORGANISATIONNEL`, `PRIVE`, `CHANNEL`).
 - **Groupes organisationnels** : créés automatiquement à partir des référentiels (un groupe par classe et un seul groupe par matière, toutes classes confondues). La génération peut être relancée sans créer de doublons, grâce à l'index unique `espace_orga_unique`.
-- **Rattachement** : à l'activation de son compte, un étudiant rejoint automatiquement son groupe de classe et les groupes des matières enseignées dans sa classe (`RattachementService`).
+- **Rattachement** : à l'activation de son compte, un étudiant rejoint automatiquement son groupe de classe et les groupes des matières enseignées dans sa classe, et un enseignant devient propriétaire des groupes des matières dont il est responsable (`RattachementService`).
 
 ## 6. Choix techniques et raisons
 

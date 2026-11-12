@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Enums\Droit;
 use App\Enums\EtatCompte;
+use App\Enums\Profil;
 use App\Mail\ActivationCompte;
 use App\Models\AnneeUniversitaire;
 use App\Models\Classe;
@@ -11,6 +12,8 @@ use App\Models\Departement;
 use App\Models\Filiere;
 use App\Models\Niveau;
 use App\Models\User;
+use App\Services\GenerationGroupesService;
+use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -114,6 +117,51 @@ class ActivationTest extends TestCase
 
         $compte->refresh();
         $this->assertSame(EtatCompte::EN_ATTENTE, $compte->etat);
+    }
+
+    public function test_un_etudiant_active_voit_ses_groupes_dans_me_espaces(): void
+    {
+        $this->seed(DemoSeeder::class);
+        $this->app->make(GenerationGroupesService::class)->generer();
+
+        $classe = Classe::query()->where('code', 'L2-INFO-A')->sole();
+
+        // Nouvel étudiant de L2 Info A, créé par l'inscription : en attente.
+        $compte = User::factory()->create([
+            'matricule' => 'LI2-2026-0458',
+            'email' => 'nouvel.etudiant@univ.tn',
+            'profil' => Profil::ETUDIANT,
+            'etat' => EtatCompte::EN_ATTENTE,
+            'password' => null,
+            'email_verified_at' => null,
+            'classe_id' => $classe->id,
+        ]);
+
+        $activation = $this->postJson($this->urlActivation($compte), [
+            'password' => 'MotDePasse1',
+            'password_confirmation' => 'MotDePasse1',
+        ])->assertOk();
+
+        // Le jeton renvoyé à l'activation donne accès à ses espaces.
+        $reponse = $this->withHeader('Authorization', 'Bearer '.$activation->json('token'))
+            ->getJson('/api/me/espaces')
+            ->assertOk();
+
+        $noms = collect($reponse->json('organisationnels'))->pluck('nom');
+
+        $this->assertCount(7, $noms);
+        $this->assertTrue($noms->contains('L2 Informatique A'), 'Groupe de classe manquant.');
+
+        foreach ([
+            'Algorithmique avancée',
+            'Bases de données',
+            'Développement web',
+            'Réseaux',
+            'Génie logiciel',
+            "Systèmes d'exploitation",
+        ] as $matiere) {
+            $this->assertTrue($noms->contains($matiere), "Groupe de matière manquant : {$matiere}.");
+        }
     }
 
     public function test_le_renvoi_du_lien_envoie_un_email_si_le_compte_est_en_attente(): void
