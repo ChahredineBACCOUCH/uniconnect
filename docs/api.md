@@ -146,6 +146,8 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 - `statut` vaut `OK`, ou `SANS_SOURCE` (rien de pertinent dans le cours ; l'IA n'est pas appelée).
 - **404** : assistant désactivé dans cet espace · **429** : `{ message: "Vous avez atteint vos 20 questions du jour. Revenez demain." }` · **503** : Gemini et Groq ne répondent pas.
 - Une question fait 3 à 1 000 caractères (sinon 422).
+- `conversation_id` absent : une nouvelle conversation est créée. Une conversation d'une autre personne ou d'un autre espace donne **404**.
+- Le quota (20 par jour, `config/uniconnect.php`) compte les questions de la personne dans tous les espaces depuis minuit ; une question en échec (503) n'est pas comptée.
 
 ## 8. Notifications
 

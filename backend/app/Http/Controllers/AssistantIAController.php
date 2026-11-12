@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Enums\StatutEchangeIa;
+use App\Exceptions\IAIndisponibleException;
+use App\Http\Requests\PoserQuestionIARequest;
+use App\Models\ConversationIA;
+use App\Models\EchangeIA;
+use App\Models\Espace;
+use App\Models\User;
+use App\Services\AssistantService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+/**
+ * SCRUM-102 : poser une question à l'Assistant IA d'un espace.
+ *
+ * POST /api/espaces/{espace}/ia/questions  { question, conversation_id? }
+ * → { conversation_id, echange_id, reponse, statut, sources, quota_restant }
+ *
+ * 403 non membre · 404 assistant inactif · 422 question invalide
+ * 429 quota du jour atteint · 503 Gemini et Groq indisponibles.
+ */
+class AssistantIAController extends Controller
+{
+    public function poser(PoserQuestionIARequest $request, Espace $espace, AssistantService $assistant): JsonResponse
+    {
+        $this->authorize('view', $espace);
+        abort_unless((bool) $espace->assistant?->actif, 404, "L'assistant IA n'est pas activé dans cet espace.");
+
+        $user = $request->user();
+        $quota = (int) config('uniconnect.ia.quota_questions_jour');
+        $restant = $quota - $this->questionsDuJour($user);
+
+        if ($restant <= 0) {
+            return response()->json([
+                'message' => "Vous avez atteint vos {$quota} questions du jour. Revenez demain.",
+            ], 429);
+        }
+
+        $question = $request->validated('question');
+        $idConversation = $request->validated('conversation_id');
+        $conversation = $this->conversation(
+            $idConversation !== null ? (int) $idConversation : null,
+            $espace,
+            $user,
+            $question,
+        );
+
+        try {
+            $resultat = $assistant->poser($espace, $question);
+        } catch (IAIndisponibleException) {
+            // L'échec est gardé pour le suivi ; il ne compte pas dans le quota.
+            EchangeIA::create([
+                'conversation_id' => $conversation->id,
+                'question' => $question,
+                'statut' => StatutEchangeIa::ERREUR,
+            ]);
+
+            return response()->json(['message' => "L'assistant est momentanément indisponible."], 503);
+        }
+
+        $echange = DB::transaction(function () use ($conversation, $question, $resultat) {
+            $echange = EchangeIA::create([
+                'conversation_id' => $conversation->id,
+                'question' => $question,
+                'reponse' => $resultat->reponse,
+                'tokens_entree' => $resultat->ia?->tokensEntree,
+                'tokens_sortie' => $resultat->ia?->tokensSortie,
+                'duree_ms' => $resultat->dureeMs,
+                'fournisseur' => $resultat->ia?->fournisseur,
+                'statut' => $resultat->statut,
+            ]);
+
+            foreach ($resultat->sources as $source) {
+                $echange->sources()->create([
+                    'fragment_id' => $source['fragment_id'],
+                    'extrait' => $source['extrait'],
+                    'score' => $source['score'],
+                ]);
+            }
+
+            $conversation->touch();
+
+            return $echange;
+        });
+
+        return response()->json([
+            'conversation_id' => $conversation->id,
+            'echange_id' => $echange->id,
+            'reponse' => $resultat->reponse,
+            'statut' => $resultat->statut->value,
+            'sources' => $resultat->sourcesPourApi(),
+            'quota_restant' => $restant - 1,
+        ]);
+    }
+
+    /**
+     * Questions posées aujourd'hui par l'utilisateur, tous espaces confondus.
+     * Les échanges en ERREUR (IA indisponible) ne sont pas comptés.
+     */
+    private function questionsDuJour(User $user): int
+    {
+        return EchangeIA::query()
+            ->whereHas('conversation', fn ($q) => $q->where('user_id', $user->id))
+            ->where('statut', '!=', StatutEchangeIa::ERREUR->value)
+            ->where('created_at', '>=', now()->startOfDay())
+            ->count();
+    }
+
+    /**
+     * Conversation existante de l'utilisateur dans cet espace, ou nouvelle conversation
+     * (titre = début de la première question). L'identifiant d'une conversation d'une
+     * autre personne ou d'un autre espace donne 404.
+     */
+    private function conversation(?int $id, Espace $espace, User $user, string $question): ConversationIA
+    {
+        if ($id !== null) {
+            return ConversationIA::query()
+                ->where('espace_id', $espace->id)
+                ->where('user_id', $user->id)
+                ->findOrFail($id);
+        }
+
+        return ConversationIA::create([
+            'espace_id' => $espace->id,
+            'user_id' => $user->id,
+            'titre' => Str::limit($question, 157),
+        ]);
+    }
+}
