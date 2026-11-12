@@ -66,6 +66,10 @@ function monterDiscussion() {
 describe('DiscussionTab', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    // Les messages de test sont datés du 10/11/2026 : on fige l'horloge au même
+    // jour pour que les libellés « Aujourd'hui » / « Hier » ne dépendent pas de
+    // la date d'exécution du CI.
+    vi.setSystemTime(new Date(2026, 10, 10, 10, 0, 0))
     Object.defineProperty(document, 'hidden', { configurable: true, value: false })
     setActivePinia(createPinia())
     useAuthStore().user = { id: 1, prenom: 'Amine', nom: 'Benali' }

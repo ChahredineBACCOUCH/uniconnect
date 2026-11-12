@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Espace de communication : groupe organisationnel, groupe privé ou channel.
@@ -84,5 +86,23 @@ class Espace extends Model
     public function createur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** Chapitres du cours, dans l'ordre (SCRUM-97). @return HasMany<Chapitre, $this> */
+    public function chapitres(): HasMany
+    {
+        return $this->hasMany(Chapitre::class)->orderBy('ordre');
+    }
+
+    /** Toutes les ressources de l'espace, via ses chapitres. @return HasManyThrough<Ressource, Chapitre, $this> */
+    public function ressources(): HasManyThrough
+    {
+        return $this->hasManyThrough(Ressource::class, Chapitre::class);
+    }
+
+    /** Réglages de l'Assistant IA (null tant qu'il n'a jamais été activé). @return HasOne<AssistantIA, $this> */
+    public function assistant(): HasOne
+    {
+        return $this->hasOne(AssistantIA::class);
     }
 }
