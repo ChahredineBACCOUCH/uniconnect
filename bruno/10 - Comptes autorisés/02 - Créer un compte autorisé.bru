@@ -1,0 +1,36 @@
+meta {
+  name: 02 - Créer un compte autorisé
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/comptes-autorises
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "matricule": "BRU-{{$timestamp}}",
+    "nom": "Test",
+    "prenom": "Bruno",
+    "email": "bruno.{{$timestamp}}@univ.test",
+    "profil": "ENSEIGNANT"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("compteId", res.body.data.id);
+    bru.setVar("matriculeCree", res.body.data.matricule);
+  }
+}
+
+tests {
+  test("201 et état NON_CREE par défaut", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.etat).to.equal("NON_CREE");
+    expect(res.body.data.profil).to.equal("ENSEIGNANT");
+  });
+}

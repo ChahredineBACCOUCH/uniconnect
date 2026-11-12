@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivationController;
 use App\Http\Controllers\Admin\AnneeController;
+use App\Http\Controllers\Admin\CompteAutoriseController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EspaceController;
 use App\Http\Controllers\InvitationController;
@@ -107,4 +108,16 @@ Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
         Route::apiResource('annees', AnneeController::class)->only(['index', 'store', 'show', 'update']);
         Route::post('annees/{annee}/activer', [AnneeController::class, 'activer'])
             ->name('admin.annees.activer');
+    });
+
+// SCRUM-75 : liste des personnes autorisées à créer un compte.
+Route::middleware(['auth:sanctum', 'can:GERER_UTILISATEURS'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::apiResource('comptes-autorises', CompteAutoriseController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['comptes-autorises' => 'compte_autorise']);
+
+        Route::post('comptes-autorises/{compte_autorise}/desactiver', [CompteAutoriseController::class, 'desactiver'])
+            ->name('admin.comptes-autorises.desactiver');
     });
