@@ -27,4 +27,10 @@ return [
     // Une invitation non traitée expire au bout de ce délai.
     'delai_invitation_jours' => 14,
 
+    // Assistant IA (SCRUM-102) : questions par utilisateur et par jour, tous espaces
+    // confondus, pour rester dans le quota gratuit de Gemini et Groq.
+    'ia' => [
+        'quota_questions_jour' => 20,
+    ],
+
 ];

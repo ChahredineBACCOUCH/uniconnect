@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivationController;
 use App\Http\Controllers\Admin\AnneeController;
+use App\Http\Controllers\AssistantIAController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EspaceController;
 use App\Http\Controllers\InvitationController;
@@ -97,6 +98,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/espaces/{espace}/messages', [MessageController::class, 'store']);
     Route::patch('/messages/{message}', [MessageController::class, 'update']);
     Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
+
+    // SCRUM-102 : question à l'Assistant IA (membre, assistant actif, 20 questions par jour).
+    Route::post('/espaces/{espace}/ia/questions', [AssistantIAController::class, 'poser']);
 });
 
 // SCRUM-72 : gestion des années universitaires (paramétrage).
