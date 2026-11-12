@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EspaceController;
 use App\Http\Controllers\InvitationController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UtilisateurController;
+use App\Http\Middleware\VerifierLienActivation;
 use App\Http\Resources\UtilisateurResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +52,15 @@ Route::get('/auth/activation/{user}', function (Request $request, string $user) 
         .($requete !== '' ? '?'.$requete : '')
     );
 })->name('activation')->middleware('signed');
+
+// SCRUM-66 : activation du compte (choix du mot de passe) et renvoi du lien.
+// Le lien reçu par e-mail est signé pour la route GET ci-dessus : le middleware
+// VerifierLienActivation en contrôle la signature et l'expiration.
+Route::post('/auth/activate/renvoyer', [ActivationController::class, 'renvoyer'])
+    ->middleware('throttle:5,1');
+
+Route::post('/auth/activate/{user}', [ActivationController::class, 'store'])
+    ->middleware(VerifierLienActivation::class);
 
 // SCRUM-69 : connexion. Renvoie un jeton Sanctum et l'utilisateur connecté.
 // Cinq mots de passe incorrects bloquent le compte pendant 15 minutes.
