@@ -81,3 +81,27 @@ export async function transfererPropriete(espaceId, userId) {
 export async function quitterEspace(espaceId) {
   await http.post(`/espaces/${espaceId}/quitter`)
 }
+
+/* SCRUM-85 / SCRUM-86 : mes espaces (menu latéral) et mes invitations (accueil). */
+
+/** → `{ organisationnels: [], prives: [], channels: [] }` avec `non_lus` par espace. */
+export async function recupererMesEspaces() {
+  const { data } = await http.get('/me/espaces')
+  return data
+}
+
+/** Invitations en attente de l'utilisateur connecté. */
+export async function recupererMesInvitations() {
+  const { data } = await http.get('/me/invitations')
+  return data.data
+}
+
+/** L'invité devient membre ; renvoie l'espace rejoint. */
+export async function accepterInvitation(invitationId) {
+  const { data } = await http.post(`/invitations/${invitationId}/accepter`)
+  return data.data
+}
+
+export async function refuserInvitation(invitationId) {
+  await http.post(`/invitations/${invitationId}/refuser`)
+}

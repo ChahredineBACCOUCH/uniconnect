@@ -82,7 +82,7 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/me/espaces` | connecté | → `{ data: EspaceResume[] }`, groupés côté front (classe, matières, groupes privés) | SCRUM-85 |
+| GET | `/me/espaces` | connecté | → `{ organisationnels: [], prives: [], channels: [] }`, chaque espace `{ id, nom, type, icone, role, etat, non_lus, visibilite_limitee }`, triés par nom. `non_lus` = messages visibles des autres après le dernier message lu (une seule requête SQL) | SCRUM-85 |
 | GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, etat, role, nb_membres, duree_visibilite_heures, duree_courte_autorisee, mode_annonce, assistant: { actif, instructions, nb_documents_indexes } }` | SCRUM-94, 95, 97 |
 | POST | `/espaces` | droit `CREER_GROUPE_PRIVE` | `{ nom (3 à 80 car.), description?, duree_visibilite_heures?, duree_courte_autorisee?, mode_annonce? }` → **201** `{ data: espace }` (même format que `GET /espaces/{id}`, le créateur devient `PROPRIETAIRE`). `duree_visibilite_heures` parmi `24`, `168`, `720` ; absente = 168 (7 jours) ; `null` = illimitée. `mode_annonce: true` = seuls les gestionnaires publient. Sans le droit → **403**. Les invités s'ajoutent ensuite avec `POST /espaces/{id}/invitations` (écran E06 : `/espaces/nouveau`) | SCRUM-87, 89 |
 | PATCH | `/espaces/{id}` | propriétaire / co-gestionnaire | `{ nom?, description? }` → `{ data: espace }` ; **403** si l'espace est archivé | SCRUM-87 |
