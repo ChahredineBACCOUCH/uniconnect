@@ -1,0 +1,5 @@
+matricule,nom,prenom,email,profil,classe_code
+MAT-DBL-001,Ben Ali,Sami,sami@univ.test,ETUDIANT,L2-INFO-A
+MAT-DBL-001,Jaziri,Amine,amine@univ.test,ETUDIANT,L2-INFO-A
+MAT-DBL-003,Mansouri,Rim,sami@univ.test,ENSEIGNANT,
+MAT-EXISTANT,Ancien,Compte,nouveau@univ.test,ENSEIGNANT,
