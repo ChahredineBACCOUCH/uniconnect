@@ -3,12 +3,15 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
+import EspaceList from '@/components/EspaceList.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useEspacesStore } from '@/stores/espaces'
 import { initiales, nomComplet, sousTitreProfil } from '@/utils/utilisateur'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const espaces = useEspacesStore()
 const { mdAndUp, xs } = useDisplay()
 
 /*
@@ -25,7 +28,6 @@ watch(
 )
 
 const search = ref('')
-const unreadNotifications = 4
 // Utilisateur connecté (GET /me), et non plus le personnage de la maquette.
 const user = computed(() => ({
   initials: initiales(auth.user),
@@ -35,52 +37,43 @@ const user = computed(() => ({
 // Même droit que la route /espaces/nouveau et POST /espaces (sinon page 403).
 const peutCreerEspace = computed(() => auth.hasDroit('CREER_GROUPE_PRIVE'))
 
-const navSections = [
+// Invitations en attente (GET /me/invitations) : seules notifications disponibles
+// tant que l'API des notifications (SCRUM-121) n'existe pas.
+const nbInvitations = computed(() => espaces.invitations.length)
+
+const navHaut = computed(() => [
+  { title: 'Accueil', icon: 'mdi-home-outline', to: '/', exact: true },
   {
-    title: null,
-    items: [
-      { title: 'Accueil', icon: 'mdi-home-outline', to: '/', exact: true },
-      {
-        title: 'Notifications',
-        icon: 'mdi-bell-outline',
-        to: '/notifications',
-        badge: unreadNotifications,
-      },
-    ],
+    title: 'Notifications',
+    icon: 'mdi-bell-outline',
+    to: '/notifications',
+    badge: nbInvitations.value,
   },
-  {
-    title: 'Mes classes et matières',
-    items: [
-      { title: 'L2 Info – Groupe A', icon: 'mdi-school-outline', to: '/espaces/1', badge: 2 },
-      { title: 'Bases de données', icon: 'mdi-book-outline', to: '/espaces/2', badge: 5 },
-      { title: 'Développement Web', icon: 'mdi-book-outline', to: '/espaces/3' },
-      { title: 'Réseaux informatiques', icon: 'mdi-book-outline', to: '/espaces/4' },
-    ],
-  },
-  {
-    title: 'Mes groupes privés',
-    items: [
-      { title: 'Projet intégration – Éq. 4', icon: 'mdi-lock-outline', to: '/espaces/5', badge: 1 },
-      { title: 'Révisions BD', icon: 'mdi-lock-outline', to: '/espaces/6' },
-    ],
-  },
-  {
-    title: 'Mes channels',
-    items: [
-      { title: 'Vie étudiante', icon: 'mdi-pound', to: '/espaces/7' },
-      { title: 'Club Informatique', icon: 'mdi-pound', to: '/espaces/8' },
-      { title: 'Scolarité – Annonces', icon: 'mdi-bullhorn-outline', to: '/espaces/9' },
-    ],
-  },
-  {
-    title: null,
-    items: [
-      { title: 'Explorer les channels', icon: 'mdi-compass-outline', to: '/channels' },
-      { title: 'Recherche', icon: 'mdi-magnify', to: '/recherche' },
-      { title: 'Mon profil', icon: 'mdi-account-circle-outline', to: '/profil' },
-    ],
-  },
+])
+
+const navBas = [
+  { title: 'Explorer les channels', icon: 'mdi-compass-outline', to: '/channels' },
+  { title: 'Recherche', icon: 'mdi-magnify', to: '/recherche' },
+  { title: 'Mon profil', icon: 'mdi-account-circle-outline', to: '/profil' },
 ]
+
+// Espaces du menu : chargés dès que la session est connue, vidés à la déconnexion.
+watch(
+  () => auth.user?.id,
+  (id) => {
+    if (id) espaces.charger()
+    else espaces.vider()
+  },
+  { immediate: true },
+)
+
+// À chaque changement de page : compteurs de non-lus, espace créé, rejoint ou quitté.
+watch(
+  () => route.path,
+  () => {
+    if (auth.user?.id && espaces.charge) espaces.charger({ discret: true })
+  },
+)
 
 const bottomNavItems = [
   { label: 'Accueil', icon: 'mdi-home-outline', to: '/' },
@@ -147,10 +140,20 @@ function onBottomNavChange(value) {
         icon
         variant="text"
         color="on-surface-variant"
-        aria-label="Notifications, 4 non lues"
+        :aria-label="
+          nbInvitations
+            ? `Notifications, ${nbInvitations} invitation${nbInvitations > 1 ? 's' : ''} en attente`
+            : 'Notifications'
+        "
         to="/notifications"
       >
-        <v-badge :content="unreadNotifications" color="error" offset-x="2" offset-y="2">
+        <v-badge
+          :model-value="nbInvitations > 0"
+          :content="nbInvitations"
+          color="error"
+          offset-x="2"
+          offset-y="2"
+        >
           <v-icon icon="mdi-bell-outline" size="22" />
         </v-badge>
       </v-btn>
@@ -206,24 +209,34 @@ function onBottomNavChange(value) {
         </v-btn>
 
         <v-list nav density="comfortable" class="drawer-nav">
-          <template v-for="(section, index) in navSections" :key="index">
-            <v-list-subheader v-if="section.title" class="drawer-subheader">
-              {{ section.title }}
-            </v-list-subheader>
+          <v-list-item
+            v-for="item in navHaut"
+            :key="item.to"
+            :to="item.to"
+            :exact="item.exact"
+            :prepend-icon="item.icon"
+            :title="item.title"
+          >
+            <template v-if="item.badge" #append>
+              <span class="nav-badge">{{ item.badge }}</span>
+            </template>
+          </v-list-item>
 
-            <v-list-item
-              v-for="item in section.items"
-              :key="item.to"
-              :to="item.to"
-              :exact="item.exact"
-              :prepend-icon="item.icon"
-              :title="item.title"
-            >
-              <template v-if="item.badge" #append>
-                <span class="nav-badge">{{ item.badge }}</span>
-              </template>
-            </v-list-item>
-          </template>
+          <EspaceList />
+
+          <v-divider class="my-2" />
+          <v-list-item
+            v-for="item in navBas"
+            :key="item.to"
+            :to="item.to"
+            :exact="item.exact"
+            :prepend-icon="item.icon"
+            :title="item.title"
+          >
+            <template v-if="item.badge" #append>
+              <span class="nav-badge">{{ item.badge }}</span>
+            </template>
+          </v-list-item>
         </v-list>
       </div>
     </v-navigation-drawer>
