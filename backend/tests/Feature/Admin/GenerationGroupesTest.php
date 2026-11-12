@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Enums\Droit;
 use App\Enums\EtatCompte;
@@ -9,6 +9,7 @@ use App\Enums\RoleMembre;
 use App\Enums\TypeEspace;
 use App\Models\Adhesion;
 use App\Models\AnneeUniversitaire;
+use App\Models\Classe;
 use App\Models\Espace;
 use App\Models\Matiere;
 use App\Models\User;
@@ -18,7 +19,9 @@ use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
- * SCRUM-82 : génération idempotente des groupes organisationnels de l'année active.
+ * SCRUM-82 / SCRUM-84 : génération idempotente des groupes organisationnels
+ * de l'année active, bloquée sans année active, avec rattachement des
+ * étudiants à leur groupe de classe.
  */
 class GenerationGroupesTest extends TestCase
 {
@@ -26,14 +29,16 @@ class GenerationGroupesTest extends TestCase
 
     private const MESSAGE_SANS_ANNEE = "Aucune année universitaire n'est active : activez une année avant de générer les groupes.";
 
-    private function preparerDemonstration(): User
+    private User $admin;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->seed(DemoSeeder::class);
 
-        $admin = User::query()->where('email', 'admin@demo.uniconnect')->sole();
-        Sanctum::actingAs($admin);
-
-        return $admin;
+        $this->admin = User::query()->where('email', 'admin@demo.uniconnect')->sole();
+        Sanctum::actingAs($this->admin);
     }
 
     private function etudiantDemo(): User
@@ -41,10 +46,18 @@ class GenerationGroupesTest extends TestCase
         return User::query()->where('email', 'etudiant@demo.uniconnect')->sole();
     }
 
+    private function groupeDeClasse(string $code): Espace
+    {
+        $classe = Classe::query()->where('code', $code)->sole();
+
+        return Espace::query()
+            ->where('type', TypeEspace::ORGANISATIONNEL->value)
+            ->where('classe_id', $classe->id)
+            ->sole();
+    }
+
     public function test_l_apercu_liste_les_groupes_a_creer_sans_rien_ecrire(): void
     {
-        $this->preparerDemonstration();
-
         $reponse = $this->getJson('/api/admin/groupes/apercu')
             ->assertOk()
             ->assertJsonPath('annee.libelle', '2026/2027')
@@ -67,8 +80,6 @@ class GenerationGroupesTest extends TestCase
 
     public function test_le_parametre_apercu_du_post_ne_cree_rien(): void
     {
-        $this->preparerDemonstration();
-
         $this->postJson('/api/admin/groupes/generer?apercu=1')
             ->assertOk()
             ->assertJsonPath('total', 9)
@@ -80,7 +91,6 @@ class GenerationGroupesTest extends TestCase
 
     public function test_la_generation_cree_3_groupes_de_classe_et_6_groupes_de_matiere(): void
     {
-        $admin = $this->preparerDemonstration();
         $etudiant = $this->etudiantDemo();
 
         $this->postJson('/api/admin/groupes/generer')
@@ -97,7 +107,7 @@ class GenerationGroupesTest extends TestCase
         $this->assertSame(6, Espace::query()->whereNotNull('matiere_id')->whereNull('classe_id')->count());
 
         $this->assertSame(9, Adhesion::query()
-            ->where('user_id', $admin->id)
+            ->where('user_id', $this->admin->id)
             ->where('role', RoleMembre::PROPRIETAIRE->value)
             ->count());
 
@@ -107,14 +117,15 @@ class GenerationGroupesTest extends TestCase
             ->count());
     }
 
-    public function test_relancer_la_generation_ne_cree_aucun_doublon(): void
+    public function test_la_generation_ne_cree_jamais_de_doublon(): void
     {
-        $this->preparerDemonstration();
-
         $this->postJson('/api/admin/groupes/generer')->assertOk();
 
         $groupes = Espace::count();
         $adhesions = Adhesion::count();
+
+        $this->assertSame(9, $groupes);
+        $this->assertSame(16, $adhesions);
 
         $this->postJson('/api/admin/groupes/generer')
             ->assertOk()
@@ -133,10 +144,8 @@ class GenerationGroupesTest extends TestCase
             ->assertJsonCount(0, 'a_creer');
     }
 
-    public function test_sans_annee_active_l_api_repond_422(): void
+    public function test_la_generation_est_bloquee_sans_annee_active(): void
     {
-        $this->preparerDemonstration();
-
         AnneeUniversitaire::query()->update(['active' => false]);
 
         $this->getJson('/api/admin/groupes/apercu')
@@ -148,12 +157,40 @@ class GenerationGroupesTest extends TestCase
             ->assertJsonPath('message', self::MESSAGE_SANS_ANNEE);
 
         $this->assertSame(0, Espace::count());
+        $this->assertSame(0, Adhesion::count());
+    }
+
+    public function test_un_etudiant_est_membre_de_son_groupe_de_classe_et_pas_de_l_autre(): void
+    {
+        $this->postJson('/api/admin/groupes/generer')->assertOk();
+
+        $etudiant = $this->etudiantDemo();
+        $groupeA = $this->groupeDeClasse('L2-INFO-A');
+        $groupeB = $this->groupeDeClasse('L2-INFO-B');
+
+        $this->assertTrue(
+            $groupeA->adhesions()
+                ->where('user_id', $etudiant->id)
+                ->where('role', RoleMembre::MEMBRE->value)
+                ->exists()
+        );
+
+        $this->assertFalse(
+            $groupeB->adhesions()
+                ->where('user_id', $etudiant->id)
+                ->exists()
+        );
+
+        // Un seul groupe de classe pour l'étudiant.
+        $this->assertSame(1, Adhesion::query()
+            ->where('user_id', $etudiant->id)
+            ->where('role', RoleMembre::MEMBRE->value)
+            ->whereIn('espace_id', Espace::query()->whereNull('matiere_id')->select('id'))
+            ->count());
     }
 
     public function test_l_enseignant_de_la_matiere_est_proprietaire_des_groupes_de_matiere(): void
     {
-        $admin = $this->preparerDemonstration();
-
         $enseignant = User::query()->where('email', 'enseignant@demo.uniconnect')->sole();
         $matiere = Matiere::query()->where('code', 'INF201')->sole();
         $matiere->enseignants()->attach($enseignant->id);
@@ -178,7 +215,7 @@ class GenerationGroupesTest extends TestCase
             );
             $this->assertFalse(
                 $groupe->adhesions()
-                    ->where('user_id', $admin->id)
+                    ->where('user_id', $this->admin->id)
                     ->where('role', RoleMembre::PROPRIETAIRE->value)
                     ->exists()
             );
@@ -188,7 +225,7 @@ class GenerationGroupesTest extends TestCase
         $groupesDeClasse = Espace::query()->whereNull('matiere_id')->pluck('id');
 
         $this->assertSame(3, Adhesion::query()
-            ->where('user_id', $admin->id)
+            ->where('user_id', $this->admin->id)
             ->where('role', RoleMembre::PROPRIETAIRE->value)
             ->whereIn('espace_id', $groupesDeClasse)
             ->count());
@@ -196,8 +233,6 @@ class GenerationGroupesTest extends TestCase
 
     public function test_changer_l_enseignant_ne_cree_pas_un_second_proprietaire(): void
     {
-        $this->preparerDemonstration();
-
         $matiere = Matiere::query()->where('code', 'INF202')->sole();
         $premier = User::query()->where('email', 'enseignant@demo.uniconnect')->sole();
         $matiere->enseignants()->attach($premier->id);
@@ -229,12 +264,7 @@ class GenerationGroupesTest extends TestCase
 
     public function test_un_utilisateur_sans_le_droit_ne_peut_pas_generer(): void
     {
-        $this->seed(DemoSeeder::class);
-
-        $admin = User::query()->where('email', 'admin@demo.uniconnect')->sole();
-        $admin->retirerDroit(Droit::CREER_GROUPE_ORGA);
-
-        Sanctum::actingAs($admin);
+        $this->admin->retirerDroit(Droit::CREER_GROUPE_ORGA);
 
         $this->getJson('/api/admin/groupes/apercu')->assertForbidden();
         $this->postJson('/api/admin/groupes/generer')->assertForbidden();
