@@ -166,7 +166,7 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | GET | `/admin/annees` | `GERER_PARAMETRAGE` | → liste `{ id, libelle, date_debut, date_fin, active }` | SCRUM-72 |
 | POST | `/admin/annees` | `GERER_PARAMETRAGE` | `{ libelle: "2027/2028", date_debut, date_fin }` → **201** | SCRUM-72 |
 | PATCH | `/admin/annees/{id}` | `GERER_PARAMETRAGE` | `{ libelle?, date_debut?, date_fin? }` → année | SCRUM-72 |
-| POST | `/admin/annees/{id}/activer` | `GERER_PARAMETRAGE` | → année active (l'ancienne est désactivée dans la même transaction) | SCRUM-72 |
+| POST | `/admin/annees/{id}/activer` | `GERER_PARAMETRAGE` | `{ archiver_precedente? }` → année active (l'ancienne est désactivée dans la même transaction ; `archiver_precedente` archive les espaces de l'ancienne année) | SCRUM-72 |
 | GET/POST | `/admin/referentiels/{type}` | `GERER_PARAMETRAGE` | `type` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` | SCRUM-79 |
 | PATCH/DELETE | `/admin/referentiels/{type}/{id}` | `GERER_PARAMETRAGE` | suppression refusée (**409**) si l'élément est utilisé | SCRUM-79 |
 | GET | `/admin/comptes-autorises?profil=&classe_id=&etat=&q=` | `GERER_UTILISATEURS` | → liste paginée `{ id, matricule, nom, prenom, email, profil, classe, etat }` | SCRUM-75 |
