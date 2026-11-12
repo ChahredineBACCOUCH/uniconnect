@@ -9,7 +9,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
- * GET /api/user renvoie l'objet `Utilisateur` de docs/api.md : le front lit
+ * GET /api/me renvoie l'objet `Utilisateur` de docs/api.md : le front lit
  * `droits` pour afficher les pages et boutons réservés (auth.hasDroit()).
  */
 class UtilisateurConnecteTest extends TestCase
@@ -24,7 +24,7 @@ class UtilisateurConnecteTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $reponse = $this->getJson('/api/user')
+        $reponse = $this->getJson('/api/me')
             ->assertOk()
             ->assertJsonPath('id', $user->id)
             ->assertJsonPath('nom', 'Diallo')
@@ -38,7 +38,7 @@ class UtilisateurConnecteTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $this->getJson('/api/user')
+        $this->getJson('/api/me')
             ->assertOk()
             ->assertJsonMissingPath('password')
             ->assertJsonMissingPath('tentatives_echouees')
@@ -49,6 +49,6 @@ class UtilisateurConnecteTest extends TestCase
 
     public function test_sans_jeton_la_reponse_est_401(): void
     {
-        $this->getJson('/api/user')->assertUnauthorized();
+        $this->getJson('/api/me')->assertUnauthorized();
     }
 }

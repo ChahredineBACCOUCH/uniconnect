@@ -60,7 +60,7 @@ docker compose ps
 
 | Service | Port(s) | Usage |
 |---|---|---|
-| `postgres` | `5432` | Base `uniconnect` (utilisateur `uniconnect`, mot de passe `secret`) |
+| `postgres` | `5433` | Base `uniconnect` (utilisateur `uniconnect`, mot de passe `secret`) |
 | `mailpit` | `1025` (SMTP), `8025` (interface web) | Réception des e-mails en local |
 
 Attendez que le service `postgres` soit indiqué comme `healthy` dans `docker compose ps` avant de lancer les migrations.
@@ -182,7 +182,7 @@ Le seeder crée également 40 entrées dans `comptes_autorises` : 35 étudiants 
 | `could not find driver` ou erreur PostgreSQL | Activez l'extension `pdo_pgsql` dans `php.ini`, puis redémarrez le terminal. |
 | `composer install` échoue sur `symfony/* requires php >=8.4.1` | Passez à PHP 8.4.1 ou plus. N'utilisez pas `--ignore-platform-req`. |
 | `SQLSTATE[08006]` / connexion refusée | Attendez que PostgreSQL soit `healthy` (`docker compose ps`) puis relancez `php artisan migrate --seed`. |
-| Port `5432` déjà utilisé, ou `authentification par mot de passe échouée pour l'utilisateur « uniconnect »` | Un PostgreSQL installé sur Windows (service `postgresql-x64-16`) occupe le port 5432, et Laravel se connecte à lui au lieu de Docker. Arrêtez ce service, ou publiez le conteneur sur un autre port (`"5433:5432"` dans `docker-compose.yml`) et mettez `DB_PORT=5433` dans `backend/.env`. Voir le commentaire de SCRUM-25. |
+| `authentification par mot de passe échouée pour l'utilisateur « uniconnect »` | Un PostgreSQL installé sur Windows (service `postgresql-x64-16`) occupe le port 5432. Le conteneur est donc publié sur `5433` par défaut (`DB_PORT=5433` dans `backend/.env`). Si votre `backend/.env` date d'avant ce changement, mettez `DB_PORT=5433` ; pour revenir au 5432 : `"5432:5432"` dans `docker-compose.yml` et `DB_PORT=5432` dans `backend/.env`. Voir le commentaire de SCRUM-25. |
 | Port `8000` ou `5173` déjà utilisé | Arrêtez le processus concerné, ou utilisez `php artisan serve --port=8001` et adaptez `VITE_API_URL`. |
 | Les tests frontend échouent sur `localStorage` | Utilisez Node.js 22 ou 24 (Node 26 est concerné). |
 
