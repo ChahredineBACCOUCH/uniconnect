@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\EtatCompte;
+use App\Enums\Profil;
 use App\Http\Resources\MatiereResource;
 use App\Models\Matiere;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -54,6 +57,31 @@ class MatiereController extends ReferentielController
             Matiere::query()->with(['classes', 'enseignants'])->orderBy('code'),
             MatiereResource::class,
         );
+    }
+
+    /**
+     * SCRUM-80 : enseignants actifs proposés dans les sélecteurs de l'écran A02.
+     *
+     * La route est déclarée avant `apiResource('matieres')` pour ne pas être
+     * capturée par `matieres/{matiere}`.
+     */
+    public function enseignants(): JsonResponse
+    {
+        $enseignants = User::query()
+            ->where('profil', Profil::ENSEIGNANT)
+            ->where('etat', EtatCompte::ACTIF)
+            ->orderBy('nom')
+            ->orderBy('prenom')
+            ->get();
+
+        return response()->json([
+            'data' => $enseignants->map(fn (User $u) => [
+                'id' => $u->id,
+                'nom' => $u->nom,
+                'prenom' => $u->prenom,
+                'email' => $u->email,
+            ])->values(),
+        ]);
     }
 
     public function store(Request $request): JsonResponse

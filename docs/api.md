@@ -172,6 +172,7 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | GET/POST | `/admin/{referentiel}` | `GERER_PARAMETRAGE` | `referentiel` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` ; listes paginées `?actif=&q=&page=&par_page=` et création → **201** | SCRUM-79 |
 | GET/PATCH/DELETE | `/admin/{referentiel}/{id}` | `GERER_PARAMETRAGE` | détail, modification, suppression ; **409** `{ message }` si l'élément est utilisé | SCRUM-79 |
 | PATCH | `/admin/{referentiel}/{id}/desactiver` | `GERER_PARAMETRAGE` | → élément à `actif: false` (aucune suppression) | SCRUM-79 |
+| GET | `/admin/matieres/enseignants` | `GERER_PARAMETRAGE` | → enseignants actifs `{ data: [{ id, nom, prenom, email }] }` pour les sélecteurs de l'écran A02 | SCRUM-80 |
 | GET | `/admin/comptes-autorises?profil=&classe_id=&etat=&q=` | `GERER_UTILISATEURS` | → liste paginée `{ id, matricule, nom, prenom, email, profil, classe, etat }` | SCRUM-75 |
 | POST/PATCH/DELETE | `/admin/comptes-autorises[/{id}]` | `GERER_UTILISATEURS` | création, modification, suppression unitaire ; **409** si l'autorisation est déjà rattachée à un compte créé | SCRUM-75 |
 | POST | `/admin/comptes-autorises/{id}/desactiver` | `GERER_UTILISATEURS` | → autorisation à l'état `DESACTIVE` (aucune suppression) | SCRUM-75 |

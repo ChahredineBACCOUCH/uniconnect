@@ -83,7 +83,7 @@ const router = createRouter({
         {
           path: 'admin/referentiels',
           name: 'admin-referentiels',
-          component: PlaceholderView,
+          component: () => import('../views/admin/ReferentielsView.vue'),
           meta: { title: 'Référentiels', profil: 'ADMINISTRATION', droit: 'GERER_PARAMETRAGE' },
         },
         {

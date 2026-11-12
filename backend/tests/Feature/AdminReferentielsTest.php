@@ -422,4 +422,42 @@ class AdminReferentielsTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('classe_ids.0');
     }
+
+    public function test_les_enseignants_actifs_sont_proposes_pour_les_matieres(): void
+    {
+        $enseignant = User::factory()->create([
+            'nom' => 'Ben Ali',
+            'prenom' => 'Sana',
+            'profil' => Profil::ENSEIGNANT,
+            'etat' => EtatCompte::ACTIF,
+        ]);
+
+        User::factory()->create([
+            'profil' => Profil::ENSEIGNANT,
+            'etat' => EtatCompte::DESACTIVE,
+        ]);
+        User::factory()->create([
+            'profil' => Profil::ADMINISTRATION,
+            'etat' => EtatCompte::ACTIF,
+        ]);
+
+        Sanctum::actingAs($this->administrateur());
+
+        $this->getJson('/api/admin/matieres/enseignants')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $enseignant->id)
+            ->assertJsonPath('data.0.nom', 'Ben Ali')
+            ->assertJsonPath('data.0.prenom', 'Sana')
+            ->assertJsonPath('data.0.email', $enseignant->email);
+    }
+
+    public function test_la_liste_des_enseignants_est_protegee(): void
+    {
+        $this->getJson('/api/admin/matieres/enseignants')->assertUnauthorized();
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $this->getJson('/api/admin/matieres/enseignants')->assertForbidden();
+    }
 }
