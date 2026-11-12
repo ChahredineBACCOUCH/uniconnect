@@ -42,7 +42,11 @@ class LoginController extends Controller
             ],
         );
 
-        $compte = User::where('email', $donnees['email'])->first();
+        // L'e-mail ne dépend pas de la casse (majuscule automatique sur mobile) :
+        // PostgreSQL compare en respectant la casse, d'où lower() des deux côtés.
+        $compte = User::query()
+            ->whereRaw('lower(email) = ?', [mb_strtolower(trim($donnees['email']))])
+            ->first();
 
         // Compte inconnu : même message qu'un mot de passe faux, on ne révèle rien.
         if (! $compte) {

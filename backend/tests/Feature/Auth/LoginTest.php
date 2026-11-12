@@ -155,6 +155,17 @@ class LoginTest extends TestCase
             );
     }
 
+    public function test_l_e_mail_est_reconnu_sans_tenir_compte_de_la_casse(): void
+    {
+        $compte = $this->compte();
+
+        $this->postJson('/api/auth/login', [
+            'email' => ' '.mb_strtoupper($compte->email).' ',
+            'password' => self::MOT_DE_PASSE,
+        ])->assertOk()
+            ->assertJsonPath('user.id', $compte->id);
+    }
+
     public function test_un_compte_inconnu_renvoie_le_meme_message_qu_un_mot_de_passe_faux(): void
     {
         $this->postJson('/api/auth/login', [
