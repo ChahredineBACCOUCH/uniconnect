@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ClasseController;
 use App\Http\Controllers\Admin\CompteAutoriseController;
 use App\Http\Controllers\Admin\DepartementController;
 use App\Http\Controllers\Admin\FiliereController;
+use App\Http\Controllers\Admin\GroupeController;
 use App\Http\Controllers\Admin\ImportCompteController;
 use App\Http\Controllers\Admin\MatiereController;
 use App\Http\Controllers\Admin\NiveauController;
@@ -179,4 +180,14 @@ Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
             ->parameters(['matieres' => 'matiere']);
         Route::patch('matieres/{matiere}/desactiver', [MatiereController::class, 'desactiver'])
             ->name('admin.matieres.desactiver');
+    });
+
+// SCRUM-82 : génération des groupes organisationnels de l'année active.
+Route::middleware(['auth:sanctum', 'can:CREER_GROUPE_ORGA'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('groupes/apercu', [GroupeController::class, 'apercu'])
+            ->name('admin.groupes.apercu');
+        Route::post('groupes/generer', [GroupeController::class, 'generer'])
+            ->name('admin.groupes.generer');
     });

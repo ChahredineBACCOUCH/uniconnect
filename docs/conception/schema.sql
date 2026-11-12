@@ -105,10 +105,11 @@ CREATE TABLE espaces (
   created_by bigint REFERENCES users(id) ON DELETE SET NULL,
   created_at timestamptz, updated_at timestamptz,
   CHECK (type <> 'CHANNEL' OR mode_acces IS NOT NULL),
-  CHECK (type <> 'ORGANISATIONNEL' OR (annee_id IS NOT NULL AND classe_id IS NOT NULL))
+  -- Un groupe vise une classe, une matière (toutes classes confondues), ou les deux.
+  CHECK (type <> 'ORGANISATIONNEL' OR (annee_id IS NOT NULL AND (classe_id IS NOT NULL OR matiere_id IS NOT NULL)))
 );
 CREATE INDEX espaces_type_etat ON espaces (type, etat);
-CREATE UNIQUE INDEX espace_orga_unique ON espaces (annee_id, classe_id, COALESCE(matiere_id, 0)) WHERE type = 'ORGANISATIONNEL';  -- génération idempotente
+CREATE UNIQUE INDEX espace_orga_unique ON espaces (annee_id, COALESCE(classe_id, 0), COALESCE(matiere_id, 0)) WHERE type = 'ORGANISATIONNEL';  -- génération idempotente
 
 CREATE TABLE adhesions (
   id bigserial PRIMARY KEY,
