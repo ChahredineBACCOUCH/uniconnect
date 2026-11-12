@@ -63,9 +63,15 @@ function monterDiscussion() {
   })
 }
 
+// Jour « courant » figé pour toute la suite : formaterJour() compare la date
+// du message à la date réelle (new Date()). Sans horloge figée, les messages
+// du 10 nov. 2026 finiraient par afficher « Hier » et le test casserait
+// dès le lendemain, quel que soit le jour où la suite est lancée.
+const MAINTENANT = new Date(2026, 10, 10, 12, 0, 0)
+
 describe('DiscussionTab', () => {
   beforeEach(() => {
-    vi.useFakeTimers()
+    vi.useFakeTimers({ now: MAINTENANT })
     Object.defineProperty(document, 'hidden', { configurable: true, value: false })
     setActivePinia(createPinia())
     useAuthStore().user = { id: 1, prenom: 'Amine', nom: 'Benali' }
