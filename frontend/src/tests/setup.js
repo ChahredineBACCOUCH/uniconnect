@@ -15,6 +15,19 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
 }
 
 /*
+ * jsdom ne fournit pas `visualViewport` : les overlays Vuetify (v-dialog,
+ * v-menu) le lisent sans garde et lèvent une ReferenceError à l'ouverture.
+ */
+if (typeof globalThis.visualViewport === 'undefined') {
+  globalThis.visualViewport = {
+    width: 1024,
+    height: 768,
+    addEventListener() {},
+    removeEventListener() {},
+  }
+}
+
+/*
  * Node 22+ expose un global `localStorage` expérimental : à partir de Node 26,
  * il existe mais renvoie undefined (il faut --localstorage-file) et masque alors
  * celui de jsdom. Les tests du store auth échouaient alors sur `localStorage`.

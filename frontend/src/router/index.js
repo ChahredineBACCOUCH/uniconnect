@@ -73,7 +73,7 @@ const router = createRouter({
         {
           path: 'admin/annees',
           name: 'admin-annees',
-          component: PlaceholderView,
+          component: () => import('../views/admin/AnneesView.vue'),
           meta: {
             title: 'Années universitaires',
             profil: 'ADMINISTRATION',
