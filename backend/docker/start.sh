@@ -16,6 +16,14 @@ mkdir -p \
     bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 
-php artisan migrate --force \
-    && php artisan config:cache \
+php artisan migrate --force
+
+# Comptes de démonstration (SCRUM-89) : le Shell Render n'existe pas en offre gratuite.
+# Mettre SEED_DEMO=true dans les variables Render, redéployer, puis retirer la variable.
+# DemoSeeder est idempotent (updateOrCreate) : le relancer ne crée pas de doublons.
+if [ "${SEED_DEMO:-false}" = "true" ]; then
+    php artisan db:seed --class=DemoSeeder --force
+fi
+
+php artisan config:cache \
     && exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

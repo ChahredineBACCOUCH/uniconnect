@@ -52,6 +52,22 @@ const chargement = ref(true)
 const erreur = ref(null)
 const onglet = ref(ongletValide(route.params.onglet))
 
+/*
+ * L'onglet Assistant IA n'apparaît que si l'assistant est activé dans l'espace (SCRUM-142).
+ * En développement, VITE_IA_SIMULATION=true l'affiche toujours (réponses simulées).
+ */
+const SIMULATION_IA = import.meta.env.DEV && import.meta.env.VITE_IA_SIMULATION === 'true'
+const assistantVisible = computed(() => SIMULATION_IA || espace.value?.assistant?.actif === true)
+const ongletsVisibles = computed(() =>
+  ONGLETS.filter((element) => element.valeur !== 'assistant' || assistantVisible.value),
+)
+
+watch([espace, onglet], () => {
+  if (espace.value && onglet.value === 'assistant' && !assistantVisible.value) {
+    onglet.value = 'discussion'
+  }
+})
+
 const ongletActif = computed(
   () => ONGLETS.find((element) => element.valeur === onglet.value) ?? ONGLETS[0],
 )
@@ -199,7 +215,7 @@ function changerOnglet(valeur) {
         @update:model-value="changerOnglet"
       >
         <v-tab
-          v-for="element in ONGLETS"
+          v-for="element in ongletsVisibles"
           :key="element.valeur"
           :value="element.valeur"
           :prepend-icon="element.icone"
