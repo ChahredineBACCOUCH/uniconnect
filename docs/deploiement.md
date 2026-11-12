@@ -156,6 +156,8 @@ su -s /bin/sh www-data -c "php artisan db:seed --class=DemoSeeder --force"
 
 Le Shell s'ouvre en `root` : passez par `www-data` pour ne pas créer de fichiers appartenant à `root` dans `storage/`.
 
+**Sans Shell (offre gratuite de Render)** : ajoutez la variable `SEED_DEMO=true` (Environment), laissez Render redéployer, vérifiez dans les logs que `DemoSeeder` s'est exécuté, puis **supprimez la variable**. Le seeder est idempotent : il met à jour les comptes de démo sans créer de doublons. Les comptes de démo ont un mot de passe public (README) : ne les gardez pas après la soutenance.
+
 ## 4. Revenir en arrière
 
 Le retour arrière se fait **service par service** : revenir sur Render ne change pas le frontend, et inversement.
