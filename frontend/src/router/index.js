@@ -124,9 +124,9 @@ const router = createRouter({
           component: () => import('../views/auth/InscriptionView.vue'),
         },
         {
-          path: 'activation/:token',
+          path: 'activation/:id',
           name: 'activation',
-          component: () => import('../views/ActivationView.vue'),
+          component: () => import('../views/auth/ActivationView.vue'),
         },
       ],
     },
