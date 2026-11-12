@@ -114,6 +114,17 @@ class AdminAnneesTest extends TestCase
             ->assertJsonValidationErrors('libelle');
     }
 
+    public function test_les_erreurs_de_validation_sont_en_francais(): void
+    {
+        Sanctum::actingAs($this->administrateur());
+
+        $this->postJson('/api/admin/annees', ['libelle' => '2026-27'])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.libelle.0', 'Le libellé doit avoir la forme « 2026/2027 ».')
+            ->assertJsonPath('errors.date_debut.0', 'La date de début est obligatoire.')
+            ->assertJsonPath('errors.date_fin.0', 'La date de fin est obligatoire.');
+    }
+
     public function test_la_date_de_fin_doit_etre_posterieure_a_la_date_de_debut(): void
     {
         Sanctum::actingAs($this->administrateur());

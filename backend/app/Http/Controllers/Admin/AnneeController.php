@@ -20,6 +20,27 @@ use Illuminate\Validation\ValidationException;
  */
 class AnneeController extends Controller
 {
+    /** Libellé d'une année universitaire : « 2026/2027 ». */
+    private const FORMAT_LIBELLE = '#^\d{4}/\d{4}$#';
+
+    /**
+     * Messages en français : l'application n'a pas de fichiers de traduction,
+     * Laravel afficherait sinon « The libelle field is required. ».
+     *
+     * @var array<string, string>
+     */
+    private const MESSAGES = [
+        'libelle.required' => 'Le libellé est obligatoire.',
+        'libelle.regex' => 'Le libellé doit avoir la forme « 2026/2027 ».',
+        'libelle.unique' => 'Cette année universitaire existe déjà.',
+        'date_debut.required' => 'La date de début est obligatoire.',
+        'date_debut.date' => 'La date de début est invalide.',
+        'date_fin.required' => 'La date de fin est obligatoire.',
+        'date_fin.date' => 'La date de fin est invalide.',
+        'date_fin.after' => 'La date de fin doit être postérieure à la date de début.',
+        'archiver_precedente.boolean' => "L'option d'archivage est invalide.",
+    ];
+
     /**
      * Liste les années universitaires, de la plus récente à la plus ancienne.
      */
@@ -38,10 +59,10 @@ class AnneeController extends Controller
     public function store(Request $request): JsonResponse
     {
         $donnees = $request->validate([
-            'libelle' => ['required', 'string', 'max:9', Rule::unique('annees_universitaires', 'libelle')],
+            'libelle' => ['required', 'string', 'regex:'.self::FORMAT_LIBELLE, Rule::unique('annees_universitaires', 'libelle')],
             'date_debut' => ['required', 'date'],
             'date_fin' => ['required', 'date', 'after:date_debut'],
-        ]);
+        ], self::MESSAGES);
 
         $annee = AnneeUniversitaire::create([
             ...$donnees,
@@ -74,12 +95,12 @@ class AnneeController extends Controller
                 'sometimes',
                 'required',
                 'string',
-                'max:9',
+                'regex:'.self::FORMAT_LIBELLE,
                 Rule::unique('annees_universitaires', 'libelle')->ignore($annee->getKey()),
             ],
             'date_debut' => ['sometimes', 'required', 'date'],
             'date_fin' => ['sometimes', 'required', 'date'],
-        ]);
+        ], self::MESSAGES);
 
         $debut = Carbon::parse($donnees['date_debut'] ?? $annee->date_debut);
         $fin = Carbon::parse($donnees['date_fin'] ?? $annee->date_fin);
@@ -105,7 +126,7 @@ class AnneeController extends Controller
     {
         $donnees = $request->validate([
             'archiver_precedente' => ['sometimes', 'boolean'],
-        ]);
+        ], self::MESSAGES);
 
         DB::transaction(function () use ($annee, $donnees): void {
             $precedente = AnneeUniversitaire::query()
