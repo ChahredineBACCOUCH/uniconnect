@@ -89,7 +89,7 @@ const router = createRouter({
         {
           path: 'admin/comptes',
           name: 'admin-comptes',
-          component: PlaceholderView,
+          component: () => import('../views/admin/ComptesView.vue'),
           meta: {
             title: 'Comptes autorisés',
             profil: 'ADMINISTRATION',
