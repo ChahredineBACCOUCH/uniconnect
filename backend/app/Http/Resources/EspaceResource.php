@@ -46,10 +46,12 @@ class EspaceResource extends JsonResource
             'duree_visibilite_heures' => $this->duree_visibilite_heures,
             'duree_courte_autorisee' => $this->duree_courte_autorisee,
             'mode_annonce' => $this->mode_annonce,
-            // L'assistant IA (SCRUM-101) n'est pas encore livré.
+            // Assistant IA (table assistants_ia, SCRUM-97) : inactif tant qu'il n'a jamais été activé.
+            // nb_documents_indexes = ressources découpées en fragments (onglet vide si 0, SCRUM-144).
             'assistant' => [
-                'actif' => false,
-                'instructions' => null,
+                'actif' => (bool) $this->assistant?->actif,
+                'instructions' => $this->assistant?->instructions,
+                'nb_documents_indexes' => $this->ressources()->where('indexee_ia', true)->count(),
             ],
         ];
     }
