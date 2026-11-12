@@ -6,6 +6,8 @@ use App\Enums\EtatCompte;
 use App\Enums\Profil;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CompteAutoriseResource;
+use App\Models\AnneeUniversitaire;
+use App\Models\Classe;
 use App\Models\CompteAutorise;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -110,6 +112,34 @@ class CompteAutoriseController extends Controller
                 'par_page' => $comptes->perPage(),
                 'total' => $comptes->total(),
             ],
+        ]);
+    }
+
+    /**
+     * SCRUM-77 : classes de l'année active pour les filtres et le dialogue A03.
+     *
+     * Cette liste accompagne la page des comptes autorisés : elle est donc
+     * accessible avec le droit `GERER_UTILISATEURS`, sans exiger en plus
+     * `GERER_PARAMETRAGE`.
+     */
+    public function classes(): JsonResponse
+    {
+        $annee = AnneeUniversitaire::query()->active()->first();
+
+        $classes = $annee === null
+            ? collect()
+            : Classe::query()
+                ->where('annee_id', $annee->id)
+                ->where('actif', true)
+                ->orderBy('code')
+                ->get(['id', 'code', 'libelle']);
+
+        return response()->json([
+            'data' => $classes->map(fn (Classe $classe): array => [
+                'id' => $classe->id,
+                'code' => $classe->code,
+                'libelle' => $classe->libelle,
+            ])->all(),
         ]);
     }
 

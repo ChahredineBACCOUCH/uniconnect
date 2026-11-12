@@ -137,6 +137,10 @@ Route::middleware(['auth:sanctum', 'can:GERER_UTILISATEURS'])
         Route::get('comptes-autorises/import/modele', [ImportCompteController::class, 'modele'])
             ->name('admin.comptes-autorises.import.modele');
 
+        // SCRUM-77 : classes de l'année active pour les filtres de l'écran A03.
+        Route::get('comptes-autorises/classes', [CompteAutoriseController::class, 'classes'])
+            ->name('admin.comptes-autorises.classes');
+
         Route::apiResource('comptes-autorises', CompteAutoriseController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['comptes-autorises' => 'compte_autorise']);
@@ -168,6 +172,9 @@ Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
             ->parameters(['classes' => 'classe']);
         Route::patch('classes/{classe}/desactiver', [ClasseController::class, 'desactiver'])
             ->name('admin.classes.desactiver');
+
+        Route::get('matieres/enseignants', [MatiereController::class, 'enseignants'])
+            ->name('admin.matieres.enseignants');
 
         Route::apiResource('matieres', MatiereController::class)
             ->parameters(['matieres' => 'matiere']);

@@ -172,12 +172,14 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | GET/POST | `/admin/{referentiel}` | `GERER_PARAMETRAGE` | `referentiel` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` ; listes paginées `?actif=&q=&page=&par_page=` et création → **201** | SCRUM-79 |
 | GET/PATCH/DELETE | `/admin/{referentiel}/{id}` | `GERER_PARAMETRAGE` | détail, modification, suppression ; **409** `{ message }` si l'élément est utilisé | SCRUM-79 |
 | PATCH | `/admin/{referentiel}/{id}/desactiver` | `GERER_PARAMETRAGE` | → élément à `actif: false` (aucune suppression) | SCRUM-79 |
+| GET | `/admin/matieres/enseignants` | `GERER_PARAMETRAGE` | → enseignants actifs `{ data: [{ id, nom, prenom, email }] }` pour les sélecteurs de l'écran A02 | SCRUM-80 |
 | GET | `/admin/comptes-autorises?profil=&classe_id=&etat=&q=` | `GERER_UTILISATEURS` | → liste paginée `{ id, matricule, nom, prenom, email, profil, classe, etat }` | SCRUM-75 |
 | POST/PATCH/DELETE | `/admin/comptes-autorises[/{id}]` | `GERER_UTILISATEURS` | création, modification, suppression unitaire ; **409** si l'autorisation est déjà rattachée à un compte créé | SCRUM-75 |
 | POST | `/admin/comptes-autorises/{id}/desactiver` | `GERER_UTILISATEURS` | → autorisation à l'état `DESACTIVE` (aucune suppression) | SCRUM-75 |
 | POST | `/admin/comptes-autorises/import/apercu` | `GERER_UTILISATEURS` | multipart `fichier` (Excel) → `{ total, valides, erreurs: [{ ligne, motif }], lignes }`, sans rien enregistrer | SCRUM-76 |
 | POST | `/admin/comptes-autorises/import/valider` | `GERER_UTILISATEURS` | `{ lignes: [...] }` issues de l'aperçu → **201** `{ importes, ignores, erreurs, import_id }` | SCRUM-76 |
 | GET | `/admin/comptes-autorises/import/modele` | `GERER_UTILISATEURS` | → modèle Excel `modele-import-comptes.xlsx` | SCRUM-76 |
+| GET | `/admin/comptes-autorises/classes` | `GERER_UTILISATEURS` | → classes actives de l'année active `{ data: [{ id, code, libelle }] }` | SCRUM-77 |
 | GET | `/admin/groupes/apercu` | `CREER_GROUPE_ORGA` | → `{ annee, total, a_creer: [...], deja_existants: n, membres_a_ajouter: n }`, sans rien enregistrer ; **422** s'il n'y a pas d'année active | SCRUM-82 |
 | POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | même réponse que `GET /admin/groupes/apercu` (compatibilité) | SCRUM-82 |
 | POST | `/admin/groupes/generer` | `CREER_GROUPE_ORGA` | un groupe par classe + un groupe par matière (toutes classes confondues) → `{ annee, crees: n, deja_existants: n, membres_ajoutes: n }`, relançable sans doublon ; **422** s'il n'y a pas d'année active | SCRUM-82 |
