@@ -58,8 +58,10 @@ class RattachementServiceTest extends TestCase
         $this->seed(DemoSeeder::class);
         $this->app->make(GenerationGroupesService::class)->generer();
 
+        // Un étudiant actif doit obligatoirement avoir une classe (contrainte
+        // PostgreSQL) : on utilise donc un enseignant, qui n'en a pas.
         $sansClasse = User::factory()->create([
-            'profil' => Profil::ETUDIANT,
+            'profil' => Profil::ENSEIGNANT,
             'etat' => EtatCompte::ACTIF,
         ]);
 
