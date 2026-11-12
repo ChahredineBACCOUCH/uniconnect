@@ -107,6 +107,39 @@ class LoginTest extends TestCase
         ])->assertStatus(423);
     }
 
+    public function test_le_compte_se_debloque_apres_quinze_minutes(): void
+    {
+        $compte = $this->compte();
+
+        // Cinq mots de passe faux : le compte est bloqué pour quinze minutes.
+        for ($essai = 1; $essai <= 5; $essai++) {
+            $this->postJson('/api/auth/login', [
+                'email' => $compte->email,
+                'password' => 'MauvaisMotDePasse1',
+            ]);
+        }
+
+        // Immédiatement après, même le bon mot de passe est refusé.
+        $this->postJson('/api/auth/login', [
+            'email' => $compte->email,
+            'password' => self::MOT_DE_PASSE,
+        ])->assertStatus(423);
+
+        // Seize minutes plus tard, le blocage a expiré : la connexion réussit.
+        $this->travelTo(now()->addMinutes(16));
+
+        $this->postJson('/api/auth/login', [
+            'email' => $compte->email,
+            'password' => self::MOT_DE_PASSE,
+        ])->assertOk()
+            ->assertJsonStructure(['token', 'user'])
+            ->assertJsonPath('user.email', $compte->email);
+
+        $compte->refresh();
+        $this->assertNull($compte->bloque_jusqua);
+        $this->assertSame(0, $compte->tentatives_echouees);
+    }
+
     public function test_un_compte_bloque_renvoie_l_heure_de_deblocage(): void
     {
         $compte = $this->compte(['bloque_jusqua' => now()->addMinutes(10)]);
