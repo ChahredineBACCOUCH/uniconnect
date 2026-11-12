@@ -27,6 +27,12 @@ class AnneeUniversitaire extends Model
         return $this->hasMany(Classe::class, 'annee_id');
     }
 
+    /** Espaces rattachés à cette année (groupes organisationnels). @return HasMany<Espace, $this> */
+    public function espaces(): HasMany
+    {
+        return $this->hasMany(Espace::class, 'annee_id');
+    }
+
     /**
      * Année universitaire active (une seule à la fois) : AnneeUniversitaire::active()->first().
      *
