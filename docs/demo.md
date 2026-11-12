@@ -17,7 +17,7 @@
 | Temps | Qui présente | Écran | Ce qu'on montre | Phrase clé |
 |---|---|---|---|---|
 | 0:00 – 1:00 | Chahredine | — | Le problème : la communication d'une université est dispersée (e-mails, WhatsApp, plateformes) | « UniConnect réunit les échanges de chaque classe et de chaque cours, avec un assistant qui répond à partir des supports des enseignants. » |
-| 1:00 – 3:00 | Mansour | Admin | Années → **import CSV** des comptes autorisés (montrer une erreur détectée à l'aperçu) → **génération des groupes** | « Les espaces de classe et de matière sont créés automatiquement à partir des données de la scolarité. » |
+| 1:00 – 3:00 | Mansour | Admin | Années → **import Excel** des comptes autorisés (montrer une erreur détectée à l'aperçu) → **génération des groupes** | « Les espaces de classe et de matière sont créés automatiquement à partir des données de la scolarité. » |
 | 3:00 – 4:30 | Moataz | Visiteur | Inscription de Rania : e-mail vérifié → lien d'activation → mot de passe → elle retrouve **automatiquement** ses groupes | « Seules les personnes autorisées peuvent créer un compte. » |
 | 4:30 – 6:30 | Mouetez | Étudiant | Accueil (non-lus) → discussion « Bases de données » → message + **PDF joint** → reçu en direct chez un autre compte → groupe privé + invitation | « Un non-membre ne peut ni lire ni télécharger, même avec le lien direct. » (montrer la 403) |
 | 6:30 – 8:00 | Hayder | Enseignant | Annonce publiée (notification) → Ressources : ajout d'un PDF dans un chapitre → puce « Indexée pour l'IA » → activation de l'assistant | « Le cours devient la base de connaissances de l'assistant. » |

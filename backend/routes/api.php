@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ClasseController;
 use App\Http\Controllers\Admin\CompteAutoriseController;
 use App\Http\Controllers\Admin\DepartementController;
 use App\Http\Controllers\Admin\FiliereController;
+use App\Http\Controllers\Admin\ImportCompteController;
 use App\Http\Controllers\Admin\MatiereController;
 use App\Http\Controllers\Admin\NiveauController;
 use App\Http\Controllers\AssistantIAController;
@@ -127,6 +128,14 @@ Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
 Route::middleware(['auth:sanctum', 'can:GERER_UTILISATEURS'])
     ->prefix('admin')
     ->group(function () {
+        // SCRUM-76 : import Excel des comptes autorisés (aperçu puis validation).
+        Route::post('comptes-autorises/import/apercu', [ImportCompteController::class, 'apercu'])
+            ->name('admin.comptes-autorises.import.apercu');
+        Route::post('comptes-autorises/import/valider', [ImportCompteController::class, 'valider'])
+            ->name('admin.comptes-autorises.import.valider');
+        Route::get('comptes-autorises/import/modele', [ImportCompteController::class, 'modele'])
+            ->name('admin.comptes-autorises.import.modele');
+
         Route::apiResource('comptes-autorises', CompteAutoriseController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['comptes-autorises' => 'compte_autorise']);
