@@ -27,8 +27,8 @@ Créés par le seeder de démonstration (SCRUM-42 et SCRUM-188).
 | R2 | Inscription d'une personne dont le compte existe déjà | 409 | SCRUM-65 |
 | R3 | Inscription sans année active | 422 | SCRUM-65 |
 | R4 | Lien d'activation expiré | 410 | SCRUM-66 |
-| R5 | 5 mauvais mots de passe de suite | 6ᵉ essai → 423 pendant 15 min | SCRUM-71 |
-| R6 | Compte suspendu | Connexion refusée (403) | SCRUM-71 |
+| R5 | 5 mauvais mots de passe de suite | 423 pendant 15 min dès le 5ᵉ essai | SCRUM-69 |
+| R6 | Compte suspendu | Connexion refusée (403) | SCRUM-69 |
 | R7 | Deux années actives en même temps | Impossible : l'activation de l'une désactive l'autre | SCRUM-74 |
 | R8 | Import CSV avec doublon, e-mail invalide, classe inconnue | Lignes rejetées avec motif, aucune donnée importée lors de l'aperçu | SCRUM-78 |
 | R9 | Génération des groupes lancée deux fois | Aucun doublon | SCRUM-84 |

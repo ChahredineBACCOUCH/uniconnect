@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable([
     'matricule',
@@ -35,7 +37,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -72,6 +74,20 @@ class User extends Authenticatable
     public function droits(): HasMany
     {
         return $this->hasMany(DroitUtilisateur::class);
+    }
+
+    /** Adhésions aux espaces, avec le rôle de l'utilisateur. @return HasMany<Adhesion, $this> */
+    public function adhesions(): HasMany
+    {
+        return $this->hasMany(Adhesion::class);
+    }
+
+    /** Espaces dont l'utilisateur est membre, avec son rôle dans la table pivot. @return BelongsToMany<Espace, $this> */
+    public function espaces(): BelongsToMany
+    {
+        return $this->belongsToMany(Espace::class, 'adhesions')
+            ->withPivot(['role', 'notifications_actives', 'dernier_message_lu_id'])
+            ->withTimestamps();
     }
 
     public function possedeDroit(Droit $droit): bool

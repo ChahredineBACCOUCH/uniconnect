@@ -97,6 +97,10 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Laravel tourne en UTC (config/app.php) alors que PostgreSQL utilise
+            // le fuseau du serveur par défaut : sans cette ligne, les dates
+            // `timestampTz` sont écrites puis relues avec un décalage d'une heure.
+            'timezone' => env('DB_TIMEZONE', '+00:00'),
         ],
 
         'sqlsrv' => [
