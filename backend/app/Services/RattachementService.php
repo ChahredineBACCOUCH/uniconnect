@@ -12,8 +12,10 @@ use App\Models\User;
  * SCRUM-68 / SCRUM-82 : rattachement d'un utilisateur aux groupes
  * organisationnels de sa classe (groupe de classe et groupes de matière).
  *
- * Réutilisé à l'activation d'un compte étudiant. Idempotent : chaque adhésion
- * est créée avec `firstOrCreate` (unique `espace_id + user_id`).
+ * Les groupes de matière couvrent toutes les classes de l'année : on y rattache
+ * l'étudiant lorsque la matière est enseignée dans sa classe. Réutilisé à
+ * l'activation d'un compte étudiant. Idempotent : chaque adhésion est créée
+ * avec `firstOrCreate` (unique `espace_id + user_id`).
  */
 class RattachementService
 {
@@ -28,10 +30,20 @@ class RattachementService
             return 0;
         }
 
+        $matiereIds = $classe->matieres()->pluck('matieres.id');
+
         $espaces = Espace::query()
             ->where('type', TypeEspace::ORGANISATIONNEL->value)
             ->where('annee_id', $classe->annee_id)
-            ->where('classe_id', $classe->id)
+            ->where(function ($query) use ($classe, $matiereIds): void {
+                $query->where('classe_id', $classe->id);
+
+                if ($matiereIds->isNotEmpty()) {
+                    $query->orWhere(fn ($query) => $query
+                        ->whereNull('classe_id')
+                        ->whereIn('matiere_id', $matiereIds));
+                }
+            })
             ->get();
 
         $ajoutes = 0;

@@ -48,17 +48,18 @@ class GenerationGroupesTest extends TestCase
         $reponse = $this->getJson('/api/admin/groupes/apercu')
             ->assertOk()
             ->assertJsonPath('annee.libelle', '2026/2027')
-            ->assertJsonPath('total', 21)
+            ->assertJsonPath('total', 9)
             ->assertJsonPath('deja_existants', 0)
-            // 21 propriétaires (administration) + 7 adhésions de l'étudiant de L2-INFO-A.
-            ->assertJsonPath('membres_a_ajouter', 28)
-            ->assertJsonCount(21, 'a_creer');
+            // 9 propriétaires + 7 adhésions de l'étudiant de L2-INFO-A.
+            ->assertJsonPath('membres_a_ajouter', 16)
+            ->assertJsonCount(9, 'a_creer');
 
         $noms = collect($reponse->json('a_creer'))->pluck('nom');
 
         $this->assertTrue($noms->contains('L2 Informatique A'));
-        $this->assertTrue($noms->contains('Algorithmique avancée · L2 Informatique A'));
-        $this->assertTrue($noms->contains('Algorithmique avancée · L3 Informatique'));
+        $this->assertTrue($noms->contains('Algorithmique avancée'));
+        // Un seul groupe par matière, toutes classes confondues.
+        $this->assertSame(1, $noms->filter(fn (string $nom) => $nom === 'Algorithmique avancée')->count());
 
         $this->assertSame(0, Espace::count());
         $this->assertSame(0, Adhesion::count());
@@ -70,14 +71,14 @@ class GenerationGroupesTest extends TestCase
 
         $this->postJson('/api/admin/groupes/generer?apercu=1')
             ->assertOk()
-            ->assertJsonPath('total', 21)
-            ->assertJsonCount(21, 'a_creer');
+            ->assertJsonPath('total', 9)
+            ->assertJsonCount(9, 'a_creer');
 
         $this->assertSame(0, Espace::count());
         $this->assertSame(0, Adhesion::count());
     }
 
-    public function test_la_generation_cree_3_groupes_de_classe_et_18_groupes_de_matiere(): void
+    public function test_la_generation_cree_3_groupes_de_classe_et_6_groupes_de_matiere(): void
     {
         $admin = $this->preparerDemonstration();
         $etudiant = $this->etudiantDemo();
@@ -85,16 +86,17 @@ class GenerationGroupesTest extends TestCase
         $this->postJson('/api/admin/groupes/generer')
             ->assertOk()
             ->assertJsonPath('annee.libelle', '2026/2027')
-            ->assertJsonPath('crees', 21)
+            ->assertJsonPath('crees', 9)
             ->assertJsonPath('deja_existants', 0)
-            // 21 propriétaires + 7 adhésions de l'étudiant de L2-INFO-A.
-            ->assertJsonPath('membres_ajoutes', 28);
+            // 9 propriétaires + 7 adhésions de l'étudiant de L2-INFO-A.
+            ->assertJsonPath('membres_ajoutes', 16);
 
-        $this->assertSame(21, Espace::query()->where('type', TypeEspace::ORGANISATIONNEL->value)->count());
+        $this->assertSame(9, Espace::query()->where('type', TypeEspace::ORGANISATIONNEL->value)->count());
         $this->assertSame(3, Espace::query()->whereNull('matiere_id')->count());
-        $this->assertSame(18, Espace::query()->whereNotNull('matiere_id')->count());
+        $this->assertSame(6, Espace::query()->whereNotNull('matiere_id')->count());
+        $this->assertSame(6, Espace::query()->whereNotNull('matiere_id')->whereNull('classe_id')->count());
 
-        $this->assertSame(21, Adhesion::query()
+        $this->assertSame(9, Adhesion::query()
             ->where('user_id', $admin->id)
             ->where('role', RoleMembre::PROPRIETAIRE->value)
             ->count());
@@ -117,7 +119,7 @@ class GenerationGroupesTest extends TestCase
         $this->postJson('/api/admin/groupes/generer')
             ->assertOk()
             ->assertJsonPath('crees', 0)
-            ->assertJsonPath('deja_existants', 21)
+            ->assertJsonPath('deja_existants', 9)
             ->assertJsonPath('membres_ajoutes', 0);
 
         $this->assertSame($groupes, Espace::count());
@@ -125,8 +127,8 @@ class GenerationGroupesTest extends TestCase
 
         $this->getJson('/api/admin/groupes/apercu')
             ->assertOk()
-            ->assertJsonPath('total', 21)
-            ->assertJsonPath('deja_existants', 21)
+            ->assertJsonPath('total', 9)
+            ->assertJsonPath('deja_existants', 9)
             ->assertJsonPath('membres_a_ajouter', 0)
             ->assertJsonCount(0, 'a_creer');
     }
@@ -162,7 +164,9 @@ class GenerationGroupesTest extends TestCase
             ->where('matiere_id', $matiere->id)
             ->get();
 
-        $this->assertCount(3, $groupes);
+        // Un seul groupe de matière, toutes classes confondues.
+        $this->assertCount(1, $groupes);
+        $this->assertNull($groupes->first()->classe_id);
 
         foreach ($groupes as $groupe) {
             $this->assertSame(1, $groupe->adhesions()->where('role', RoleMembre::PROPRIETAIRE->value)->count());

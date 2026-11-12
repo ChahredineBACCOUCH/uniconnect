@@ -14,16 +14,16 @@ use App\Models\Classe;
 use App\Models\Espace;
 use App\Models\Matiere;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
  * SCRUM-82 : groupes organisationnels de l'année active.
  *
- * Un groupe par classe et un groupe par couple classe + matière, générés à
- * partir des référentiels. La génération est idempotente : elle s'appuie sur
- * l'index unique `espace_orga_unique` et sur `firstOrCreate`.
+ * Un groupe par classe et un groupe par matière (toutes classes confondues),
+ * générés à partir des référentiels. La génération est idempotente : elle
+ * s'appuie sur l'index unique `espace_orga_unique` et sur `firstOrCreate`.
  */
 class GenerationGroupesService
 {
@@ -48,7 +48,7 @@ class GenerationGroupesService
         $membresAAjouter = 0;
 
         foreach ($this->plan($annee) as $groupe) {
-            $espace = $existants->get($this->cle($groupe['classe']->id, $groupe['matiere']?->id));
+            $espace = $existants->get($this->cle($groupe['classe']?->id, $groupe['matiere']?->id));
 
             if ($espace === null) {
                 $aCreer[] = $this->resume($groupe);
@@ -94,7 +94,7 @@ class GenerationGroupesService
                     [
                         'type' => TypeEspace::ORGANISATIONNEL->value,
                         'annee_id' => $annee->id,
-                        'classe_id' => $groupe['classe']->id,
+                        'classe_id' => $groupe['classe']?->id,
                         'matiere_id' => $groupe['matiere']?->id,
                     ],
                     [
@@ -128,10 +128,10 @@ class GenerationGroupesService
     }
 
     /**
-     * Groupes attendus : un par classe, puis un par matière de chaque classe.
+     * Groupes attendus : un par classe, puis un par matière de l'année.
      *
      * @return list<array{
-     *     classe: Classe,
+     *     classe: ?Classe,
      *     matiere: ?Matiere,
      *     nom: string,
      *     description: string,
@@ -174,20 +174,36 @@ class GenerationGroupesService
                 'etudiants' => $classe->etudiants,
                 'membres' => $this->membres($proprietaireDefaut, $classe->etudiants),
             ];
+        }
 
-            foreach ($classe->matieres as $matiere) {
-                $proprietaire = $this->enseignantResponsable($matiere) ?? $proprietaireDefaut;
+        // Un seul groupe par matière : il regroupe les étudiants de toutes les
+        // classes actives de l'année qui suivent cette matière.
+        $matieres = Matiere::query()
+            ->where('actif', true)
+            ->whereHas('classes', fn ($query) => $query
+                ->where('classes.annee_id', $annee->id)
+                ->where('classes.actif', true))
+            ->orderBy('code')
+            ->get();
 
-                $plan[] = [
-                    'classe' => $classe,
-                    'matiere' => $matiere,
-                    'nom' => Str::limit("{$matiere->libelle} · {$classe->libelle}", 120, ''),
-                    'description' => "Groupe de la matière {$matiere->libelle} pour la classe {$classe->libelle} ({$annee->libelle}).",
-                    'proprietaire' => $proprietaire,
-                    'etudiants' => $classe->etudiants,
-                    'membres' => $this->membres($proprietaire, $classe->etudiants),
-                ];
-            }
+        foreach ($matieres as $matiere) {
+            $etudiants = $classes
+                ->filter(fn (Classe $classe) => $classe->matieres->contains('id', $matiere->id))
+                ->flatMap(fn (Classe $classe) => $classe->etudiants)
+                ->unique('id')
+                ->values();
+
+            $proprietaire = $this->enseignantResponsable($matiere) ?? $proprietaireDefaut;
+
+            $plan[] = [
+                'classe' => null,
+                'matiere' => $matiere,
+                'nom' => Str::limit($matiere->libelle, 120, ''),
+                'description' => "Groupe de la matière {$matiere->libelle} ({$annee->libelle}).",
+                'proprietaire' => $proprietaire,
+                'etudiants' => $etudiants,
+                'membres' => $this->membres($proprietaire, $etudiants),
+            ];
         }
 
         return $plan;
@@ -285,7 +301,7 @@ class GenerationGroupesService
             return 0;
         }
 
-        $ids = $membres->modelKeys();
+        $ids = $membres->pluck('id')->all();
 
         if ($espace === null) {
             return count($ids);
@@ -329,7 +345,7 @@ class GenerationGroupesService
         return [
             'nom' => $groupe['nom'],
             'type' => $groupe['matiere'] === null ? 'CLASSE' : 'MATIERE',
-            'classe' => $groupe['classe']->code,
+            'classe' => $groupe['classe']?->code,
             'matiere' => $groupe['matiere']?->code,
             'proprietaire' => $proprietaire === null
                 ? null
@@ -337,9 +353,9 @@ class GenerationGroupesService
         ];
     }
 
-    private function cle(int $classeId, ?int $matiereId): string
+    private function cle(?int $classeId, ?int $matiereId): string
     {
-        return $classeId.'-'.($matiereId ?? 0);
+        return ($classeId ?? 0).'-'.($matiereId ?? 0);
     }
 
     /**

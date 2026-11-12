@@ -42,8 +42,14 @@ class RattachementServiceTest extends TestCase
         $espaces = $etudiant->espaces()->get();
 
         $this->assertCount(7, $espaces);
+        // 1 groupe de classe + 6 groupes de matière (toutes classes confondues).
+        $this->assertSame(1, $espaces->where('classe_id', $classe->id)->count());
+        $this->assertSame(6, $espaces
+            ->whereNull('classe_id')
+            ->whereNotNull('matiere_id')
+            ->count());
         $this->assertTrue($espaces->every(
-            fn (Espace $espace) => (int) $espace->classe_id === $classe->id
+            fn (Espace $espace) => (int) $espace->annee_id === (int) $classe->annee_id
         ));
     }
 
