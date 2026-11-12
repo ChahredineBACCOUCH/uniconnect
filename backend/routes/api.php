@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EspaceController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembreController;
+use App\Http\Controllers\MesEspacesController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UtilisateurController;
@@ -77,6 +78,9 @@ Route::post('/auth/login', [LoginController::class, 'store']);
 Route::middleware('auth:sanctum')->group(function () {
     // SCRUM-69 : déconnexion (le jeton utilisé pour la requête est supprimé).
     Route::post('/auth/logout', [LoginController::class, 'destroy']);
+
+    // SCRUM-85 : mes espaces (menu latéral et accueil), regroupés par type, avec les non-lus.
+    Route::get('/me/espaces', [MesEspacesController::class, 'index']);
 
     // SCRUM-87 : créer un groupe privé, modifier ses informations.
     Route::post('/espaces', [EspaceController::class, 'store']);
