@@ -8,11 +8,10 @@ use App\Mail\ActivationCompte;
 use App\Models\CompteAutorise;
 use App\Models\User;
 use App\Services\EligibiliteService;
+use App\Services\LienActivation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -98,21 +97,13 @@ class RegisterController extends Controller
     }
 
     /**
-     * Lien signé valable 48 h : la signature est calculée sur la route backend
+     * Lien signé valable 48 h : il est calculé pour la route backend
      * `activation`, puis l'adresse est réécrite pour pointer vers la page Vue
      * /activation/{id} (le routeur Vue attend un paramètre de chemin).
      */
     private function lienActivation(User $user): string
     {
-        $signe = URL::temporarySignedRoute('activation', now()->addHours(48), ['user' => $user->id]);
-
-        // …puis on réécrit uniquement le préfixe : /api/auth/activation/{id} devient
-        // /activation/{id}, les paramètres expires et signature sont conservés.
-        return Str::replace(
-            URL::to('/api/auth/activation'),
-            rtrim((string) config('app.frontend_url'), '/').'/activation',
-            $signe,
-        );
+        return LienActivation::pour($user);
     }
 
     /** Chaque code de refus devient une réponse 422 avec un message français. */
