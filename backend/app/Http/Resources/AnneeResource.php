@@ -22,6 +22,9 @@ class AnneeResource extends JsonResource
             'date_debut' => $this->date_debut?->toDateString(),
             'date_fin' => $this->date_fin?->toDateString(),
             'active' => $this->active,
+            // Renseignés par la liste (withCount) ; 0 ailleurs.
+            'nombre_groupes' => (int) ($this->nombre_groupes ?? 0),
+            'nombre_groupes_archives' => (int) ($this->nombre_groupes_archives ?? 0),
         ];
     }
 }

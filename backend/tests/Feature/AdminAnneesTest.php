@@ -9,6 +9,7 @@ use App\Enums\Profil;
 use App\Enums\TypeEspace;
 use App\Models\AnneeUniversitaire;
 use App\Models\Espace;
+use App\Models\Matiere;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -46,6 +47,22 @@ class AdminAnneesTest extends TestCase
         ], $attributs));
     }
 
+    private function espace(
+        AnneeUniversitaire $annee,
+        TypeEspace $type,
+        EtatEspace $etat,
+        string $nom,
+        ?int $matiereId = null,
+    ): Espace {
+        return Espace::create([
+            'type' => $type,
+            'nom' => $nom,
+            'etat' => $etat,
+            'annee_id' => $annee->id,
+            'matiere_id' => $matiereId,
+        ]);
+    }
+
     public function test_un_invite_ne_peut_pas_acceder_aux_annees(): void
     {
         $this->getJson('/api/admin/annees')->assertUnauthorized();
@@ -76,6 +93,27 @@ class AdminAnneesTest extends TestCase
             ->assertJsonPath('data.0.id', $recente->id)
             ->assertJsonPath('data.1.id', $ancienne->id)
             ->assertJsonPath('data.0.active', false);
+    }
+
+    public function test_la_liste_indique_le_nombre_de_groupes_organisationnels(): void
+    {
+        $annee = $this->annee();
+        $this->annee(['libelle' => '2025/2026', 'date_debut' => '2025-09-01', 'date_fin' => '2026-06-30']);
+
+        $matiereA = Matiere::create(['code' => 'INF201', 'libelle' => 'Algorithmique', 'semestre' => 1, 'actif' => true]);
+        $matiereB = Matiere::create(['code' => 'INF202', 'libelle' => 'Bases de données', 'semestre' => 1, 'actif' => true]);
+
+        $this->espace($annee, TypeEspace::ORGANISATIONNEL, EtatEspace::ACTIF, 'L2 Informatique A', $matiereA->id);
+        $this->espace($annee, TypeEspace::ORGANISATIONNEL, EtatEspace::ARCHIVE, 'L2 Informatique B', $matiereB->id);
+        // Les groupes privés ne comptent pas dans la colonne « Groupes organisationnels ».
+        $this->espace($annee, TypeEspace::PRIVE, EtatEspace::ACTIF, 'Révisions BD');
+
+        Sanctum::actingAs($this->administrateur());
+
+        $this->getJson('/api/admin/annees')
+            ->assertOk()
+            ->assertJsonPath('data.0.nombre_groupes', 2)
+            ->assertJsonPath('data.0.nombre_groupes_archives', 1);
     }
 
     public function test_l_administrateur_cree_une_annee(): void

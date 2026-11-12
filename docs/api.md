@@ -165,7 +165,7 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 
 | Méthode | Route | Droit | Corps → Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/admin/annees` | `GERER_PARAMETRAGE` | → liste `{ id, libelle, date_debut, date_fin, active }` | SCRUM-72 |
+| GET | `/admin/annees` | `GERER_PARAMETRAGE` | → liste `{ id, libelle, date_debut, date_fin, active, nombre_groupes, nombre_groupes_archives }` (`nombre_groupes` : groupes organisationnels de l'année, pour l'écran A01) | SCRUM-72, 73 |
 | POST | `/admin/annees` | `GERER_PARAMETRAGE` | `{ libelle: "2027/2028", date_debut, date_fin }` → **201** | SCRUM-72 |
 | PATCH | `/admin/annees/{id}` | `GERER_PARAMETRAGE` | `{ libelle?, date_debut?, date_fin? }` → année | SCRUM-72 |
 | POST | `/admin/annees/{id}/activer` | `GERER_PARAMETRAGE` | `{ archiver_precedente? }` → année active (l'ancienne est désactivée dans la même transaction ; `archiver_precedente` archive les espaces de l'ancienne année) | SCRUM-72 |

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\EtatEspace;
+use App\Enums\TypeEspace;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AnneeResource;
 use App\Models\AnneeUniversitaire;
 use App\Models\Espace;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -43,10 +45,20 @@ class AnneeController extends Controller
 
     /**
      * Liste les années universitaires, de la plus récente à la plus ancienne.
+     *
+     * Chaque année indique son nombre de groupes organisationnels (écran A01) :
+     * total et nombre d'entre eux déjà archivés.
      */
     public function index(): AnonymousResourceCollection
     {
         $annees = AnneeUniversitaire::query()
+            ->withCount([
+                'espaces as nombre_groupes' => fn (Builder $query) => $query
+                    ->where('type', TypeEspace::ORGANISATIONNEL->value),
+                'espaces as nombre_groupes_archives' => fn (Builder $query) => $query
+                    ->where('type', TypeEspace::ORGANISATIONNEL->value)
+                    ->where('etat', EtatEspace::ARCHIVE->value),
+            ])
             ->orderByDesc('date_debut')
             ->get();
 

@@ -5,6 +5,9 @@ import http from '@/api/http'
  * Les listes Laravel sont enveloppées dans `{ data, meta }`.
  */
 
+// SCRUM-73 : la liste des années est aussi utilisée par l'écran A01.
+export { recupererAnnees } from '@/api/annees'
+
 /** Liste paginée : `{ data, meta: { page, par_page, total } }`. */
 export async function recupererReferentiel(endpoint, params = {}) {
   const { data } = await http.get(endpoint, { params })
@@ -37,12 +40,6 @@ export async function supprimerReferentiel(endpoint, id) {
 export async function recupererOptions(endpoint) {
   const reponse = await recupererReferentiel(endpoint, { actif: 1, par_page: 100 })
   return reponse.data ?? []
-}
-
-/** Années universitaires : `GET /admin/annees` n'est pas paginé. */
-export async function recupererAnnees() {
-  const { data } = await http.get('/admin/annees')
-  return data.data ?? []
 }
 
 /** Enseignants actifs proposés pour les matières. */
