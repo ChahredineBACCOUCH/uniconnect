@@ -5,13 +5,12 @@ import http from '@/api/http'
 const TOKEN_KEY = 'uniconnect.token'
 
 /*
- * Routes de l'API d'authentification.
- * À aligner avec le LoginController du backend (SCRUM-69) si leurs noms changent.
+ * Routes de l'API d'authentification (SCRUM-69 : LoginController).
  */
 export const AUTH_ROUTES = {
-  login: '/login',
-  logout: '/logout',
-  me: '/user',
+  login: '/auth/login',
+  logout: '/auth/logout',
+  me: '/me',
 }
 
 // localStorage peut être indisponible (navigation privée, réglages du navigateur) :
