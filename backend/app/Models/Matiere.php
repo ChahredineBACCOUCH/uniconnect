@@ -24,4 +24,10 @@ class Matiere extends Model
     {
         return $this->belongsToMany(Classe::class, 'classe_matiere');
     }
+
+    /** Enseignants qui assurent cette matière. @return BelongsToMany<User, $this> */
+    public function enseignants(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'matiere_enseignant');
+    }
 }

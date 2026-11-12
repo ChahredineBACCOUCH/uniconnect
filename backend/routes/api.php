@@ -2,7 +2,12 @@
 
 use App\Http\Controllers\ActivationController;
 use App\Http\Controllers\Admin\AnneeController;
+use App\Http\Controllers\Admin\ClasseController;
 use App\Http\Controllers\Admin\CompteAutoriseController;
+use App\Http\Controllers\Admin\DepartementController;
+use App\Http\Controllers\Admin\FiliereController;
+use App\Http\Controllers\Admin\MatiereController;
+use App\Http\Controllers\Admin\NiveauController;
 use App\Http\Controllers\AssistantIAController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EspaceController;
@@ -124,4 +129,34 @@ Route::middleware(['auth:sanctum', 'can:GERER_UTILISATEURS'])
 
         Route::post('comptes-autorises/{compte_autorise}/desactiver', [CompteAutoriseController::class, 'desactiver'])
             ->name('admin.comptes-autorises.desactiver');
+    });
+
+// SCRUM-79 : CRUD des cinq référentiels pédagogiques (paramétrage).
+Route::middleware(['auth:sanctum', 'can:GERER_PARAMETRAGE'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::apiResource('departements', DepartementController::class)
+            ->parameters(['departements' => 'departement']);
+        Route::patch('departements/{departement}/desactiver', [DepartementController::class, 'desactiver'])
+            ->name('admin.departements.desactiver');
+
+        Route::apiResource('filieres', FiliereController::class)
+            ->parameters(['filieres' => 'filiere']);
+        Route::patch('filieres/{filiere}/desactiver', [FiliereController::class, 'desactiver'])
+            ->name('admin.filieres.desactiver');
+
+        Route::apiResource('niveaux', NiveauController::class)
+            ->parameters(['niveaux' => 'niveau']);
+        Route::patch('niveaux/{niveau}/desactiver', [NiveauController::class, 'desactiver'])
+            ->name('admin.niveaux.desactiver');
+
+        Route::apiResource('classes', ClasseController::class)
+            ->parameters(['classes' => 'classe']);
+        Route::patch('classes/{classe}/desactiver', [ClasseController::class, 'desactiver'])
+            ->name('admin.classes.desactiver');
+
+        Route::apiResource('matieres', MatiereController::class)
+            ->parameters(['matieres' => 'matiere']);
+        Route::patch('matieres/{matiere}/desactiver', [MatiereController::class, 'desactiver'])
+            ->name('admin.matieres.desactiver');
     });

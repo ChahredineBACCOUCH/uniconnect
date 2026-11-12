@@ -169,8 +169,9 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | POST | `/admin/annees` | `GERER_PARAMETRAGE` | `{ libelle: "2027/2028", date_debut, date_fin }` → **201** | SCRUM-72 |
 | PATCH | `/admin/annees/{id}` | `GERER_PARAMETRAGE` | `{ libelle?, date_debut?, date_fin? }` → année | SCRUM-72 |
 | POST | `/admin/annees/{id}/activer` | `GERER_PARAMETRAGE` | `{ archiver_precedente? }` → année active (l'ancienne est désactivée dans la même transaction ; `archiver_precedente` archive les espaces de l'ancienne année) | SCRUM-72 |
-| GET/POST | `/admin/referentiels/{type}` | `GERER_PARAMETRAGE` | `type` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` | SCRUM-79 |
-| PATCH/DELETE | `/admin/referentiels/{type}/{id}` | `GERER_PARAMETRAGE` | suppression refusée (**409**) si l'élément est utilisé | SCRUM-79 |
+| GET/POST | `/admin/{referentiel}` | `GERER_PARAMETRAGE` | `referentiel` ∈ `departements`, `filieres`, `niveaux`, `classes`, `matieres` ; listes paginées `?actif=&q=&page=&par_page=` et création → **201** | SCRUM-79 |
+| GET/PATCH/DELETE | `/admin/{referentiel}/{id}` | `GERER_PARAMETRAGE` | détail, modification, suppression ; **409** `{ message }` si l'élément est utilisé | SCRUM-79 |
+| PATCH | `/admin/{referentiel}/{id}/desactiver` | `GERER_PARAMETRAGE` | → élément à `actif: false` (aucune suppression) | SCRUM-79 |
 | GET | `/admin/comptes-autorises?profil=&classe_id=&etat=&q=` | `GERER_UTILISATEURS` | → liste paginée `{ id, matricule, nom, prenom, email, profil, classe, etat }` | SCRUM-75 |
 | POST/PATCH/DELETE | `/admin/comptes-autorises[/{id}]` | `GERER_UTILISATEURS` | création, modification, suppression unitaire ; **409** si l'autorisation est déjà rattachée à un compte créé | SCRUM-75 |
 | POST | `/admin/comptes-autorises/{id}/desactiver` | `GERER_UTILISATEURS` | → autorisation à l'état `DESACTIVE` (aucune suppression) | SCRUM-75 |
@@ -178,6 +179,8 @@ Toutes ces routes exigent `profil = ADMINISTRATION` **et** le droit indiqué (si
 | POST | `/admin/comptes-autorises/import` | `GERER_UTILISATEURS` | même fichier → **201** `{ importes: n, ignores: n }` | SCRUM-76 |
 | POST | `/admin/groupes/generer?apercu=1` | `CREER_GROUPE_ORGA` | → `{ a_creer: [...], deja_existants: n }` | SCRUM-82 |
 | POST | `/admin/groupes/generer` | `CREER_GROUPE_ORGA` | → `{ crees: n, membres_ajoutes: n }`, peut être relancé sans doublons ; **422** s'il n'y a pas d'année active | SCRUM-82 |
+
+Référentiels : `code` unique (et `code` + `annee_id` pour une classe). `POST`/`PATCH /admin/matieres[/{id}]` acceptent aussi `classe_ids[]` et `enseignant_ids[]`, synchronisés sur les tables pivot. Supprimer un élément encore utilisé répond **409** `{ message: "Impossible de supprimer : élément utilisé. Vous pouvez le désactiver." }`, y compris une classe qui a des étudiants.
 
 Colonnes du fichier CSV d'import : `matricule;nom;prenom;email;profil;classe_code`. Séparateur `;`, encodage UTF-8, `classe_code` vide pour les non-étudiants.
 
