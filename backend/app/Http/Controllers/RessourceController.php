@@ -10,6 +10,8 @@ use App\Http\Resources\RessourceResource;
 use App\Models\Chapitre;
 use App\Models\Espace;
 use App\Models\Ressource;
+use App\Models\User;
+use App\Notifications\NouvelleRessource;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -215,9 +217,28 @@ class RessourceController extends Controller
             'taille' => $fichier?->getSize(),
         ]);
 
+        // SCRUM-121 : les autres membres de l'espace sont prévenus.
+        $this->prevenirLesMembres($espace, $ressource, $request->user());
+
         return (new RessourceResource($ressource))
             ->response()
             ->setStatusCode(201);
+    }
+
+    /**
+     * SCRUM-121 : chaque membre de l'espace (sauf l'auteur) reçoit une
+     * notification, sauf s'il a désactivé les notifications pour cet espace.
+     */
+    private function prevenirLesMembres(Espace $espace, Ressource $ressource, User $auteur): void
+    {
+        $membres = $espace->membres()
+            ->where('users.id', '!=', $auteur->id)
+            ->where('adhesions.notifications_actives', true)
+            ->get();
+
+        foreach ($membres as $membre) {
+            $membre->notify(new NouvelleRessource($espace, $ressource, $auteur));
+        }
     }
 
     private function chapitresAvecRessources(Espace $espace): Collection

@@ -105,3 +105,45 @@ export async function accepterInvitation(invitationId) {
 export async function refuserInvitation(invitationId) {
   await http.post(`/invitations/${invitationId}/refuser`)
 }
+
+/* SCRUM-124 : annonces officielles d'un espace. */
+
+export async function recupererAnnonces(espaceId) {
+  const { data } = await http.get(`/espaces/${espaceId}/annonces`)
+  return data.data
+}
+
+/**
+ * Publie une annonce. Les fichiers sont envoyés en multipart ; sans fichier,
+ * la requête reste un JSON classique.
+ */
+export async function publierAnnonce(espaceId, payload) {
+  const { fichiers = [], ...champs } = payload
+  let corps = champs
+
+  if (fichiers.length > 0) {
+    corps = new FormData()
+
+    for (const [cle, valeur] of Object.entries(champs)) {
+      if (valeur === undefined || valeur === null) continue
+      // FormData convertit tout en texte : on envoie 1/0 pour les booléens,
+      // seules valeurs acceptées par la règle `boolean` de Laravel.
+      corps.append(cle, typeof valeur === 'boolean' ? (valeur ? '1' : '0') : valeur)
+    }
+
+    for (const fichier of fichiers) {
+      corps.append('fichiers[]', fichier)
+    }
+  }
+
+  const { data } = await http.post(`/espaces/${espaceId}/annonces`, corps)
+  return data.data
+}
+
+/* SCRUM-147 : réglage de l'Assistant IA (enseignant propriétaire / co-gestionnaire, SCRUM-145). */
+
+/** `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }` */
+export async function configurerAssistant(espaceId, reglage) {
+  const { data } = await http.patch(`/espaces/${espaceId}/assistant`, reglage)
+  return data
+}

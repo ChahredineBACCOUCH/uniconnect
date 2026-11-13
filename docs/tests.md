@@ -48,11 +48,11 @@ Une ligne par parcours, une colonne par profil. La cellule donne le **résultat 
 | P6 | **Pièces jointes** | joindre un PDF (≤ 25 Mo — règle `regles_plateforme`, formats autorisés) → sinon **422** ; plus de 5 fichiers → **422** ; **téléchargement : voir § 5** (SCRUM-137, non livré) | idem | idem |
 | P7 | **Groupe privé** | bouton « Créer un groupe privé » **caché** sans le droit `CREER_GROUPE_PRIVE` (défaut des comptes de démo) ; sinon **403** en API ; peut quitter un espace | créer, renommer, supprimer (propriétaire) ; nom trop court → **422** | idem |
 | P8 | **Membres et rôles** | voir la liste et les rôles ; pas de bouton « retirer » / « nommer co-gestionnaire » (**caché**, **403** en API) | nommer un co-gestionnaire ; retirer un membre → **accès coupé immédiatement** (**403**) ; transférer la propriété ; le propriétaire qui part sans successeur → **409** | peut reprendre un espace quand il n'y a plus de co-gestionnaire |
-| P9 | **Invitation** | accepter / refuser une invitation reçue (notification reçue dès la fusion de SCRUM-121) ; invitation expirée → **422** ; seule l'invitation reçue est acceptable (**403** sinon) | inviter des membres (propriétaire / co-gestionnaire) ; simple membre → **403** ; groupe organisationnel → **422** ; annulable par son auteur ou le propriétaire | idem |
+| P9 | **Invitation** | accepter / refuser une invitation reçue (une notification non lue est créée, SCRUM-121) ; invitation expirée → **422** ; seule l'invitation reçue est acceptable (**403** sinon) | inviter des membres (propriétaire / co-gestionnaire) ; simple membre → **403** ; groupe organisationnel → **422** ; annulable par son auteur ou le propriétaire | idem |
 | P10 | **Annonce** | lire les annonces ; publier → **403** (bouton **caché**) | publier → **201** et les membres sont **notifiés** (+ e-mail si `notifier_email`) ; supprimer **sa** annonce, pas celle d'un autre → **403** | idem |
 | P11 | **Chapitres et ressources** | lire et **télécharger** les ressources ; modifier / supprimer **caché** ; non-membre → **403** | créer un chapitre, ajouter un PDF (→ « Indexée pour l'IA ») ou un lien, modifier, déplacer, supprimer ; membre simple → **403** | idem |
 | P12 | **Assistant IA** | poser une question → réponse + sources cliquables ; assistant inactif → **404** ; 21ᵉ question du jour → **429** ; question hors sujet → « pas de source » ; hors espace → **403** | activer / désactiver l'assistant et sa consigne (onglet visible **seulement** s'il est actif) ; simple membre → **403** | idem |
-| P13 | **Notifications** | lister, marquer lue, tout lire — ⚠️ à ne tester qu'**après** la fusion de SCRUM-121 (PR ouverte) | idem | idem |
+| P13 | **Notifications** (E09) | cloche avec le nombre de non-lues ; onglets Invitations et Notifications ; marquer lue, tout lire (SCRUM-121 et SCRUM-122) | idem | idem |
 | P14 | **Channel** | v1.1 (§ 5) | v1.1 | v1.1 |
 | P15 | **Signalement** | v1.1 (§ 5) | v1.1 | v1.1 |
 | P16 | **Modération** | v1.1 (§ 5) | v1.1 | v1.1 |
@@ -105,18 +105,16 @@ Chaque règle a **un** test automatique qui la couvre. La colonne « Test automa
 | R29 | Quota de 20 questions par jour | **429** à la 21ᵉ | `Feature/IA/QuestionIAApiTest.php::test_le_quota_du_jour_renvoie_429` · `Feature/IA/AssistantConfigurationApiTest.php::test_20_questions_puis_la_21e_renvoie_429` | ✅ |
 | R30 | Assistant inactif dans l'espace | **404** | `Feature/IA/QuestionIAApiTest.php::test_assistant_inactif_ou_absent_renvoie_404` | ✅ |
 | R31 | Une annonce notifie les membres ; seul son auteur la supprime | notification reçue ; **403** sinon | `Feature/AnnonceApiTest.php::test_un_gestionnaire_publie_une_annonce_et_notifie_tous_les_membres` · `::test_seul_l_auteur_supprime_son_annonce` | ✅ |
-| R32 | Une invitation crée une notification non lue | 1 notification non lue chez l'invité | `Feature/NotificationApiTest.php::test_une_invitation_cree_une_notification_non_lue` (PR SCRUM-121, fusionnée avec `main`) | ✅ |
+| R32 | Une invitation crée une notification non lue | 1 notification non lue chez l'invité | `Feature/NotificationApiTest.php::test_une_invitation_cree_une_notification_non_lue` | ✅ |
 | R33 | Aucune donnée interne renvoyée à l'API (mot de passe, chemins de fichiers) | pas de `password`, pas de chemin | `Feature/UtilisateurConnecteTest.php::test_aucune_donnee_interne_n_est_exposee` | ✅ |
 | R34 | Origines CORS : seulement le front de production et les aperçus Vercel de l'équipe | autres origines bloquées, pas de cookie | `Feature/CorsTest.php::test_les_autres_origines_sont_bloquees` · `::test_pas_de_cookies_on_utilise_des_jetons_bearer` | ✅ |
 | R35 | Rattachement automatique à l'activation (classe pour l'étudiant, matières pour l'enseignant) | groupes créés et propriétaire désigné | `Feature/RattachementServiceTest.php::test_rattache_un_etudiant_aux_groupes_de_sa_classe` · `::test_un_enseignant_responsable_devient_proprietaire_des_groupes_de_ses_matieres` | ✅ |
 | R36 | Un groupe organisationnel exige une année et une classe, et reste unique | contrainte CHECK + index unique | `Feature/EspacesAdhesionsTest.php::test_un_groupe_organisationnel_exige_une_annee_et_une_classe` · `::test_un_groupe_organisationnel_est_unique_par_annee_classe_matiere` | ✅ |
 | R37 | Channels, signalements, modération, demandes d'adhésion, purge automatique | — | — | ⚠️ v1.1 (non livré) |
 | R38 | Téléchargement d'une **pièce jointe** de message (`GET /api/fichiers/{id}/telecharger`) | membre de l'espace seulement | — | ⚠️ hors périmètre du 19/11 (SCRUM-137 non livré) |
-| R39 | Notification : liste paginée, filtre « non lues », marquage comme lue, « tout lire » | `meta.non_lues` juste, **404** sur la notification d'autrui | `Feature/NotificationApiTest.php` (PR SCRUM-121, fusionnée avec `main`) | ✅ |
+| R39 | Notification : liste paginée, filtre « non lues », marquage comme lue, « tout lire » | `meta.non_lues` juste, **404** sur la notification d'autrui | `Feature/NotificationApiTest.php` | ✅ |
 
 > Tests du frontend (Vitest) : `src/router/__tests__/guards.spec.js` (accès aux pages d'administration), `src/stores/__tests__/auth.spec.js` (droits et session), `src/api/__tests__/http.spec.js` (401, 422), `src/composables/__tests__/usePolling.spec.js` (rafraîchissement toutes les 5 s).
-
-> ⚠️ **Point d'attention pour le daily** : la table `notifications` et la classe `NouvelleAnnonce` sont **déjà dans `main`** (SCRUM-123). La PR SCRUM-121 (notifications + API) a été **mise à jour pour s'y adapter** (merge de `main` + suppression de la migration en double + réécriture de `NouvelleAnnonce` sur le modèle `Annonce`, qui respecte désormais `adhesions.notifications_actives`). Les tests sont verts (323 tests). Tant que la PR n'est pas fusionnée, P13 et les notifications d'invitation (P9) ne sont pas testables.
 
 ## 4. Procédure de recette croisée
 

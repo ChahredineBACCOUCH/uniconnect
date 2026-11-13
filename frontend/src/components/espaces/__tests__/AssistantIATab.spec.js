@@ -10,7 +10,7 @@ import http from '@/api/http'
 import AssistantIATab from '../AssistantIATab.vue'
 
 vi.mock('@/api/http', () => ({
-  default: { post: vi.fn() },
+  default: { post: vi.fn(), patch: vi.fn() },
 }))
 
 const ESPACE = {
@@ -162,5 +162,79 @@ describe('AssistantIATab', () => {
     expect(marqueurs[1].classes()).toContain('citation--active')
     expect(chip().classes()).toContain('v-chip--variant-flat')
     expect(chip().attributes('href')).toBe('/espaces/3/ressources?ressource=4')
+  })
+  // SCRUM-146 : avis 👍/👎 sous la réponse.
+  it("enregistre l'avis 👍 puis 👎 sur une réponse", async () => {
+    http.post.mockResolvedValue({
+      data: {
+        conversation_id: 1,
+        echange_id: 7,
+        reponse: 'Les attributs sont %FOUND et %NOTFOUND [1].',
+        statut: 'OK',
+        sources: [{ n: 1, fichier: 'chap03.pdf', page: 3, ressource_id: 1 }],
+        quota_restant: 19,
+      },
+    })
+    http.patch.mockResolvedValue({ status: 204 })
+    const wrapper = monter()
+
+    await wrapper.find('textarea').setValue('Quels sont les attributs ?')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Cette réponse vous a-t-elle aidé ?')
+    const utile = wrapper.find('[aria-label="Réponse utile"]')
+    const pasUtile = wrapper.find('[aria-label="Réponse pas utile"]')
+
+    await utile.trigger('click')
+    await flushPromises()
+    expect(http.patch).toHaveBeenLastCalledWith('/ia/echanges/7/avis', { utile: true })
+    expect(utile.attributes('aria-pressed')).toBe('true')
+    expect(wrapper.text()).toContain('Merci pour votre avis.')
+
+    await pasUtile.trigger('click')
+    await flushPromises()
+    expect(http.patch).toHaveBeenLastCalledWith('/ia/echanges/7/avis', { utile: false })
+    expect(pasUtile.attributes('aria-pressed')).toBe('true')
+    expect(utile.attributes('aria-pressed')).toBe('false')
+  })
+
+  it("prévient si l'avis n'a pas pu être enregistré", async () => {
+    http.post.mockResolvedValue({
+      data: {
+        conversation_id: 1,
+        echange_id: 8,
+        reponse: null,
+        statut: 'SANS_SOURCE',
+        sources: [],
+      },
+    })
+    http.patch.mockRejectedValue(new Error('Network Error'))
+    const wrapper = monter()
+
+    await wrapper.find('textarea').setValue('Quelle est la météo demain ?')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    await wrapper.find('[aria-label="Réponse pas utile"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Votre avis n'a pas pu être enregistré.")
+    expect(wrapper.find('[aria-label="Réponse pas utile"]').attributes('aria-pressed')).toBe(
+      'false',
+    )
+  })
+
+  it("ne propose pas d'avis après une erreur", async () => {
+    http.post.mockRejectedValue(
+      Object.assign(new Error('503'), { response: { status: 503, data: {} } }),
+    )
+    const wrapper = monter()
+
+    await wrapper.find('textarea').setValue('Quels sont les attributs ?')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.find('[aria-label="Réponse utile"]').exists()).toBe(false)
   })
 })

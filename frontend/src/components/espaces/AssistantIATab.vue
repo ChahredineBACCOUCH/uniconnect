@@ -6,7 +6,8 @@
  *
  * Les marqueurs [n] de la réponse sont cliquables et mettent en évidence la source
  * correspondante (SourcesCitees, SCRUM-143).
- * Pas encore ici : avis 👍/👎 (SCRUM-146), panneau latéral « Résumé » (SCRUM-158) et
+ * Sous chaque réponse : avis 👍/👎 (SCRUM-146).
+ * Pas encore ici : panneau latéral « Résumé » (SCRUM-158) et
  * « Sources de l'assistant », qui attend GET /espaces/{id}/ressources (SCRUM-126).
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -67,9 +68,20 @@ const sourceActive = ref({})
 watch(
   () => ia.echanges.length,
   (nombre, avant) => {
-    if (nombre < avant) sourceActive.value = {}
+    if (nombre < avant) {
+      sourceActive.value = {}
+      avisEnEchec.value = {}
+    }
   },
 )
+
+// SCRUM-146 : avis 👍/👎 ; message sous la réponse si l'API l'a refusé.
+const avisEnEchec = ref({})
+
+async function donnerAvis(index, utile) {
+  const enregistre = await ia.donnerAvis(index, utile)
+  avisEnEchec.value = { ...avisEnEchec.value, [index]: !enregistre }
+}
 
 async function surlignerSource(index, n) {
   sourceActive.value = { ...sourceActive.value, [index]: n }
@@ -315,6 +327,51 @@ watch(
                 Réponse générée par IA, à vérifier dans les sources.
               </span>
             </template>
+
+            <!-- SCRUM-146 : avis sur la réponse (aussi quand le cours ne contenait pas la réponse). -->
+            <div
+              v-if="echange.echangeId && ['OK', 'SANS_SOURCE'].includes(echange.statut)"
+              class="avis"
+            >
+              <span class="text-caption text-medium-emphasis">
+                {{
+                  echange.avis === null
+                    ? 'Cette réponse vous a-t-elle aidé ?'
+                    : 'Merci pour votre avis.'
+                }}
+              </span>
+              <v-btn
+                icon
+                size="x-small"
+                variant="text"
+                :color="echange.avis === true ? 'success' : undefined"
+                :aria-pressed="echange.avis === true"
+                aria-label="Réponse utile"
+                @click="donnerAvis(index, true)"
+              >
+                <v-icon
+                  :icon="echange.avis === true ? 'mdi-thumb-up' : 'mdi-thumb-up-outline'"
+                  size="18"
+                />
+              </v-btn>
+              <v-btn
+                icon
+                size="x-small"
+                variant="text"
+                :color="echange.avis === false ? 'error' : undefined"
+                :aria-pressed="echange.avis === false"
+                aria-label="Réponse pas utile"
+                @click="donnerAvis(index, false)"
+              >
+                <v-icon
+                  :icon="echange.avis === false ? 'mdi-thumb-down' : 'mdi-thumb-down-outline'"
+                  size="18"
+                />
+              </v-btn>
+              <span v-if="avisEnEchec[index]" class="text-caption text-error">
+                Votre avis n'a pas pu être enregistré.
+              </span>
+            </div>
           </div>
         </div>
       </template>
@@ -497,6 +554,18 @@ watch(
 
 .bulle ul {
   padding-left: 20px;
+}
+
+.avis {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.avis > .text-caption:first-child {
+  margin-right: 6px;
 }
 
 .attente {
