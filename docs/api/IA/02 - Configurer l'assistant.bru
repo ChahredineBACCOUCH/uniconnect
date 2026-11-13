@@ -1,0 +1,24 @@
+meta {
+  name: 02 - Configurer l'assistant
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/espaces/{{espaceId}}/assistant
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "actif": true,
+    "instructions": "Reponds uniquement a partir du cours."
+  }
+}
+
+tests {
+  test("200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

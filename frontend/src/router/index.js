@@ -47,7 +47,7 @@ const router = createRouter({
         {
           path: 'notifications',
           name: 'notifications',
-          component: PlaceholderView,
+          component: () => import('../views/NotificationsView.vue'),
           meta: { title: 'Notifications' },
         },
         // Pages v1.1 (après le 19/11) : gardées pour que les liens du menu ne cassent pas.

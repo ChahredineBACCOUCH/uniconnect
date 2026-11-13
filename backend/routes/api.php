@@ -19,6 +19,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MesEspacesController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\UtilisateurController;
@@ -140,6 +141,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // SCRUM-145 : activer l'assistant et sa consigne (enseignant propriétaire / co-gestionnaire).
     Route::patch('/espaces/{espace}/assistant', [AssistantIAController::class, 'configurer']);
+
+    // SCRUM-121 : notifications de l'utilisateur (invitation, demande d'adhésion,
+    // annonce, ressource, signalement traité, retrait d'un espace).
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{id}/lue', [NotificationController::class, 'marquerLue']);
+    Route::post('/notifications/tout-lire', [NotificationController::class, 'toutLire']);
 
     // SCRUM-146 : avis 👍/👎 sur une réponse de l'assistant (auteur de la question).
     Route::patch('/ia/echanges/{echange}/avis', [AssistantIAController::class, 'avis']);
