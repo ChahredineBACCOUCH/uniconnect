@@ -91,7 +91,7 @@ class Espace extends Model
     /** Chapitres du cours, dans l'ordre (SCRUM-97). @return HasMany<Chapitre, $this> */
     public function chapitres(): HasMany
     {
-        return $this->hasMany(Chapitre::class)->orderBy('ordre');
+        return $this->hasMany(Chapitre::class)->orderBy('ordre')->orderBy('id');
     }
 
     /** Toutes les ressources de l'espace, via ses chapitres. @return HasManyThrough<Ressource, Chapitre, $this> */
