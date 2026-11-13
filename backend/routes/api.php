@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\GroupeController;
 use App\Http\Controllers\Admin\ImportCompteController;
 use App\Http\Controllers\Admin\MatiereController;
 use App\Http\Controllers\Admin\NiveauController;
+use App\Http\Controllers\AnnonceController;
 use App\Http\Controllers\AssistantIAController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ChapitreController;
@@ -112,6 +113,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/espaces/{espace}/messages', [MessageController::class, 'store']);
     Route::patch('/messages/{message}', [MessageController::class, 'update']);
     Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
+
+    // SCRUM-123 : annonces officielles d'un espace.
+    Route::get('/espaces/{espace}/annonces', [AnnonceController::class, 'index']);
+    Route::post('/espaces/{espace}/annonces', [AnnonceController::class, 'store']);
+    Route::delete('/annonces/{annonce}', [AnnonceController::class, 'destroy']);
 
     // SCRUM-126 : chapitres et ressources pédagogiques (organisation du cours).
     Route::get('/espaces/{espace}/chapitres', [ChapitreController::class, 'index']);

@@ -127,7 +127,7 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
 | GET | `/espaces/{id}/annonces` | membre | → `{ data: [{ id, titre, contenu, auteur, cree_le }] }` (les plus récentes d'abord) | SCRUM-123 |
-| POST | `/espaces/{id}/annonces` | enseignant de l'espace | `{ titre, contenu, notifier_email? }` → **201** annonce (+ notification aux membres) | SCRUM-123 |
+| POST | `/espaces/{id}/annonces` | propriétaire / co-gestionnaire | `{ titre, contenu, notifier_email? }` → **201** annonce (+ notification aux membres) | SCRUM-123 |
 | DELETE | `/annonces/{id}` | auteur | → **204** | SCRUM-123 |
 | GET | `/espaces/{id}/chapitres` | membre | → `{ data: [{ id, titre, ordre, ressources: [{ id, chapitre_id, titre, description, mime, taille, url, indexee_ia, auteur_id, cree_le }] }] }` (chapitres triés par `ordre`, ressources par `id`) | SCRUM-126 |
 | POST | `/espaces/{id}/chapitres` | enseignant de l'espace | `{ titre, ordre? }` → **201** chapitre (sans `ordre`, il passe en dernier) | SCRUM-126 |
