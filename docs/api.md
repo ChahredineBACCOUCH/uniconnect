@@ -161,13 +161,21 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 
 ## 8. Notifications
 
+Les notifications sont enregistrées dans la table `notifications` (canal `database` de Laravel) et lues par le frontend avec `GET /api/notifications`.
+
 | Méthode | Route | Accès | Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/notifications?non_lues=1` | connecté | → `{ data: [{ id, type, titre, texte, lien, lue, cree_le }], meta: { non_lues } }` | SCRUM-121 |
-| POST | `/notifications/{id}/lu` | destinataire | → **204** | SCRUM-121 |
-| POST | `/notifications/tout-lu` | connecté | → **204** | SCRUM-121 |
+| GET | `/notifications?non_lues=1&page=&par_page=` | connecté | → `{ data: [{ id, type, titre, texte, lien, lue, cree_le }], meta: { page, par_page, total, non_lues } }`, les plus récentes d'abord. `non_lues=1` : uniquement les notifications pas encore lues ; `meta.non_lues` = nombre total de notifications non lues | SCRUM-121 |
+| PATCH | `/notifications/{id}/lue` | destinataire | → **204** (la notification est marquée comme lue) ; **404** si elle n'est pas la sienne | SCRUM-121 |
+| POST | `/notifications/tout-lire` | connecté | → **204** (toutes les notifications non lues sont marquées comme lues) | SCRUM-121 |
 
-`type` peut valoir : `INVITATION`, `ANNONCE`, `RESSOURCE`, `MEMBRE_AJOUTE`.
+`type` peut valoir : `INVITATION`, `DEMANDE_ADHESION`, `ANNONCE`, `RESSOURCE`, `SIGNALEMENT_TRAITE`, `RETRAIT_ESPACE`.
+
+- Une notification n'est envoyée que si la personne a les notifications **actives** pour l'espace concerné (`adhesions.notifications_actives`). Une personne pas encore membre de l'espace (cas d'une invitation) n'a pas encore ce réglage : elle est prévenue.
+- `lien` est une route de l'application Vue, à ouvrir au clic : `/notifications`, `/espaces/{id}/annonces`, `/espaces/{id}/ressources`, `/espaces/{id}/membres` ou `/espaces`.
+- Les notifications sont créées par le backend : invitation (SCRUM-88), ressource pédagogique (SCRUM-126), retrait d'un membre (SCRUM-90), et à venir : demande d'adhésion (SCRUM-119), annonce (SCRUM-123), signalement traité (modération).
+
+> Les noms de route de cette section ont changé depuis le premier brouillon : `POST /notifications/{id}/lu` et `POST /notifications/tout-lu` sont remplacés par `PATCH /notifications/{id}/lue` et `POST /notifications/tout-lire`.
 
 ## 9. Administration
 
