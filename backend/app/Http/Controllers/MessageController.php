@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * SCRUM-94 : API de discussion d'un espace.
@@ -49,9 +51,8 @@ class MessageController extends Controller
                 $q->whereNull('expire_le')
                     ->orWhere('expire_le', '>', now());
             })
-            // Les pièces jointes (SCRUM-136) ne sont pas encore chargées : leur table
-            // n'existe pas avant ce ticket. Le resource les inclut si la relation est chargée.
-            ->with('auteur');
+            // Pièces jointes (SCRUM-136) : chargées avec la discussion.
+            ->with(['auteur', 'piecesJointes']);
 
         if ($afterId !== null) {
             // Polling : uniquement les nouveaux messages, déjà dans l'ordre d'affichage.
@@ -102,7 +103,24 @@ class MessageController extends Controller
             ),
         ]);
 
-        return (new MessageResource($message->load('auteur')))
+        foreach ($request->file('fichiers', []) as $fichier) {
+            $chemin = Storage::putFileAs(
+                'espaces/'.$espace->id,
+                $fichier,
+                Str::uuid().'.'.$fichier->extension(),
+            );
+
+            $message->piecesJointes()->create([
+                'nom' => $fichier->getClientOriginalName(),
+                'chemin' => (string) $chemin,
+                'mime' => (string) $fichier->getMimeType(),
+                'taille_octets' => $fichier->getSize(),
+                // La pièce jointe expire en même temps que le message.
+                'expire_le' => $message->expire_le,
+            ]);
+        }
+
+        return (new MessageResource($message->load(['auteur', 'piecesJointes'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -121,7 +139,7 @@ class MessageController extends Controller
             'modifie_le' => now(),
         ]);
 
-        return new MessageResource($message->load('auteur'));
+        return new MessageResource($message->load(['auteur', 'piecesJointes']));
     }
 
     /**

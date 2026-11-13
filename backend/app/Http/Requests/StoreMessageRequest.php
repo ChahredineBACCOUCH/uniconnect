@@ -4,12 +4,14 @@ namespace App\Http\Requests;
 
 use App\Models\Espace;
 use App\Models\Message;
+use App\Models\ReglePlateforme;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 /**
- * SCRUM-94 : envoi d'un message dans un espace.
+ * SCRUM-94 / SCRUM-136 : envoi d'un message, avec ou sans fichiers joints.
  */
 class StoreMessageRequest extends FormRequest
 {
@@ -23,11 +25,26 @@ class StoreMessageRequest extends FormRequest
      */
     public function rules(): array
     {
+        $regle = ReglePlateforme::actuelle();
+
         return [
-            'contenu' => ['required', 'string', 'max:10000'],
+            // Le contenu n'est obligatoire que si aucun fichier n'est joint.
+            'contenu' => [
+                Rule::requiredIf(fn (): bool => ! $this->hasFile('fichiers')),
+                'nullable',
+                'string',
+                'max:10000',
+            ],
             'parent_id' => ['nullable', 'integer', 'min:1'],
             // Durée de visibilité plus courte que celle de l'espace, si autorisée.
             'duree_visibilite_heures' => ['nullable', 'integer', 'min:1'],
+            // SCRUM-136 : jusqu'à 5 fichiers, chacun limité en taille et en format.
+            'fichiers' => ['nullable', 'array', 'max:5'],
+            'fichiers.*' => [
+                'file',
+                'max:'.$regle->taille_max_ko(),
+                'mimes:'.$regle->formats(),
+            ],
         ];
     }
 
@@ -57,14 +74,21 @@ class StoreMessageRequest extends FormRequest
      */
     public function messages(): array
     {
+        $regle = ReglePlateforme::actuelle();
+
         return [
-            'contenu.required' => 'Le contenu du message est obligatoire.',
+            'contenu.required' => "Le contenu du message est obligatoire si aucun fichier n'est joint.",
             'contenu.string' => 'Le contenu du message est invalide.',
             'contenu.max' => 'Le message ne doit pas dépasser 10 000 caractères.',
             'parent_id.integer' => 'Le message parent est invalide.',
             'parent_id.min' => 'Le message parent est invalide.',
             'duree_visibilite_heures.integer' => 'La durée de visibilité est invalide.',
             'duree_visibilite_heures.min' => 'La durée de visibilité doit être d\'au moins une heure.',
+            'fichiers.array' => 'Les fichiers joints sont invalides.',
+            'fichiers.max' => 'Vous ne pouvez joindre que 5 fichiers au maximum.',
+            'fichiers.*.file' => "Le fichier joint n'a pas pu être téléversé.",
+            'fichiers.*.max' => "Le fichier dépasse la taille maximale de {$regle->taille_max_mo} Mo",
+            'fichiers.*.mimes' => 'Ce format de fichier n\'est pas autorisé.',
         ];
     }
 
