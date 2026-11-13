@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * SCRUM-123 : annonce officielle publiée dans un espace.
@@ -39,5 +40,11 @@ class Annonce extends Model
     public function auteur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'auteur_id');
+    }
+
+    /** Pièces jointes publiées avec l'annonce (SCRUM-124). @return HasMany<PieceJointe, $this> */
+    public function piecesJointes(): HasMany
+    {
+        return $this->hasMany(PieceJointe::class);
     }
 }
