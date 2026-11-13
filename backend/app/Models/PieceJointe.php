@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Fichier attaché à un message.
- * La table `pieces_jointes` sera créée par son propre ticket ; ce modèle est déclaré
- * ici pour la relation Message::piecesJointes().
+ * Fichier attaché à un message (SCRUM-136).
+ *
+ * Le fichier lui-même est stocké sur le disque (`chemin`) ; la ligne ne conserve
+ * que les métadonnées utiles à l'affichage et au téléchargement.
  */
 #[Fillable([
     'message_id',

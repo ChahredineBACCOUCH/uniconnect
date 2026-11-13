@@ -24,6 +24,19 @@ return [
         'CHANNEL' => 720,
     ],
 
+    // Fichiers joints aux messages (SCRUM-136). Valeurs de la table
+    // `regles_plateforme` (docs/conception/schema.sql) tant que l'écran
+    // d'administration des règles n'existe pas.
+    'fichiers' => [
+        'taille_max_mo' => 25,
+        'formats_autorises' => [
+            'pdf',
+            'jpg', 'jpeg', 'png', 'gif', 'webp',
+            'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            'zip',
+        ],
+    ],
+
     // Une invitation non traitée expire au bout de ce délai.
     'delai_invitation_jours' => 14,
 

@@ -35,8 +35,7 @@ class MessageResource extends JsonResource
             'modifie' => $this->modifie_le !== null,
             'modifie_le' => $this->modifie_le?->toIso8601String(),
             'cree_le' => $this->created_at?->toIso8601String(),
-            // Vide tant que SCRUM-136 n'a pas livré la table `pieces_jointes` :
-            // on évite de déclencher une requête vers une table inexistante.
+            // SCRUM-136 : pièces jointes affichées avec le message.
             'pieces_jointes' => $this->relationLoaded('piecesJointes')
                 ? $this->piecesJointes->map(fn (PieceJointe $piece) => [
                     'id' => $piece->id,
