@@ -5,8 +5,10 @@ Livraison : **jeudi 19/11/2026** · gel du code : **mardi 17/11 à 18 h**.
 
 | Document | À quoi il sert | Ticket Jira |
 |---|---|---|
+| [installation.md](installation.md) | Installer le projet de zéro (prérequis, Docker, backend, frontend, clés Gemini/Groq, dépannage) | SCRUM-186, SCRUM-26 |
 | [architecture.md](architecture.md) | Comment l'application est construite : schéma, dossiers, sécurité, fonctionnement de l'Assistant IA | SCRUM-186 |
 | [api.md](api.md) | **Contrat de l'API** : routes, données envoyées et reçues, codes d'erreur. Le backend et le frontend s'appuient dessus | SCRUM-186 |
+| [ia-evaluation.md](ia-evaluation.md) | Résultats de l'évaluation de l'Assistant IA (`php artisan ia:eval`) | SCRUM-180 |
 | [conception/](conception/) | Schéma SQL, diagramme de classes, diagramme de cas d'utilisation | US-05, SCRUM-47 |
 | [maquette/](maquette/) | Maquette des écrans, à donner à votre IA de développement | — |
 | [deploiement.md](deploiement.md) | Mettre en ligne (Neon, Render, Vercel), variables d'environnement, retour arrière | SCRUM-34 |

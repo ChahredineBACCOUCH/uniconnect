@@ -17,6 +17,21 @@ UniConnect est composé de deux applications :
 
 Le backend expose une route de santé (`GET /api/health`) qui vérifie aussi la connexion à PostgreSQL. Le frontend consomme l'API via l'URL définie dans `frontend/.env`.
 
+## En production
+
+| | URL |
+|---|---|
+| Application (Vercel) | <https://uniconnect-six-lake.vercel.app> |
+| API (Render) | <https://uniconnect-api-qov1.onrender.com> |
+| Santé de l'API | <https://uniconnect-api-qov1.onrender.com/api/health> (doit répondre `"db": "ok"`) |
+
+## Liens
+
+- **Jira** : <https://uniconnectteam26.atlassian.net/jira/software/projects/SCRUM/boards/1>
+- **Maquette** : [`docs/maquette/`](docs/maquette/)
+- **Documentation complète** : [`docs/`](docs/README.md) (architecture, API, conception, déploiement, tests, démo, guide utilisateur)
+- **Collection Bruno** (tests manuels de l'API) : [`docs/api/`](docs/api/)
+
 ## Prérequis
 
 | Outil | Version requise | Vérification |

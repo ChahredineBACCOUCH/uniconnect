@@ -54,6 +54,25 @@ Si une route doit changer, modifiez ce fichier **dans la même PR** et prévenez
 
 ---
 
+## Vue d'ensemble des groupes de routes
+
+Toutes les routes commencent par `/api`. Sauf mention, elles exigent un jeton Sanctum (`Authorization: Bearer <jeton>`). Les droits sont vérifiés **côté serveur** par des Policies et des Gates ; masquer un bouton dans l'interface ne suffit pas.
+
+| Groupe | Base | Accès | Droits typiques |
+|---|---|---|---|
+| Santé | `/health` | public | — |
+| Authentification | `/auth/*`, `/me` | public ou connecté | — |
+| Espaces | `/espaces`, `/me/espaces` | connecté / membre | `CREER_GROUPE_PRIVE` pour créer |
+| Invitations et membres | `/espaces/{id}/invitations`, `/espaces/{id}/membres`, `/invitations/{id}/*` | membre ou gestionnaire | `manageMembers` (propriétaire / co-gestionnaire) |
+| Messages | `/espaces/{id}/messages`, `/messages/{id}` | membre | auteur pour modifier/supprimer |
+| Annonces | `/espaces/{id}/annonces`, `/annonces/{id}` | membre / gestionnaire | `update` (propriétaire / co-gestionnaire) |
+| Chapitres et ressources | `/espaces/{id}/chapitres`, `/ressources/{id}` | membre / gestionnaire | `create`/`update`/`delete` (propriétaire / co-gestionnaire) |
+| Assistant IA | `/espaces/{id}/ia/questions`, `/espaces/{id}/assistant` | membre / enseignant gestionnaire | `configurerAssistant` |
+| Notifications | `/notifications` | connecté | destinataire pour marquer comme lue |
+| Administration | `/admin/*` | droit individuel (Gate `can:…`), quel que soit le profil | selon la route (`GERER_PARAMETRAGE`, `GERER_UTILISATEURS`, `CREER_GROUPE_ORGA`) |
+
+Les codes d'erreur possibles sont résumés dans la section **Conventions → Codes de réponse** (401, 403, 404, 409, 422, 423, 429, 503). Exemples de requêtes et de réponses : annexe **Exemples** en fin de document. Collection Bruno prête à l'emploi : [`docs/api/`](api/) (variables `{{baseUrl}}` et `{{token}}`).
+
 ## 1. Santé
 
 | Méthode | Route | Accès | Réponse | Ticket |
@@ -212,6 +231,98 @@ Référentiels : `code` unique (et `code` + `annee_id` pour une classe). `POST`/
 Format du fichier d'import : Excel (`.xlsx` ou `.xls`), première feuille, colonnes `matricule`, `nom`, `prenom`, `email`, `profil`, `classe_code`. `classe_code` est vide pour les non-étudiants et doit exister pour l'année universitaire active. L'aperçu n'enregistre rien ; la validation ignore les lignes invalides ou devenues des doublons et conserve l'historique dans `imports_comptes`.
 
 ---
+
+## Exemples de requêtes et de réponses
+
+Un exemple par groupe, avec le code d'erreur le plus fréquent. La collection Bruno (`docs/api/`) contient les requêtes prêtes à l'emploi.
+
+### Auth — connexion
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{ "email": "etudiant@demo.uniconnect", "password": "Demo1234!" }
+```
+
+```json
+{ "token": "1|abc...", "user": { "id": 12, "profil": "ETUDIANT", "droits": ["CREER_GROUPE_PRIVE"] } }
+```
+
+Erreurs : **422** (identifiants incorrects), **423** (bloqué 15 min après 5 échecs), **403** (suspendu ou désactivé).
+
+### Espaces — créer un groupe privé
+
+```http
+POST /api/espaces
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "nom": "Groupe de révision BD", "duree_visibilite_heures": 168 }
+```
+
+```json
+{ "data": { "id": 42, "type": "PRIVE", "nom": "Groupe de révision BD", "role": "PROPRIETAIRE" } }
+```
+
+Erreurs : **403** (droit `CREER_GROUPE_PRIVE` manquant), **422** (nom trop court, durée non proposée).
+
+### Messages — envoyer un message
+
+```http
+POST /api/espaces/42/messages
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "contenu": "Bonjour à tous !", "duree_visibilite_heures": 168 }
+```
+
+```json
+{ "id": 7, "auteur": { "id": 12, "nom": "Ben Salah", "prenom": "Yassine" }, "contenu": "Bonjour à tous !", "expire_le": "2026-11-20T14:05:00+01:00" }
+```
+
+Erreurs : **403** (non-membre, espace archivé, mode annonce pour un membre simple), **422** (durée non autorisée).
+
+### Fichiers — télécharger une ressource
+
+```http
+GET /api/ressources/7/telecharger
+Authorization: Bearer <jeton>
+```
+
+Réponse : **302** vers un lien temporaire (5 min) en production, ou envoi direct du fichier en local. Erreurs : **403** (non-membre), **404** (lien ou fichier introuvable).
+
+### IA — poser une question
+
+```http
+POST /api/espaces/42/ia/questions
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "question": "Qu'est-ce qu'une base de données relationnelle ?" }
+```
+
+```json
+{ "conversation_id": 3, "echange_id": 12, "reponse": "...", "statut": "OK", "sources": [{ "n": 1, "fichier": "cours.pdf", "page": 4, "ressource_id": 7 }], "quota_restant": 19 }
+```
+
+Erreurs : **401** (non connecté), **403** (non-membre), **404** (assistant désactivé), **422** (question trop courte ou trop longue), **429** (quota de 20 questions atteint), **503** (Gemini et Groq indisponibles).
+
+### Admin — créer une année universitaire
+
+```http
+POST /api/admin/annees
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "libelle": "2027/2028", "date_debut": "2027-09-01", "date_fin": "2028-06-30" }
+```
+
+```json
+{ "id": 2, "libelle": "2027/2028", "active": false }
+```
+
+Erreurs : **401** (non connecté), **403** (pas le droit `GERER_PARAMETRAGE` ou profil ≠ `ADMINISTRATION`), **422** (libellé déjà utilisé, dates incohérentes).
 
 ## Routes reportées en v1.1 (ne pas coder avant le 19/11)
 
