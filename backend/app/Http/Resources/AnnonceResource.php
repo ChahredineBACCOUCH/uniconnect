@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Annonce;
+use App\Models\PieceJointe;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -29,7 +30,17 @@ class AnnonceResource extends JsonResource
                 'profil' => $this->auteur->profil?->value,
                 'badge' => $this->auteur->profil?->libelle(),
             ],
+            'notifier_email' => $this->notifier_email,
             'cree_le' => $this->created_at?->toIso8601String(),
+            // SCRUM-124 : pièces jointes affichées avec l'annonce.
+            'pieces_jointes' => $this->relationLoaded('piecesJointes')
+                ? $this->piecesJointes->map(fn (PieceJointe $piece) => [
+                    'id' => $piece->id,
+                    'nom' => $piece->nom,
+                    'mime' => $piece->mime,
+                    'taille_octets' => $piece->taille_octets,
+                ])->values()
+                : [],
         ];
     }
 }
