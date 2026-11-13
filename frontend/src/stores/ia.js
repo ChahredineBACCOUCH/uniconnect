@@ -10,6 +10,8 @@ import { simulerQuestion } from '@/api/iaSimulation'
  */
 export const IA_ROUTES = {
   questions: (espaceId) => `/espaces/${espaceId}/ia/questions`,
+  // SCRUM-146 : PATCH { utile: true | false } → 204 (auteur de la question uniquement).
+  avis: (echangeId) => `/ia/echanges/${echangeId}/avis`,
 }
 
 export const QUOTA_JOUR = 20
@@ -21,9 +23,10 @@ const SIMULATION = import.meta.env.DEV && import.meta.env.VITE_IA_SIMULATION ===
 
 /*
  * Un échange = une question et sa réponse :
- * { question, reponse, sources, statut, echangeId, erreur }
+ * { question, reponse, sources, statut, echangeId, erreur, avis }
  *   statut : EN_COURS (on attend l'IA), OK, SANS_SOURCE (rien dans le cours), ERREUR
  *   erreur : { code, message } quand statut = ERREUR (429 quota, 503 IA indisponible, réseau…)
+ *   avis : null (pas d'avis), true (👍 utile) ou false (👎 pas utile), SCRUM-146
  */
 export const useIaStore = defineStore('ia', {
   state: () => ({
@@ -67,6 +70,7 @@ export const useIaStore = defineStore('ia', {
         statut: 'EN_COURS',
         echangeId: null,
         erreur: null,
+        avis: null,
       })
       await this.envoyer(this.echanges.length - 1)
       return true
@@ -76,6 +80,27 @@ export const useIaStore = defineStore('ia', {
     async reessayer(index) {
       if (this.enCours || this.echanges[index]?.statut !== 'ERREUR') return
       await this.envoyer(index)
+    },
+
+    /*
+     * Avis 👍/👎 sur une réponse (SCRUM-146). Affiché tout de suite, annulé si l'API refuse.
+     * Recliquer sur le même avis ne renvoie rien. Renvoie false en cas d'échec.
+     */
+    async donnerAvis(index, utile) {
+      const echange = this.echanges[index]
+      if (!echange?.echangeId || echange.avis === utile) return true
+
+      const precedent = echange.avis
+      echange.avis = utile
+      if (SIMULATION) return true
+
+      try {
+        await http.patch(IA_ROUTES.avis(echange.echangeId), { utile })
+        return true
+      } catch {
+        echange.avis = precedent
+        return false
+      }
     },
 
     async envoyer(index) {
