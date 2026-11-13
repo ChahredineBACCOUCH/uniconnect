@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Ressource d'un chapitre : fichier (chemin_fichier) ou lien (url).
  * Un PDF est découpé en fragments pour l'Assistant IA (SCRUM-98).
  */
-#[Fillable(['chapitre_id', 'auteur_id', 'titre', 'description', 'chemin_fichier', 'url', 'mime', 'indexee_ia'])]
+#[Fillable(['chapitre_id', 'auteur_id', 'titre', 'description', 'chemin_fichier', 'url', 'mime', 'taille', 'indexee_ia'])]
 #[ObservedBy(RessourceObserver::class)]
 class Ressource extends Model
 {
@@ -22,6 +22,7 @@ class Ressource extends Model
     protected function casts(): array
     {
         return [
+            'taille' => 'integer',
             'indexee_ia' => 'boolean',
         ];
     }

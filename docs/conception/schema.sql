@@ -184,9 +184,10 @@ CREATE TABLE ressources (
   auteur_id bigint REFERENCES users(id) ON DELETE SET NULL,
   titre varchar(160) NOT NULL, description text,
   chemin_fichier varchar(500), url varchar(500), mime varchar(120),
+  taille bigint,                            -- taille du fichier en octets (NULL pour un lien)
   indexee_ia boolean NOT NULL DEFAULT false,
   created_at timestamptz, updated_at timestamptz,
-  CHECK (chemin_fichier IS NOT NULL OR url IS NOT NULL)
+  CONSTRAINT ressource_fichier_ou_lien CHECK ((chemin_fichier IS NULL) <> (url IS NULL))
 );
 
 -- ---------- Assistant IA ----------
