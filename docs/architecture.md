@@ -117,6 +117,48 @@ sequenceDiagram
 - **Groupes organisationnels** : créés automatiquement à partir des référentiels (un groupe par classe et un seul groupe par matière, toutes classes confondues). La génération peut être relancée sans créer de doublons, grâce à l'index unique `espace_orga_unique`.
 - **Rattachement** : à l'activation de son compte, un étudiant rejoint automatiquement son groupe de classe et les groupes des matières enseignées dans sa classe, et un enseignant devient propriétaire des groupes des matières dont il est responsable (`RattachementService`).
 
+### Diagramme de classes (extrait)
+
+Le diagramme complet est dans [`conception/diagramme-classes.png`](conception/diagramme-classes.png) (32 tables). Extrait des entités centrales, en Mermaid :
+
+```mermaid
+classDiagram
+    User "1" --> "*" Adhesion : adhesions
+    User "1" --> "*" DroitUtilisateur : droits
+    Espace "1" --> "*" Adhesion : adhesions
+    Espace "1" --> "*" Invitation : invitations
+    Espace "1" --> "*" Chapitre : chapitres
+    Espace "1" --> "0..1" AssistantIA : assistant
+    Chapitre "1" --> "*" Ressource : ressources
+    Ressource "1" --> "*" FragmentDocument : fragments
+    Message "1" --> "*" PieceJointe : pieces_jointes
+    User "1" --> "*" Message : messages
+    Espace "1" --> "*" Message : messages
+    Espace "1" --> "*" Annonce : annonces
+```
+
+### Chaîne de l'Assistant IA (indexation puis question)
+
+```mermaid
+flowchart LR
+    A[Enseignant ajoute un PDF] --> B[RessourceObserver]
+    B --> C[Job IndexerRessource]
+    C --> D[smalot/pdfparser : texte page par page]
+    D --> E[decoupage en fragments ~1500 car.]
+    E --> F[(fragments_document + tsvector GIN)]
+    F --> G[ressources.indexee_ia = true]
+    U[Etudiant pose une question] --> H[AssistantService]
+    H --> I[6 meilleurs fragments ts_rank]
+    I -->|aucun| J[SANS_SOURCE, IA non appelee]
+    I -->|fragments| K[Gemini puis Groq en secours]
+    K --> L[reponse avec marqueurs n]
+    L --> M[relie n au fichier et a la page]
+    M --> N[enregistre echange, sources, tokens, fournisseur]
+    N --> O[reponse + sources cliquables]
+```
+
+**Pourquoi des offres gratuites ?** Gemini et Groq proposent des quotas gratuits suffisants pour un cours (20 questions par jour et par étudiant). La recherche plein texte PostgreSQL (`tsvector`/`ts_rank`) évite une base vectorielle payante. Les données envoyées à l'IA sont **uniquement des extraits de cours**, jamais de données personnelles — les offres gratuites de Gemini peuvent réutiliser les données envoyées.
+
 ## 6. Choix techniques et raisons
 
 | Choix | Pourquoi |
