@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EtatEspace;
 use App\Enums\StatutEchangeIa;
 use App\Exceptions\IAIndisponibleException;
+use App\Http\Requests\ConfigurerAssistantIARequest;
 use App\Http\Requests\PoserQuestionIARequest;
+use App\Models\AssistantIA;
 use App\Models\ConversationIA;
 use App\Models\EchangeIA;
 use App\Models\Espace;
@@ -16,6 +19,7 @@ use Illuminate\Support\Str;
 
 /**
  * SCRUM-102 : poser une question à l'Assistant IA d'un espace.
+ * SCRUM-145 : activer l'assistant (PATCH /api/espaces/{espace}/assistant).
  *
  * POST /api/espaces/{espace}/ia/questions  { question, conversation_id? }
  * → { conversation_id, echange_id, reponse, statut, sources, quota_restant }
@@ -35,9 +39,13 @@ class AssistantIAController extends Controller
         $restant = $quota - $this->questionsDuJour($user);
 
         if ($restant <= 0) {
+            // Le quota repart à minuit (heure du serveur).
+            $demain = now()->addDay()->startOfDay();
+
             return response()->json([
                 'message' => "Vous avez atteint vos {$quota} questions du jour. Revenez demain.",
-            ], 429);
+                'reessayer_a' => $demain->toIso8601String(),
+            ], 429, ['Retry-After' => (string) (int) ceil(now()->diffInSeconds($demain))]);
         }
 
         $question = $request->validated('question');
@@ -94,6 +102,35 @@ class AssistantIAController extends Controller
             'statut' => $resultat->statut->value,
             'sources' => $resultat->sourcesPourApi(),
             'quota_restant' => $restant - 1,
+        ]);
+    }
+
+    /**
+     * Active ou désactive l'assistant et enregistre la consigne de l'enseignant.
+     * La ligne assistants_ia est créée au premier appel.
+     *
+     * PATCH /api/espaces/{espace}/assistant  { actif, instructions? }
+     * → { actif, instructions, nb_documents_indexes }
+     *
+     * 403 non gestionnaire, pas enseignant, ou espace archivé · 422 données invalides.
+     */
+    public function configurer(ConfigurerAssistantIARequest $request, Espace $espace): JsonResponse
+    {
+        $this->authorize('configurerAssistant', $espace);
+        abort_if($espace->etat === EtatEspace::ARCHIVE, 403, 'Cet espace est archivé : il ne peut plus être modifié.');
+
+        $donnees = ['actif' => $request->boolean('actif')];
+        if ($request->has('instructions')) {
+            $consigne = trim((string) $request->validated('instructions'));
+            $donnees['instructions'] = $consigne === '' ? null : $consigne;
+        }
+
+        $assistant = AssistantIA::updateOrCreate(['espace_id' => $espace->id], $donnees);
+
+        return response()->json([
+            'actif' => $assistant->actif,
+            'instructions' => $assistant->instructions,
+            'nb_documents_indexes' => $espace->ressources()->where('indexee_ia', true)->count(),
         ]);
     }
 
