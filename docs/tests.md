@@ -116,7 +116,7 @@ Chaque règle a **un** test automatique qui la couvre. La colonne « Test automa
 
 > Tests du frontend (Vitest) : `src/router/__tests__/guards.spec.js` (accès aux pages d'administration), `src/stores/__tests__/auth.spec.js` (droits et session), `src/api/__tests__/http.spec.js` (401, 422), `src/composables/__tests__/usePolling.spec.js` (rafraîchissement toutes les 5 s).
 
-> ⚠️ **Point d'attention pour le daily** : la table `notifications` et la classe `NouvelleAnnonce` sont **déjà dans `main`** (SCRUM-123). La PR SCRUM-121 (notifications + API) doit donc s'adapter à `main` avant d'être fusionnée : ne pas recréer la table et réécrire `NouvelleAnnonce` sur le modèle `Annonce`. Tant que la PR n'est pas fusionnée, P13 et les notifications d'invitation (P9) ne sont pas testables.
+> ⚠️ **Point d'attention pour le daily** : la table `notifications` et la classe `NouvelleAnnonce` sont **déjà dans `main`** (SCRUM-123). La PR SCRUM-121 (notifications + API) a été **mise à jour pour s'y adapter** (merge de `main` + suppression de la migration en double + réécriture de `NouvelleAnnonce` sur le modèle `Annonce`, qui respecte désormais `adhesions.notifications_actives`). Les tests sont verts (323 tests). Tant que la PR n'est pas fusionnée, P13 et les notifications d'invitation (P9) ne sont pas testables.
 
 ## 4. Procédure de recette croisée
 
