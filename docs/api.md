@@ -86,7 +86,7 @@ Objet `EspaceResume` : `{ id, type, nom, image, role, non_lus, dernier_message: 
 | GET | `/espaces/{id}` | membre | → `{ id, type, nom, description, image, etat, role, nb_membres, duree_visibilite_heures, duree_courte_autorisee, mode_annonce, assistant: { actif, instructions, nb_documents_indexes } }` | SCRUM-94, 95, 97 |
 | POST | `/espaces` | droit `CREER_GROUPE_PRIVE` | `{ nom (3 à 80 car.), description?, duree_visibilite_heures?, duree_courte_autorisee?, mode_annonce? }` → **201** `{ data: espace }` (même format que `GET /espaces/{id}`, le créateur devient `PROPRIETAIRE`). `duree_visibilite_heures` parmi `24`, `168`, `720` ; absente = 168 (7 jours) ; `null` = illimitée. `mode_annonce: true` = seuls les gestionnaires publient. Sans le droit → **403**. Les invités s'ajoutent ensuite avec `POST /espaces/{id}/invitations` (écran E06 : `/espaces/nouveau`) | SCRUM-87, 89 |
 | PATCH | `/espaces/{id}` | propriétaire / co-gestionnaire | `{ nom?, description? }` → `{ data: espace }` ; **403** si l'espace est archivé | SCRUM-87 |
-| PATCH | `/espaces/{id}/assistant` | enseignant propriétaire / co-gestionnaire | `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }` | SCRUM-145 |
+| PATCH | `/espaces/{id}/assistant` | enseignant propriétaire / co-gestionnaire | `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }`. Crée le réglage au premier appel ; `instructions` (consigne ajoutée au prompt, 1 000 car. max) vide = effacée, absente = inchangée. **403** pour un étudiant, un simple membre ou un espace archivé | SCRUM-145 |
 | POST | `/espaces/{id}/lu` | membre | `{ dernier_message_id }` → **204** (remet `non_lus` à 0) | SCRUM-95 |
 
 ## 4. Invitations et membres
@@ -154,7 +154,7 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 | PATCH | `/ia/echanges/{id}/avis` | auteur de la question | `{ utile: true \| false }` → **204** | SCRUM-146 |
 
 - `statut` vaut `OK`, ou `SANS_SOURCE` (rien de pertinent dans le cours ; l'IA n'est pas appelée).
-- **404** : assistant désactivé dans cet espace · **429** : `{ message: "Vous avez atteint vos 20 questions du jour. Revenez demain." }` · **503** : Gemini et Groq ne répondent pas.
+- **404** : assistant désactivé dans cet espace · **429** : `{ message: "Vous avez atteint vos 20 questions du jour. Revenez demain.", reessayer_a: "2026-11-18T00:00:00+01:00" }` et en-tête `Retry-After` (secondes jusqu'à minuit) · **503** : Gemini et Groq ne répondent pas.
 - Une question fait 3 à 1 000 caractères (sinon 422).
 - `conversation_id` absent : une nouvelle conversation est créée. Une conversation d'une autre personne ou d'un autre espace donne **404**.
 - Le quota (20 par jour, `config/uniconnect.php`) compte les questions de la personne dans tous les espaces depuis minuit ; une question en échec (503) n'est pas comptée.

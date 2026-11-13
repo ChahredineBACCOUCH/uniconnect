@@ -131,6 +131,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // SCRUM-102 : question à l'Assistant IA (membre, assistant actif, 20 questions par jour).
     Route::post('/espaces/{espace}/ia/questions', [AssistantIAController::class, 'poser']);
+
+    // SCRUM-145 : activer l'assistant et sa consigne (enseignant propriétaire / co-gestionnaire).
+    Route::patch('/espaces/{espace}/assistant', [AssistantIAController::class, 'configurer']);
 });
 
 // SCRUM-72 : gestion des années universitaires (paramétrage).

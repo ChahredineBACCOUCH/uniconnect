@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Profil;
 use App\Enums\RoleMembre;
 use App\Models\Espace;
 use App\Models\User;
@@ -36,6 +37,14 @@ class EspacePolicy
     public function delete(User $user, Espace $espace): bool
     {
         return $this->role($user, $espace) === RoleMembre::PROPRIETAIRE;
+    }
+
+    /**
+     * SCRUM-145 : seul un enseignant propriétaire ou co-gestionnaire active l'Assistant IA.
+     */
+    public function configurerAssistant(User $user, Espace $espace): bool
+    {
+        return $user->profil === Profil::ENSEIGNANT && $this->estGestionnaire($user, $espace);
     }
 
     private function estGestionnaire(User $user, Espace $espace): bool
