@@ -105,3 +105,11 @@ export async function accepterInvitation(invitationId) {
 export async function refuserInvitation(invitationId) {
   await http.post(`/invitations/${invitationId}/refuser`)
 }
+
+/* SCRUM-147 : réglage de l'Assistant IA (enseignant propriétaire / co-gestionnaire, SCRUM-145). */
+
+/** `{ actif, instructions? }` → `{ actif, instructions, nb_documents_indexes }` */
+export async function configurerAssistant(espaceId, reglage) {
+  const { data } = await http.patch(`/espaces/${espaceId}/assistant`, reglage)
+  return data
+}

@@ -6,7 +6,7 @@ import { IA_ROUTES, useIaStore } from '@/stores/ia'
 
 // On remplace le vrai client HTTP : aucun appel réseau pendant les tests.
 vi.mock('@/api/http', () => ({
-  default: { post: vi.fn() },
+  default: { post: vi.fn(), patch: vi.fn() },
 }))
 
 const REPONSE_OK = {
@@ -120,5 +120,34 @@ describe('store ia', () => {
 
     expect(ia.echanges).toHaveLength(0)
     expect(ia.conversationId).toBeNull()
+  })
+  // SCRUM-146 : avis 👍/👎.
+  it("envoie l'avis sur la réponse et peut le changer", async () => {
+    http.post.mockResolvedValue({ data: REPONSE_OK })
+    http.patch.mockResolvedValue({ status: 204 })
+    const ia = useIaStore()
+    await ia.poser(3, 'Quels sont les attributs ?')
+
+    expect(await ia.donnerAvis(0, true)).toBe(true)
+    expect(http.patch).toHaveBeenLastCalledWith(IA_ROUTES.avis(42), { utile: true })
+    expect(ia.echanges[0].avis).toBe(true)
+
+    // Même avis : rien n'est renvoyé.
+    await ia.donnerAvis(0, true)
+    expect(http.patch).toHaveBeenCalledTimes(1)
+
+    await ia.donnerAvis(0, false)
+    expect(http.patch).toHaveBeenLastCalledWith(IA_ROUTES.avis(42), { utile: false })
+    expect(ia.echanges[0].avis).toBe(false)
+  })
+
+  it("annule l'avis si l'API le refuse", async () => {
+    http.post.mockResolvedValue({ data: REPONSE_OK })
+    http.patch.mockRejectedValue(new Error('Network Error'))
+    const ia = useIaStore()
+    await ia.poser(3, 'Quels sont les attributs ?')
+
+    expect(await ia.donnerAvis(0, true)).toBe(false)
+    expect(ia.echanges[0].avis).toBeNull()
   })
 })

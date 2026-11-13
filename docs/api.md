@@ -151,7 +151,7 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
 | POST | `/espaces/{id}/ia/questions` | membre, assistant actif | `{ question, conversation_id? }` → `{ conversation_id, echange_id, reponse, statut, sources: [{ n, fichier, page, ressource_id }], quota_restant }` | SCRUM-100, 102 |
-| PATCH | `/ia/echanges/{id}/avis` | auteur de la question | `{ utile: true \| false }` → **204** | SCRUM-146 |
+| PATCH | `/ia/echanges/{id}/avis` | auteur de la question | `{ utile: true \| false }` → **204** ; l'avis peut être changé. **404** si l'échange n'est pas une question de la personne connectée, **422** si l'IA n'a pas répondu (`ERREUR`) | SCRUM-146 |
 
 - `statut` vaut `OK`, ou `SANS_SOURCE` (rien de pertinent dans le cours ; l'IA n'est pas appelée).
 - **404** : assistant désactivé dans cet espace · **429** : `{ message: "Vous avez atteint vos 20 questions du jour. Revenez demain.", reessayer_a: "2026-11-18T00:00:00+01:00" }` et en-tête `Retry-After` (secondes jusqu'à minuit) · **503** : Gemini et Groq ne répondent pas.

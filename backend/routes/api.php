@@ -147,6 +147,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{id}/lue', [NotificationController::class, 'marquerLue']);
     Route::post('/notifications/tout-lire', [NotificationController::class, 'toutLire']);
+
+    // SCRUM-146 : avis 👍/👎 sur une réponse de l'assistant (auteur de la question).
+    Route::patch('/ia/echanges/{echange}/avis', [AssistantIAController::class, 'avis']);
 });
 
 // SCRUM-72 : gestion des années universitaires (paramétrage).
