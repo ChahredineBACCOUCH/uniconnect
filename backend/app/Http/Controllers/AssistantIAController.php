@@ -14,12 +14,15 @@ use App\Models\Espace;
 use App\Models\User;
 use App\Services\AssistantService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
  * SCRUM-102 : poser une question à l'Assistant IA d'un espace.
  * SCRUM-145 : activer l'assistant (PATCH /api/espaces/{espace}/assistant).
+ * SCRUM-146 : avis 👍/👎 sur une réponse (PATCH /api/ia/echanges/{echange}/avis).
  *
  * POST /api/espaces/{espace}/ia/questions  { question, conversation_id? }
  * → { conversation_id, echange_id, reponse, statut, sources, quota_restant }
@@ -132,6 +135,36 @@ class AssistantIAController extends Controller
             'instructions' => $assistant->instructions,
             'nb_documents_indexes' => $espace->ressources()->where('indexee_ia', true)->count(),
         ]);
+    }
+
+    /**
+     * Avis de l'étudiant sur une réponse : utile (👍) ou non (👎). Il peut le changer.
+     *
+     * PATCH /api/ia/echanges/{echange}/avis  { utile: true|false } → 204
+     *
+     * 404 si l'échange n'est pas une question de la personne connectée
+     * (on ne révèle pas les échanges des autres) · 422 si l'IA n'a pas répondu (ERREUR).
+     */
+    public function avis(Request $request, EchangeIA $echange): Response
+    {
+        $donnees = $request->validate(
+            ['utile' => ['required', 'boolean']],
+            [
+                'utile.required' => 'Indiquez si la réponse était utile.',
+                'utile.boolean' => 'La valeur « utile » doit être vrai ou faux.',
+            ],
+        );
+
+        abort_unless($echange->conversation?->user_id === $request->user()->id, 404);
+        abort_if(
+            $echange->statut === StatutEchangeIa::ERREUR,
+            422,
+            "Impossible de donner un avis : l'assistant n'a pas répondu à cette question.",
+        );
+
+        $echange->update(['avis_utile' => (bool) $donnees['utile']]);
+
+        return response()->noContent();
     }
 
     /**
