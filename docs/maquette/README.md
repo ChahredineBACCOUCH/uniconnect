@@ -5,6 +5,7 @@ Ce dossier décrit **exactement** l'interface à coder. Donne-le à ton assistan
 | Fichier | Contenu | Comment l'utiliser |
 |---|---|---|
 | `README.md` (ce fichier) | Règles de design, thème Vuetify, liste de tous les écrans avec route, fichier Vue, API, états et ticket Jira | À coller **en entier** dans la conversation avec l'IA |
+| `maquette-livraison-v1.0.html` | Maquette cliquable de la version **réellement livrée le 19/11/2026** (sprints S0 à S2), 3 profils, bouton « Périmètre v1.0 » (livré / prévu en v1.1) | À ouvrir dans le navigateur pour la **présentation au professeur** ; un seul fichier, sans dépendance |
 | `prototype-v1.html` | Prototype cliquable de la version 1.0 (tous les écrans, 3 profils) | L'ouvrir dans le navigateur pour **voir** le résultat attendu ; donner à l'IA la partie HTML/CSS de l'écran concerné |
 | `ecrans/*.dc.html` | Code des écrans de la maquette Claude Design (HTML + CSS, données de démo) | Référence de mise en page **écran par écran**. Ces fichiers ne s'ouvrent pas seuls (il leur manque le moteur de la maquette) : donne leur contenu à l'IA comme modèle visuel |
 

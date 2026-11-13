@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniConnect · Maquette v1.0 (livraison du 19/11/2026)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<!--
+  Maquette cliquable de la version livrée le 19/11/2026 (sprints S0, S1 et S2).
+  Un seul fichier, sans dépendance : HTML + CSS + JavaScript, données de démonstration fictives.
+  Les fonctions marquées « v1.1 » dans Jira (mot de passe oublié, annuaire des channels,
+  signalement et modération, historique, tableau de bord, recherche, résumé IA, profil…)
+  ne sont volontairement PAS représentées : voir le bouton « Périmètre v1.0 ».
+-->
+<style>
+:root {
+  --primary: #1E4FB8; --primary-soft: #E3EBFB; --secondary: #00796B; --secondary-soft: #DDF2EF;
+  --accent: #F59E0B; --error: #C62828; --error-soft: #FDECEC; --warning: #ED6C02; --warning-soft: #FEF3DC;
+  --success: #2E7D32; --success-soft: #E5F4E6; --info: #0288D1;
+  --bg: #F4F6FB; --surface: #FFFFFF; --surface-variant: #EEF2FA; --on-surface: #1C2333;
+  --muted: #5B6478; --outline: #DCE1EC; --radius: 12px;
+  --shadow: 0 1px 2px rgba(28,35,51,.06), 0 2px 8px rgba(28,35,51,.06);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: Roboto, system-ui, sans-serif; font-size: 14px; color: var(--on-surface); background: var(--bg); line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3, p { margin: 0; }
+.i { width: 20px; height: 20px; fill: currentColor; flex: none; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.date-cap::first-letter { text-transform: uppercase; }
+
+/* Bandeau de présentation (n'existe pas dans l'application) */
+.strip { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 16px; background: #1C2333; color: #fff; font-size: 13px; }
+.strip strong { font-weight: 500; }
+.strip .sep { flex: 1; }
+.seg { display: inline-flex; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: #fff; padding: 4px 12px; }
+.seg button[aria-pressed="true"] { background: #fff; color: #1C2333; font-weight: 500; }
+.strip-btn { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff; border-radius: 999px; padding: 4px 12px; display: inline-flex; gap: 6px; align-items: center; }
+
+/* Mise en page de l'application */
+.app { display: grid; grid-template-columns: 288px 1fr; grid-template-rows: 64px 1fr; min-height: calc(100vh - 41px); }
+.topbar { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--outline); }
+.brand { display: flex; align-items: center; gap: 10px; border: 0; background: none; font-size: 20px; font-weight: 700; color: var(--primary); padding: 0; }
+.brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--primary); color: #fff; }
+.search { flex: 1; max-width: 520px; display: flex; align-items: center; gap: 8px; background: var(--surface-variant); border-radius: 999px; padding: 8px 16px; color: var(--muted); }
+.search span { font-size: 13px; }
+.top-sep { flex: 1; }
+.icon-btn { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--muted); }
+.icon-btn:hover { background: var(--surface-variant); }
+.dot { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--error); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.user { display: flex; align-items: center; gap: 10px; }
+.avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 700; flex: none; }
+.avatar.sm { width: 32px; height: 32px; font-size: 12px; }
+.user-text { display: flex; flex-direction: column; line-height: 1.2; }
+.user-text b { font-weight: 500; }
+.user-text span { font-size: 12px; color: var(--muted); letter-spacing: .03em; }
+.menu-btn { display: none; }
+
+.drawer { background: var(--surface); border-right: 1px solid var(--outline); padding: 16px 12px; overflow-y: auto; }
+.nav-title { margin: 16px 12px 6px; font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.nav-item { width: 100%; display: flex; align-items: center; gap: 14px; padding: 10px 12px; border: 0; border-radius: 10px; background: none; text-align: left; }
+.nav-item:hover { background: var(--surface-variant); }
+.nav-item[aria-current="page"] { background: var(--primary-soft); color: var(--primary); font-weight: 500; }
+.nav-item .lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
+.divider { height: 1px; background: var(--outline); margin: 10px 0; }
+
+.main { padding: 24px 32px 40px; overflow-x: hidden; }
+.page { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.page-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.page-head > div { flex: 1; min-width: 0; }
+.page-head h1 { font-size: 24px; font-weight: 500; }
+.bottom-nav { display: none; }
+
+/* Composants */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: 8px; border: 0; font-weight: 500; letter-spacing: .02em; }
+.btn.primary { background: var(--primary); color: #fff; }
+.btn.primary:hover { background: #18409a; }
+.btn.outlined { background: none; border: 1px solid var(--primary); color: var(--primary); }
+.btn.text { background: none; color: var(--primary); }
+.btn.danger { background: none; color: var(--error); }
+.btn.sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.card { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius); }
+.card-pad { padding: 20px; }
+.card h2 { font-size: 18px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 8px; font-size: 12px; font-weight: 500; background: var(--surface-variant); color: var(--on-surface); border: 1px solid transparent; }
+.chip.primary { background: var(--primary-soft); color: var(--primary); }
+.chip.secondary { background: var(--secondary-soft); color: var(--secondary); }
+.chip.warning { background: var(--warning-soft); color: #8A4100; }
+.chip.success { background: var(--success-soft); color: var(--success); }
+.chip.outlined { background: none; border-color: var(--outline); }
+.chip.btnchip { cursor: pointer; height: 32px; font-size: 13px; }
+.chip.btnchip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.alert { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; font-size: 13px; }
+.alert.info { background: var(--primary-soft); color: #173E92; }
+.alert.success { background: var(--success-soft); color: #1F5F23; }
+.alert.warning { background: var(--warning-soft); color: #7A3A00; }
+.alert.error { background: var(--error-soft); color: #8E1C1C; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 500; }
+.input, select.input, textarea.input { width: 100%; height: 44px; padding: 0 14px; border: 1px solid #C3CADA; border-radius: 8px; background: var(--surface); }
+textarea.input { height: auto; min-height: 88px; padding: 10px 14px; resize: vertical; }
+.input:focus { outline: 2px solid var(--primary); outline-offset: -1px; border-color: transparent; }
+.hint { font-size: 12px; color: var(--muted); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.spacer { flex: 1; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--outline); vertical-align: middle; }
+th { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: #FAFBFE; }
+.table-wrap { overflow-x: auto; }
+.empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 12px; text-align: center; color: var(--muted); }
+.empty .i { width: 32px; height: 32px; }
+
+/* Authentification */
+.auth { min-height: calc(100vh - 41px); display: grid; grid-template-columns: 1.1fr 1fr; }
+.auth-side { background: linear-gradient(150deg, #1E4FB8, #143A8C); color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+.auth-side h1 { font-size: 34px; font-weight: 700; }
+.auth-side p { font-size: 16px; opacity: .9; max-width: 440px; }
+.auth-side ul { margin: 0; padding-left: 18px; opacity: .92; display: flex; flex-direction: column; gap: 6px; }
+.auth-form { display: grid; place-items: center; padding: 32px 16px; }
+.auth-card { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px; }
+.auth-card h2 { font-size: 24px; font-weight: 500; }
+.linkbtn { border: 0; background: none; color: var(--primary); font-weight: 500; padding: 0; }
+
+/* Accueil */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.stat { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+.stat-ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; }
+.stat b { display: block; font-size: 24px; font-weight: 500; }
+.stat span { font-size: 12px; color: var(--muted); }
+.list { display: flex; flex-direction: column; }
+.list-item { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--outline); }
+.list-item:last-child { border-bottom: 0; }
+.list-item .t { flex: 1; min-width: 0; }
+.list-item .t b { font-weight: 500; display: block; }
+.ico-box { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); flex: none; }
+.clickable { cursor: pointer; border-radius: 8px; }
+.clickable:hover { background: var(--surface-variant); }
+
+/* Espace */
+.esp-head { display: flex; align-items: flex-start; gap: 14px; }
+.esp-head .ico-box { width: 52px; height: 52px; }
+.esp-head h1 { font-size: 22px; font-weight: 500; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--outline); overflow-x: auto; }
+.tab { border: 0; background: none; padding: 12px 16px; font-weight: 500; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.tab[aria-selected="true"] { color: var(--primary); border-bottom-color: var(--primary); }
+.chat { display: flex; flex-direction: column; height: 560px; }
+.chat-list { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+.day { align-self: center; font-size: 12px; color: var(--muted); background: var(--surface-variant); padding: 2px 10px; border-radius: 999px; }
+.msg { display: flex; gap: 10px; }
+.msg-body { flex: 1; min-width: 0; }
+.msg-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.msg-meta b { color: var(--on-surface); font-size: 14px; font-weight: 500; }
+.msg-text { margin-top: 2px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pj { display: inline-flex; align-items: center; gap: 10px; margin-top: 8px; padding: 8px 12px; border: 1px solid var(--outline); border-radius: 10px; background: #FAFBFE; }
+.pj small { color: var(--muted); }
+.composer { border-top: 1px solid var(--outline); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.composer-row { display: flex; gap: 8px; align-items: center; }
+.composer-row .input { flex: 1; }
+.annonce { padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.chapitre { border: 1px solid var(--outline); border-radius: 10px; overflow: hidden; }
+.chapitre summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; align-items: center; gap: 10px; font-weight: 500; background: #FAFBFE; }
+.chapitre summary::-webkit-details-marker { display: none; }
+.chapitre[open] summary .chev { transform: rotate(90deg); }
+.chapitre .ress { padding: 4px 16px 8px; }
+.ress-item.hl { background: var(--warning-soft); }
+.ia { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+.ia-chat { display: flex; flex-direction: column; height: 600px; }
+.bulle-q { align-self: flex-end; max-width: 80%; background: var(--primary); color: #fff; padding: 10px 14px; border-radius: 14px 14px 4px 14px; }
+.bulle-r { display: flex; gap: 10px; max-width: 92%; }
+.bulle-r .contenu { background: var(--surface-variant); padding: 12px 14px; border-radius: 14px 14px 14px 4px; display: flex; flex-direction: column; gap: 8px; }
+.bulle-r ul { margin: 0; padding-left: 18px; }
+.citation { border: 0; background: none; padding: 0 2px; border-radius: 4px; color: var(--primary); font-weight: 700; }
+.citation.active, .citation:hover { background: var(--primary-soft); }
+.sources { display: flex; flex-wrap: wrap; gap: 6px; }
+.source { cursor: pointer; background: var(--surface); border-color: var(--outline); }
+.source.active { background: var(--primary); color: #fff; }
+.chip.source { height: auto; min-height: 32px; padding: 6px 10px; text-align: left; white-space: normal; }
+.avis { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.avis button { border: 1px solid var(--outline); background: var(--surface); border-radius: 8px; padding: 2px 8px; }
+.avis button[aria-pressed="true"] { background: var(--primary-soft); border-color: var(--primary); }
+.ia-dot { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #1E4FB8, #00796B); color: #fff; flex: none; }
+.switch { position: relative; width: 44px; height: 24px; border-radius: 12px; border: 0; background: #C3CADA; padding: 0; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .15s; }
+.switch[aria-checked="true"] { background: var(--primary); }
+.switch[aria-checked="true"]::after { left: 23px; }
+
+/* Assistant de création */
+.stepper { display: flex; gap: 6px; }
+.step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-align: center; }
+.step .n { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--surface-variant); font-weight: 700; }
+.step.on { color: var(--primary); font-weight: 500; }
+.step.on .n, .step.done .n { background: var(--primary); color: #fff; }
+.choice { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--outline); border-radius: 10px; cursor: pointer; }
+.choice input { margin-top: 3px; }
+.choice.sel { border-color: var(--primary); background: var(--primary-soft); }
+.choice.off { opacity: .55; cursor: not-allowed; }
+
+/* Fenêtres */
+.overlay { position: fixed; inset: 0; z-index: 80; background: rgba(28,35,51,.45); display: grid; place-items: center; padding: 16px; }
+.dialog { width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.dialog h2 { font-size: 20px; font-weight: 500; }
+.dialog .actions { display: flex; justify-content: flex-end; gap: 8px; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 90; background: #1C2333; color: #fff; padding: 12px 18px; border-radius: 8px; box-shadow: var(--shadow); }
+.scope-col h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.scope-col ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
+
+/* Responsive : tablette */
+@media (max-width: 960px) {
+  .app { grid-template-columns: 1fr; }
+  .drawer { position: fixed; top: 105px; bottom: 0; left: 0; width: 288px; z-index: 60; transform: translateX(-100%); transition: transform .2s; box-shadow: var(--shadow); }
+  .drawer.open { transform: none; }
+  .menu-btn { display: grid; }
+  .user-text, .search { display: none; }
+  .ia { grid-template-columns: 1fr; }
+  .ia-side { display: none; }
+  .stats, .grid-3 { grid-template-columns: 1fr; }
+  .auth { grid-template-columns: 1fr; }
+  .auth-side { display: none; }
+}
+/* Responsive : téléphone */
+@media (max-width: 600px) {
+  .main { padding: 16px 16px 88px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .bottom-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; height: 64px; background: var(--surface); border-top: 1px solid var(--outline); }
+  .bottom-nav button { flex: 1; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; color: var(--muted); }
+  .bottom-nav button[aria-current="page"] { color: var(--primary); font-weight: 500; }
+  .chat, .ia-chat { height: calc(100vh - 330px); min-height: 380px; }
+  .strip .hide-xs { display: none; }
+  .dialog { max-width: none; max-height: none; height: 100%; border-radius: 0; }
+  .overlay { padding: 0; }
+  .step span { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+'use strict'
+
+/* ------------------------------------------------------------------ icônes (Material Design Icons, SVG) */
+const IC = {
+  menu:"M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z",
+  school:"M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z",
+  magnify:"M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",
+  bell:"M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21",
+  home:"M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z",
+  book:"M18,2A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H18M18,4H13V12L10.5,9.75L8,12V4H6V20H18V4Z",
+  lock:"M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",
+  pound:"M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z",
+  compass:"M14.19,14.19L6,18L9.81,9.81L18,6M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,10.9A1.1,1.1 0 0,0 10.9,12A1.1,1.1 0 0,0 12,13.1A1.1,1.1 0 0,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z",
+  account:"M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z",
+  group:"M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",
+  plus:"M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",
+  send:"M2,21L23,12L2,3V10L17,12L2,14V21Z",
+  clip:"M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z",
+  pin:"M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z",
+  flag:"M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z",
+  spark:"M19,1L17.74,3.75L15,5L17.74,6.26L19,9L20.25,6.26L23,5L20.25,3.75M9,4L6.5,9.5L1,12L6.5,14.5L9,20L11.5,14.5L17,12L11.5,9.5M19,15L17.74,17.74L15,19L17.74,20.25L19,23L20.25,20.25L23,19L20.25,17.74",
+  file:"M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z",
+  download:"M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z",
+  chevron:"M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",
+  check:"M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",
+  close:"M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",
+  dashboard:"M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z",
+  calendar:"M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z",
+  cog:"M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",
+  history:"M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3",
+  shield:"M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z",
+  logout:"M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z",
+  up:"M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z",
+  down:"M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z",
+  info:"M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z",
+  alert:"M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z",
+  folder:"M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z",
+  upload:"M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z",
+  bullhorn:"M12,8H4A2,2 0 0,0 2,10V14A2,2 0 0,0 4,16H5V20A1,1 0 0,0 6,21H8A1,1 0 0,0 9,20V16H12L17,20V4L12,8M21.5,12C21.5,13.71 20.54,15.26 19,16V8C20.53,8.75 21.5,10.3 21.5,12Z",
+  list:"M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
+};
+const ico = (k, st) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"${st ? ` style="${st}"` : ''}><path d="${IC[k] || IC.info}"></path></svg>`
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+
+/* ------------------------------------------------------------------ données de démonstration (fictives) */
+const PROFILS = {
+  etudiant: { id: 1, prenom: 'Amine', nom: 'Benali', profil: 'Étudiant', classe: 'L2 Info – Groupe A', droits: ['CREER_GROUPE_PRIVE'] },
+  enseignant: { id: 2, prenom: 'Sophie', nom: 'Martin', profil: 'Enseignant', classe: null, droits: ['CREER_GROUPE_PRIVE'] },
+  admin: { id: 3, prenom: 'Fatou', nom: 'Diallo', profil: 'Administration', classe: null, droits: ['GERER_PARAMETRAGE', 'GERER_UTILISATEURS', 'CREER_GROUPE_ORGA', 'CREER_GROUPE_PRIVE'] },
+}
+
+const D = {
+  espaces: [
+    { id: 1, type: 'ORGANISATIONNEL', icone: 'school', nom: 'L2 Info – Groupe A', visibilite: '30 jours', membres: 32, roles: { etudiant: 'MEMBRE', enseignant: 'MEMBRE' }, assistant: false, nonLus: 2 },
+    { id: 2, type: 'ORGANISATIONNEL', icone: 'book', nom: 'Bases de données', visibilite: '30 jours', membres: 33, roles: { etudiant: 'MEMBRE', enseignant: 'PROPRIETAIRE' }, assistant: true, nonLus: 3 },
+    { id: 3, type: 'ORGANISATIONNEL', icone: 'book', nom: 'Développement Web', visibilite: '30 jours', membres: 33, roles: { etudiant: 'MEMBRE', enseignant: 'PROPRIETAIRE' }, assistant: false, nonLus: 0 },
+    { id: 4, type: 'PRIVE', icone: 'lock', nom: 'Projet intégration – Équipe 4', visibilite: '7 jours', membres: 4, roles: { etudiant: 'PROPRIETAIRE' }, assistant: false, nonLus: 1 },
+  ],
+  invitations: { etudiant: [{ id: 9, espace: 'Révisions BD', par: 'Sophie Martin (Enseignant)', expire: '27 nov. 2026' }], enseignant: [], admin: [] },
+  notifications: [
+    { id: 1, texte: 'Nouvelle annonce dans « Bases de données » : TP noté jeudi', quand: 'il y a 2 h', lue: false },
+    { id: 2, texte: 'Nouvelle ressource : Chapitre 3 – Curseurs PL/SQL.pdf', quand: 'hier', lue: false },
+    { id: 3, texte: 'Sophie Martin vous a ajouté à « Bases de données »', quand: '10 nov.', lue: true },
+  ],
+  messages: {
+    2: [
+      { id: 1, auteur: 'Sophie Martin', initiales: 'SM', badge: 'Enseignant', heure: '09:12', texte: 'Bonjour à tous, le chapitre 3 sur les curseurs est en ligne dans Ressources.', jour: 'Hier' },
+      { id: 2, auteur: 'Yasmine Trabelsi', initiales: 'YT', heure: '09:40', texte: 'Merci madame ! Le TP de jeudi porte aussi sur les curseurs explicites ?', jour: 'Hier' },
+      { id: 3, auteur: 'Sophie Martin', initiales: 'SM', badge: 'Enseignant', heure: '10:02', texte: 'Oui, révisez OPEN / FETCH / CLOSE et les attributs %FOUND et %NOTFOUND.', jour: 'Hier' },
+      { id: 4, auteur: 'Karim Haddad', initiales: 'KH', heure: '08:15', texte: 'Je partage mes notes du cours, si ça peut aider.', pj: { nom: 'notes-curseurs.pdf', taille: '412 Ko' }, jour: "Aujourd'hui" },
+    ],
+  },
+  annonces: {
+    2: [{ titre: 'TP noté jeudi 20/11', texte: 'Le TP noté aura lieu jeudi de 10 h à 12 h en salle B12. Documents autorisés : vos notes personnelles.', auteur: 'Sophie Martin', date: '13 nov. 2026' }],
+  },
+  chapitres: {
+    2: [
+      { titre: 'Chapitre 1 – Modèle relationnel', ress: [{ id: 11, nom: 'Chapitre 1 – Modèle relationnel.pdf', taille: '1,2 Mo', indexee: true }] },
+      { titre: 'Chapitre 2 – SQL avancé', ress: [{ id: 12, nom: 'Chapitre 2 – SQL avancé.pdf', taille: '2,4 Mo', indexee: true }, { id: 13, nom: 'Exercices SQL (lien)', taille: 'Lien', indexee: false }] },
+      { titre: 'Chapitre 3 – PL/SQL', ress: [{ id: 14, nom: 'Chapitre 3 – Curseurs PL/SQL.pdf', taille: '980 Ko', indexee: true }] },
+    ],
+  },
+  membres: [
+    { nom: 'Sophie Martin', initiales: 'SM', profil: 'Enseignant', role: 'PROPRIETAIRE', depuis: '1 sept. 2026' },
+    { nom: 'Karim Haddad', initiales: 'KH', profil: 'Étudiant', role: 'CO_GESTIONNAIRE', depuis: '1 sept. 2026' },
+    { nom: 'Amine Benali', initiales: 'AB', profil: 'Étudiant', role: 'MEMBRE', depuis: '1 sept. 2026' },
+    { nom: 'Yasmine Trabelsi', initiales: 'YT', profil: 'Étudiant', role: 'MEMBRE', depuis: '1 sept. 2026' },
+    { nom: 'Nour Ben Ali', initiales: 'NB', profil: 'Étudiant', role: 'MEMBRE', depuis: '3 sept. 2026' },
+  ],
+  annees: [
+    { libelle: '2026/2027', debut: '01/09/2026', fin: '30/06/2027', active: true },
+    { libelle: '2027/2028', debut: '01/09/2027', fin: '30/06/2028', active: false },
+  ],
+  referentiels: {
+    Départements: [['INFO', 'Informatique'], ['MATH', 'Mathématiques']],
+    Filières: [['LI', 'Licence Informatique'], ['LM', 'Licence Mathématiques']],
+    Niveaux: [['L1', 'Licence 1'], ['L2', 'Licence 2'], ['L3', 'Licence 3']],
+    Classes: [['L2-INFO-A', 'L2 Info – Groupe A'], ['L2-INFO-B', 'L2 Info – Groupe B'], ['L3-INFO-A', 'L3 Info – Groupe A']],
+    Matières: [['BD', 'Bases de données'], ['WEB', 'Développement Web'], ['RES', 'Réseaux informatiques']],
+  },
+  comptes: [
+    { matricule: 'ETU-2026-001', nom: 'Benali Amine', email: 'amine.benali@univ.tn', profil: 'Étudiant', classe: 'L2-INFO-A', etat: 'Actif' },
+    { matricule: 'ETU-2026-002', nom: 'Trabelsi Yasmine', email: 'yasmine.trabelsi@univ.tn', profil: 'Étudiant', classe: 'L2-INFO-A', etat: 'Actif' },
+    { matricule: 'ETU-2026-003', nom: 'Ben Ali Nour', email: 'nour.benali@univ.tn', profil: 'Étudiant', classe: 'L2-INFO-A', etat: 'Non créé' },
+    { matricule: 'ENS-2026-001', nom: 'Martin Sophie', email: 'sophie.martin@univ.tn', profil: 'Enseignant', classe: '—', etat: 'Actif' },
+  ],
+}
+
+/* ------------------------------------------------------------------ état */
+const S = {
+  role: 'etudiant', connecte: false, ecranAuth: 'connexion', vue: 'accueil', espaceId: null, onglet: 'discussion',
+  drawer: false, dialog: null, toast: null, quota: 20, ia: [], sourceActive: {}, hl: null,
+  wizard: null, assistantActif: { 2: true }, groupesGeneres: false, importApercu: false,
+}
+const user = () => PROFILS[S.role]
+const initiales = (u) => (u.prenom[0] + u.nom[0]).toUpperCase()
+const espacesVisibles = () => (S.role === 'admin' ? [] : D.espaces.filter((e) => e.roles[S.role]))
+const invitations = () => D.invitations[S.role]
+const nonLues = () => invitations().length + D.notifications.filter((n) => !n.lue).length
+const role = (e) => e.roles[S.role] || null
+const estGestionnaire = (e) => ['PROPRIETAIRE', 'CO_GESTIONNAIRE'].includes(role(e))
+const LIB_ROLE = { PROPRIETAIRE: 'Propriétaire', CO_GESTIONNAIRE: 'Co-gestionnaire', MEMBRE: 'Membre' }
+
+function toast(texte) {
+  S.toast = texte
+  render()
+  clearTimeout(toast.t)
+  toast.t = setTimeout(() => { S.toast = null; render() }, 2600)
+}
+function go(vue, extra = {}) {
+  Object.assign(S, { vue, drawer: false }, extra)
+  render()
+  window.scrollTo(0, 0)
+}
+
+/* ------------------------------------------------------------------ bandeau de présentation */
+function strip() {
+  const p = (r, l) => `<button type="button" data-act="role" data-a="${r}" aria-pressed="${S.role === r}">${l}</button>`
+  return `<div class="strip" role="region" aria-label="Commandes de la maquette">
+    <strong>Maquette v1.0</strong><span class="hide-xs">· livraison du 19/11/2026</span>
+    <span class="sep"></span>
+    <span class="hide-xs">Profil :</span>
+    <div class="seg">${p('etudiant', 'Étudiant')}${p('enseignant', 'Enseignant')}${p('admin', 'Administration')}</div>
+    <button class="strip-btn" type="button" data-act="dialog" data-a="perimetre">${ico('list', 'width:16px;height:16px')}Périmètre v1.0</button>
+    ${S.connecte ? `<button class="strip-btn" type="button" data-act="logout">Écrans de connexion</button>` : ''}
+  </div>`
+}
+
+/* ------------------------------------------------------------------ authentification (E01, E02, E03) */
+function auth() {
+  const cote = `<div class="auth-side">
+    <span class="brand-mark" style="width:52px;height:52px">${ico('school', 'width:30px;height:30px')}</span>
+    <h1>UniConnect</h1>
+    <p>La communication de votre université, réunie au même endroit.</p>
+    <ul><li>Vos groupes de classe et de matières, créés automatiquement</li><li>Annonces, ressources de cours et fichiers protégés</li><li>Un Assistant IA qui répond à partir de vos cours, avec ses sources</li></ul>
+  </div>`
+  let form = ''
+  if (S.ecranAuth === 'connexion') {
+    form = `<form class="auth-card" data-submit="connexion">
+      <h2>Connexion</h2><p class="muted">Connectez-vous avec votre adresse électronique institutionnelle.</p>
+      <div class="field"><label for="em">Adresse électronique institutionnelle</label><input id="em" class="input" type="email" value="${esc(user().prenom.toLowerCase())}.${esc(user().nom.toLowerCase())}@univ.tn"></div>
+      <div class="field"><label for="pw">Mot de passe</label><input id="pw" class="input" type="password" value="motdepasse"></div>
+      <label class="row small"><input type="checkbox" checked> Rester connecté</label>
+      <button class="btn primary block" type="submit">Se connecter</button>
+      <p class="hint">Après 5 tentatives incorrectes, le compte est bloqué 15 minutes.</p>
+      <p class="small">Pas encore de compte ? <button class="linkbtn" type="button" data-act="auth" data-a="inscription">Créer un compte</button></p>
+    </form>`
+  } else if (S.ecranAuth === 'inscription') {
+    form = `<form class="auth-card" data-submit="inscription">
+      <h2>Créer mon compte</h2><p class="muted">Seules les personnes inscrites par l'administration peuvent créer un compte.</p>
+      <div class="field"><label for="ma">Matricule</label><input id="ma" class="input" value="ETU-2026-003"></div>
+      <div class="grid-2"><div class="field"><label for="no">Nom</label><input id="no" class="input" value="Ben Ali"></div><div class="field"><label for="pr">Prénom</label><input id="pr" class="input" value="Nour"></div></div>
+      <div class="field"><label for="ei">Adresse e-mail de l'université</label><input id="ei" class="input" type="email" value="nour.benali@univ.tn"></div>
+      <label class="row small"><input type="checkbox" checked> J'accepte la charte d'utilisation</label>
+      <button class="btn primary block" type="submit">Créer mon compte</button>
+      <p class="small">Déjà inscrit ? <button class="linkbtn" type="button" data-act="auth" data-a="connexion">Se connecter</button></p>
+    </form>`
+  } else if (S.ecranAuth === 'envoye') {
+    form = `<div class="auth-card"><h2>Vérifiez votre messagerie</h2>
+      <div class="alert success">${ico('check')}<div>Un lien d'activation a été envoyé à <b>nour.benali@univ.tn</b>. Il est valable 48 heures.</div></div>
+      <button class="btn primary block" type="button" data-act="auth" data-a="activation">Ouvrir le lien reçu (démo)</button>
+      <button class="btn text" type="button" data-act="toast" data-a="Un nouvel e-mail d'activation a été envoyé.">Renvoyer l'e-mail d'activation</button></div>`
+  } else {
+    form = `<form class="auth-card" data-submit="activation">
+      <h2>Activer mon compte</h2><p class="muted">Bonjour Nour, choisissez votre mot de passe.</p>
+      <div class="field"><label for="p1">Mot de passe</label><input id="p1" class="input" type="password" value="Uniconnect2026"><span class="hint">8 caractères minimum, avec une majuscule, une minuscule et un chiffre.</span></div>
+      <div class="field"><label for="p2">Confirmation</label><input id="p2" class="input" type="password" value="Uniconnect2026"></div>
+      <button class="btn primary block" type="submit">Activer et me connecter</button>
+    </form>`
+  }
+  return `<div class="auth">${cote}<div class="auth-form">${form}</div></div>`
+}
+
+/* ------------------------------------------------------------------ coque de l'application */
+function topbar() {
+  const u = user()
+  return `<header class="topbar">
+    <button class="icon-btn menu-btn" type="button" data-act="drawer" aria-label="Ouvrir le menu">${ico('menu')}</button>
+    <button class="brand" type="button" data-act="go" data-a="accueil"><span class="brand-mark">${ico('school')}</span>UniConnect</button>
+    <div class="search" aria-hidden="true">${ico('magnify')}<span>Rechercher un espace, une personne, un fichier…</span></div>
+    <span class="top-sep"></span>
+    <button class="icon-btn" type="button" data-act="go" data-a="notifications" aria-label="Notifications, ${nonLues()} non lues">${ico('bell')}${nonLues() ? `<span class="dot">${nonLues()}</span>` : ''}</button>
+    <div class="user"><span class="avatar">${initiales(u)}</span><span class="user-text"><b>${esc(u.prenom)} ${esc(u.nom)}</b><span>${esc(u.profil)}${u.classe ? ' · ' + esc(u.classe) : ''}</span></span></div>
+    <button class="icon-btn" type="button" data-act="logout" aria-label="Se déconnecter">${ico('logout')}</button>
+  </header>`
+}
+
+function drawer() {
+  const item = (vue, icone, lbl, badge, extra = '') => {
+    const actif = S.vue === vue && !extra
+    return `<button class="nav-item" type="button" data-act="go" data-a="${vue}" ${extra} ${actif ? 'aria-current="page"' : ''}>${ico(icone)}<span class="lbl">${esc(lbl)}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</button>`
+  }
+  const esp = (e) => `<button class="nav-item" type="button" data-act="espace" data-a="${e.id}" ${S.vue === 'espace' && S.espaceId === e.id ? 'aria-current="page"' : ''}>${ico(e.icone)}<span class="lbl">${esc(e.nom)}</span>${e.nonLus ? `<span class="badge">${e.nonLus}</span>` : ''}</button>`
+  const rub = (titre, type) => {
+    const l = espacesVisibles().filter((e) => e.type === type)
+    return l.length ? `<div class="nav-title">${titre}</div>${l.map(esp).join('')}` : ''
+  }
+  let html = ''
+  if (user().droits.includes('CREER_GROUPE_PRIVE') && S.role !== 'admin') {
+    html += `<button class="btn primary block" type="button" data-act="wizard">${ico('plus')}Créer un espace</button>`
+  }
+  html += `<div style="margin-top:8px">${item('accueil', 'home', 'Accueil')}${item('notifications', 'bell', 'Notifications', nonLues())}</div>`
+  if (S.role === 'admin') {
+    html += `<div class="nav-title">Administration</div>
+      ${item('annees', 'calendar', 'Années universitaires')}${item('referentiels', 'folder', 'Référentiels')}
+      ${item('comptes', 'account', 'Comptes autorisés')}${item('groupes', 'group', 'Groupes organisationnels')}`
+  } else {
+    html += rub('Mes classes et matières', 'ORGANISATIONNEL') + rub('Mes groupes privés', 'PRIVE')
+  }
+  return `<nav class="drawer ${S.drawer ? 'open' : ''}" aria-label="Menu principal">${html}</nav>`
+}
+
+function bottomNav() {
+  const b = (vue, icone, l) => `<button type="button" data-act="go" data-a="${vue}" ${S.vue === vue ? 'aria-current="page"' : ''}>${ico(icone)}<span>${l}</span></button>`
+  return `<nav class="bottom-nav" aria-label="Navigation">${b('accueil', 'home', 'Accueil')}${S.role === 'admin' ? b('comptes', 'account', 'Comptes') : `<button type="button" data-act="drawer">${ico('group')}<span>Espaces</span></button>`}${b('notifications', 'bell', 'Notifs')}</nav>`
+}
+
+/* ------------------------------------------------------------------ accueil (E04) */
+function accueil() {
+  const u = user()
+  const date = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(2026, 10, 19))
+  const esp = espacesVisibles()
+  const totalNonLus = esp.reduce((t, e) => t + e.nonLus, 0)
+  const stat = (v, l, icone, bg, fg) => `<div class="card stat"><span class="stat-ico" style="background:${bg};color:${fg}">${ico(icone)}</span><div><b>${v}</b><span>${l}</span></div></div>`
+  const invs = invitations()
+  if (S.role === 'admin') {
+    return `<div class="page"><div class="page-head"><div><h1>Bonjour ${esc(u.prenom)}</h1><p class="muted date-cap">${date}</p></div></div>
+      <div class="stats">${stat('2026/2027', 'année active', 'calendar', '#E3EBFB', '#1E4FB8')}${stat(D.comptes.length, 'comptes autorisés', 'account', '#DDF2EF', '#00695C')}${stat(S.groupesGeneres ? 12 : 0, 'groupes organisationnels', 'group', '#FEF3DC', '#8A4100')}</div>
+      <div class="card card-pad"><h2>${ico('shield')}Paramétrage de l'année</h2>
+        <div class="list" style="margin-top:8px">
+        ${[['annees', 'calendar', 'Années universitaires', 'Une seule année active à la fois'], ['referentiels', 'folder', 'Référentiels', 'Départements, filières, niveaux, classes, matières'], ['comptes', 'account', 'Comptes autorisés', 'Liste des personnes qui peuvent créer un compte, import Excel'], ['groupes', 'group', 'Groupes organisationnels', 'Un groupe par classe et par matière']].map(([v, i, t, d]) => `<div class="list-item clickable" data-act="go" data-a="${v}"><span class="ico-box">${ico(i)}</span><div class="t"><b>${t}</b><span class="muted small">${d}</span></div>${ico('chevron')}</div>`).join('')}
+        </div></div></div>`
+  }
+  return `<div class="page">
+    <div class="page-head"><div><h1>Bonjour ${esc(u.prenom)}</h1><p class="muted date-cap">${date}</p></div></div>
+    <div class="stats">${stat(totalNonLus, totalNonLus > 1 ? 'messages non lus' : 'message non lu', 'send', '#E3EBFB', '#1E4FB8')}${stat(invs.length, invs.length > 1 ? 'invitations en attente' : 'invitation en attente', 'group', '#DDF2EF', '#00695C')}${stat(esp.length, 'espaces', 'list', '#FEF3DC', '#8A4100')}</div>
+    <div class="card card-pad"><h2>${ico('bullhorn')}Dernières annonces</h2>
+      <div class="list" style="margin-top:8px">${D.annonces[2].map((a) => `<div class="list-item clickable" data-act="espace" data-a="2" data-o="annonces"><span class="ico-box">${ico('bullhorn')}</span><div class="t"><b>${esc(a.titre)}</b><span class="muted small">Bases de données · ${esc(a.auteur)} · ${a.date}</span></div>${ico('chevron')}</div>`).join('')}</div></div>
+    <div class="card card-pad"><h2>${ico('group')}Invitations</h2>
+      ${invs.length ? `<div class="list" style="margin-top:8px">${invs.map((i) => `<div class="list-item"><span class="ico-box">${ico('lock')}</span><div class="t"><b>${esc(i.espace)}</b><span class="muted small">Invité par ${esc(i.par)} · expire le ${i.expire}</span></div><button class="btn text sm" type="button" data-act="refuser" data-a="${i.id}">Refuser</button><button class="btn primary sm" type="button" data-act="accepter" data-a="${i.id}">Accepter</button></div>`).join('')}</div>`
+        : `<div class="empty">${ico('check')}<p>Aucune invitation en attente.</p></div>`}</div>
+    <div class="card card-pad"><h2>${ico('list')}Mes espaces</h2>
+      <div class="list" style="margin-top:8px">${esp.map((e) => `<div class="list-item clickable" data-act="espace" data-a="${e.id}"><span class="ico-box">${ico(e.icone)}</span><div class="t"><b>${esc(e.nom)}</b><span class="muted small">${e.membres} membres · ${LIB_ROLE[role(e)]}</span></div>${e.nonLus ? `<span class="chip primary">${e.nonLus} non lu${e.nonLus > 1 ? 's' : ''}</span>` : ''}</div>`).join('')}</div></div>
+  </div>`
+}
+
+/* ------------------------------------------------------------------ notifications (E09) */
+function notifications() {
+  const invs = invitations()
+  return `<div class="page"><div class="page-head"><div><h1>Notifications</h1></div><button class="btn text" type="button" data-act="toutlire">Tout marquer comme lu</button></div>
+    <div class="card card-pad"><h2>Invitations</h2>
+      ${invs.length ? `<div class="list" style="margin-top:8px">${invs.map((i) => `<div class="list-item"><span class="ico-box">${ico('lock')}</span><div class="t"><b>${esc(i.espace)}</b><span class="muted small">Invité par ${esc(i.par)}</span></div><button class="btn text sm" type="button" data-act="refuser" data-a="${i.id}">Refuser</button><button class="btn primary sm" type="button" data-act="accepter" data-a="${i.id}">Accepter</button></div>`).join('')}</div>` : `<div class="empty"><p>Aucune invitation en attente.</p></div>`}
+    </div>
+    <div class="card card-pad"><h2>Notifications</h2><div class="list" style="margin-top:8px">
+      ${D.notifications.map((n) => `<div class="list-item clickable" data-act="lire" data-a="${n.id}"><span style="width:8px;height:8px;border-radius:50%;background:${n.lue ? 'transparent' : 'var(--primary)'}"></span><div class="t"><span style="${n.lue ? '' : 'font-weight:500'}">${esc(n.texte)}</span><br><span class="muted small">${n.quand}</span></div></div>`).join('')}
+    </div></div></div>`
+}
+
+/* ------------------------------------------------------------------ espace (E05 à E07) */
+function espace() {
+  const e = D.espaces.find((x) => x.id === S.espaceId)
+  const onglets = [['discussion', 'Discussion'], ['annonces', 'Annonces'], ['ressources', 'Ressources'], ['membres', 'Membres']]
+  if (S.assistantActif[e.id]) onglets.push(['assistant', 'Assistant IA'])
+  if (estGestionnaire(e)) onglets.push(['parametres', 'Paramètres'])
+  if (!onglets.some(([k]) => k === S.onglet)) S.onglet = 'discussion'
+  const contenu = { discussion, annonces, ressources, membres, assistant, parametres }[S.onglet](e)
+  return `<div class="page">
+    <div class="esp-head"><span class="ico-box">${ico(e.icone, 'width:28px;height:28px')}</span>
+      <div style="flex:1;min-width:0"><h1>${esc(e.nom)}</h1>
+        <div class="row" style="margin-top:6px"><span class="chip primary">${e.type === 'PRIVE' ? 'Groupe privé' : e.icone === 'school' ? 'Groupe de classe' : 'Matière'}</span><span class="chip warning">Messages visibles ${e.visibilite}</span><span class="muted small">${e.membres} membres · ${LIB_ROLE[role(e)]}</span></div>
+      </div></div>
+    <div class="tabs" role="tablist">${onglets.map(([k, l]) => `<button class="tab" role="tab" type="button" data-act="onglet" data-a="${k}" aria-selected="${S.onglet === k}">${k === 'assistant' ? ico('spark', 'width:18px;height:18px') : ''}${l}</button>`).join('')}</div>
+    ${contenu}
+  </div>`
+}
+
+function discussion(e) {
+  const msgs = D.messages[e.id] || []
+  let jour = null
+  const lignes = msgs.map((m) => {
+    const sep = m.jour !== jour ? `<span class="day">${m.jour}</span>` : ''
+    jour = m.jour
+    return `${sep}<div class="msg"><span class="avatar sm" style="${m.badge ? 'background:var(--secondary)' : ''}">${m.initiales}</span><div class="msg-body">
+      <div class="msg-meta"><b>${esc(m.auteur)}</b>${m.badge ? `<span class="chip secondary">${m.badge}</span>` : ''}<span>${m.heure}</span></div>
+      <p class="msg-text">${esc(m.texte)}</p>
+      ${m.pj ? `<button class="pj" type="button" data-act="toast" data-a="Téléchargement protégé : réservé aux membres de l'espace.">${ico('file')}<span>${esc(m.pj.nom)} <small>· ${m.pj.taille}</small></span>${ico('download')}</button>` : ''}
+    </div></div>`
+  }).join('')
+  return `<div class="card chat">
+    <div class="chat-list" id="chat">${lignes || `<div class="empty">${ico('send')}<p><b>Aucun message pour l'instant.</b><br>Soyez le premier à lancer la discussion.</p></div>`}</div>
+    <form class="composer" data-submit="message">
+      ${S.pj ? `<div class="row"><span class="chip outlined">${ico('file', 'width:16px;height:16px')}${esc(S.pj)}<button type="button" class="linkbtn" data-act="pjx" aria-label="Retirer la pièce jointe">${ico('close', 'width:14px;height:14px')}</button></span></div>` : ''}
+      <div class="composer-row">
+        <button class="icon-btn" type="button" data-act="pj" aria-label="Joindre un fichier">${ico('clip')}</button>
+        <input class="input" name="texte" placeholder="Écrire un message à ${esc(e.nom)}…" aria-label="Message" autocomplete="off">
+        <button class="btn primary" type="submit">${ico('send')}<span class="hide-xs">Envoyer</span></button>
+      </div>
+      <span class="hint">Les messages de cet espace sont supprimés définitivement ${e.visibilite} après leur envoi. Fichiers : 10 Mo maximum, visibles uniquement par les membres.</span>
+    </form></div>`
+}
+
+function annonces(e) {
+  const l = D.annonces[e.id] || []
+  return `${estGestionnaire(e) ? `<div class="row"><span class="spacer"></span><button class="btn primary" type="button" data-act="dialog" data-a="annonce">${ico('plus')}Publier une annonce</button></div>` : ''}
+    ${l.length ? l.map((a) => `<div class="card annonce"><div class="row"><span class="chip warning">${ico('bullhorn', 'width:14px;height:14px')}Annonce</span><span class="muted small">${esc(a.auteur)} · ${a.date}</span></div><h2 style="font-size:18px;font-weight:500">${esc(a.titre)}</h2><p>${esc(a.texte)}</p></div>`).join('')
+      : `<div class="card"><div class="empty">${ico('bullhorn')}<p>Aucune annonce pour l'instant.</p></div></div>`}`
+}
+
+function ressources(e) {
+  const chaps = D.chapitres[e.id] || []
+  const ens = estGestionnaire(e)
+  return `<div class="row">${ens ? `<button class="btn outlined" type="button" data-act="toast" data-a="Nouveau chapitre ajouté (démo).">${ico('plus')}Nouveau chapitre</button><button class="btn primary" type="button" data-act="dialog" data-a="ressource">${ico('upload')}Ajouter une ressource</button>` : ''}</div>
+    ${chaps.length ? chaps.map((c, i) => `<details class="chapitre" ${i === 2 || S.hl ? 'open' : ''}><summary><span class="chev">${ico('chevron')}</span>${esc(c.titre)}<span class="spacer"></span><span class="muted small">${c.ress.length} ressource${c.ress.length > 1 ? 's' : ''}</span></summary>
+      <div class="ress list">${c.ress.map((r) => `<div class="list-item ress-item ${S.hl === r.id ? 'hl' : ''}"><span class="ico-box">${ico(r.taille === 'Lien' ? 'compass' : 'file')}</span><div class="t"><b>${esc(r.nom)}</b><span class="muted small">${r.taille}</span></div>${ens && r.indexee ? '<span class="chip success">Indexée pour l\'IA</span>' : ''}<button class="icon-btn" type="button" data-act="toast" data-a="Téléchargement protégé : réservé aux membres de l'espace." aria-label="Télécharger">${ico('download')}</button></div>`).join('')}</div></details>`).join('')
+      : `<div class="card"><div class="empty">${ico('folder')}<p>Aucune ressource publiée.</p></div></div>`}`
+}
+
+function membres(e) {
+  const gest = estGestionnaire(e)
+  const u = user()
+  const moi = { nom: `${u.prenom} ${u.nom}`, initiales: initiales(u), profil: u.profil, role: role(e) || 'MEMBRE', depuis: e.id > 4 ? "aujourd'hui" : '5 nov. 2026' }
+  const autres = D.membres.filter((m) => m.nom !== moi.nom)
+  let l = D.membres
+  if (e.type === 'PRIVE') {
+    // Groupe privé : le créateur est propriétaire, les autres sont des membres invités.
+    l = moi.role === 'PROPRIETAIRE'
+      ? [moi, ...autres.filter((m) => m.role !== 'PROPRIETAIRE').map((m) => ({ ...m, role: 'MEMBRE' }))]
+      : [autres[0], moi, ...autres.slice(1).map((m) => ({ ...m, role: 'MEMBRE' }))]
+    l = l.slice(0, e.membres)
+  }
+  return `<div class="card"><div class="row card-pad" style="padding-bottom:0"><h2>${e.membres} membres</h2><span class="spacer"></span>${gest ? `<button class="btn primary" type="button" data-act="dialog" data-a="inviter">${ico('plus')}Inviter</button>` : ''}</div>
+    <div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>Membre</th><th>Profil</th><th>Rôle</th><th>Depuis</th>${gest ? '<th></th>' : ''}</tr></thead><tbody>
+    ${l.map((m) => `<tr><td><div class="row"><span class="avatar sm">${m.initiales}</span>${esc(m.nom)}</div></td><td>${m.profil}</td><td><span class="chip ${m.role === 'PROPRIETAIRE' ? 'primary' : m.role === 'CO_GESTIONNAIRE' ? 'secondary' : ''}">${LIB_ROLE[m.role]}</span></td><td class="muted">${m.depuis}</td>
+      ${gest ? `<td>${m.role === 'MEMBRE' ? `<button class="btn text sm" type="button" data-act="toast" data-a="${esc(m.nom)} est maintenant co-gestionnaire.">Nommer co-gestionnaire</button><button class="btn danger sm" type="button" data-act="toast" data-a="${esc(m.nom)} a été retiré : son accès aux messages et fichiers est coupé immédiatement.">Retirer</button>` : ''}</td>` : ''}</tr>`).join('')}
+    </tbody></table></div>
+    <div class="card-pad">${e.type === 'ORGANISATIONNEL' ? '<p class="muted small">Groupe de classe ou de matière : les membres sont rattachés automatiquement, on ne peut pas le quitter.</p>' : `<button class="btn danger" type="button" data-act="toast" data-a="Vous avez quitté l'espace (démo).">Quitter l'espace</button>`}</div></div>`
+}
+
+/* Assistant IA : réponses de démonstration, avec citations [n] et sources */
+const QR = {
+  q: "Quels sont les attributs d'un curseur explicite ?",
+  r: [
+    'Un curseur explicite possède quatre attributs [1] :',
+    '- **%FOUND** : vrai si le dernier FETCH a ramené une ligne [1]',
+    '- **%NOTFOUND** : l\'inverse de %FOUND, utile pour sortir d\'une boucle [1]',
+    '- **%ISOPEN** : vrai si le curseur est ouvert [2]',
+    '- **%ROWCOUNT** : nombre de lignes lues jusqu\'ici [2]',
+  ],
+  sources: [{ n: 1, fichier: 'Chapitre 3 – Curseurs PL/SQL.pdf', page: 4, id: 14 }, { n: 2, fichier: 'Chapitre 3 – Curseurs PL/SQL.pdf', page: 5, id: 14 }],
+}
+function formaterLigne(l, idx) {
+  return esc(l).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\[(\d+)\]/g, (m, n) => `<button type="button" class="citation ${S.sourceActive[idx] === +n ? 'active' : ''}" data-act="cite" data-a="${idx}" data-n="${n}">[${n}]</button>`)
+}
+function assistant(e) {
+  const echanges = S.ia.map((x, idx) => {
+    if (x.sansSource) {
+      return `<div class="bulle-q">${esc(x.q)}</div><div class="bulle-r"><span class="ia-dot">${ico('spark', 'width:18px;height:18px')}</span><div class="contenu"><div class="alert warning">${ico('info')}Je n'ai pas trouvé de réponse fiable dans les ressources de cet espace. Essayez de reformuler, ou demandez à votre enseignant.</div></div></div>`
+    }
+    const puces = x.r.filter((l) => l.startsWith('- ')).map((l) => `<li>${formaterLigne(l.slice(2), idx)}</li>`).join('')
+    const texte = x.r.filter((l) => !l.startsWith('- ')).map((l) => `<p>${formaterLigne(l, idx)}</p>`).join('')
+    return `<div class="bulle-q">${esc(x.q)}</div>
+      <div class="bulle-r"><span class="ia-dot">${ico('spark', 'width:18px;height:18px')}</span><div class="contenu">${texte}<ul>${puces}</ul>
+        <div class="sources">${x.sources.map((s) => `<button type="button" class="chip outlined source ${S.sourceActive[idx] === s.n ? 'active' : ''}" data-act="source" data-a="${s.id}">${ico('file', 'width:16px;height:16px')}<b>[${s.n}]</b> ${esc(s.fichier)} · p. ${s.page}</button>`).join('')}</div>
+        <div class="avis"><span>Réponse générée par IA, à vérifier dans les sources.</span><span class="spacer"></span><button type="button" data-act="avis" data-a="${idx}" data-v="1" aria-pressed="${x.avis === 1}" aria-label="Réponse utile">👍</button><button type="button" data-act="avis" data-a="${idx}" data-v="0" aria-pressed="${x.avis === 0}" aria-label="Réponse pas utile">👎</button></div>
+      </div></div>`
+  }).join('')
+  const vide = !S.ia.length
+  return `<div class="ia">
+    <div class="card ia-chat">
+      <div class="row card-pad" style="padding:14px 16px;border-bottom:1px solid var(--outline)"><span class="ia-dot">${ico('spark', 'width:18px;height:18px')}</span><div style="flex:1"><b>Assistant du cours</b><br><span class="muted small">Répond à partir des ressources publiées dans cet espace, en citant ses sources.</span></div><button class="btn text sm" type="button" data-act="nouvelle">Nouvelle conversation</button></div>
+      <div class="chat-list" id="chat">
+        ${vide ? `<div class="bulle-r"><span class="ia-dot">${ico('spark', 'width:18px;height:18px')}</span><div class="contenu">Bonjour ${esc(user().prenom)}. Je réponds à vos questions à partir des supports publiés dans cet espace, en citant mes sources.</div></div>
+          <div class="sources" style="padding-left:42px">${[QR.q, 'Résume les notions clés du chapitre 3', 'Quelle est la capitale de l\'Australie ?'].map((s) => `<button class="chip outlined btnchip" type="button" data-act="poser" data-a="${esc(s)}">${esc(s)}</button>`).join('')}</div>` : echanges}
+      </div>
+      <form class="composer" data-submit="question">
+        <div class="composer-row"><input class="input" name="q" placeholder="Posez une question sur le cours…" aria-label="Question" ${S.quota ? '' : 'disabled'}><button class="btn primary" type="submit" ${S.quota ? '' : 'disabled'}>${ico('send')}</button></div>
+        <span class="hint">${S.quota ? `Questions restantes aujourd'hui : ${S.quota} sur 20 (tous espaces confondus). Vos questions sont privées.` : 'Vous avez atteint vos 20 questions du jour. Revenez demain.'}</span>
+      </form>
+    </div>
+    <aside class="card card-pad ia-side"><h2 style="font-size:16px">${ico('folder')}Sources de l'assistant</h2><p class="muted small" style="margin:6px 0 10px">Documents indexés de l'espace</p>
+      <div class="list">${D.chapitres[2].flatMap((c) => c.ress.filter((r) => r.indexee)).map((r) => `<div class="list-item">${ico('file')}<span class="small">${esc(r.nom)}</span></div>`).join('')}</div></aside>
+  </div>`
+}
+
+function parametres(e) {
+  const actif = !!S.assistantActif[e.id]
+  return `<div class="grid-2">
+    <div class="card card-pad"><h2>${ico('cog')}Informations</h2>
+      <div class="field" style="margin-top:12px"><label for="pn">Nom</label><input id="pn" class="input" value="${esc(e.nom)}"></div>
+      <div class="field" style="margin-top:12px"><label for="pv">Visibilité des messages</label><select id="pv" class="input"><option>24 heures</option><option>7 jours</option><option selected>30 jours</option></select><span class="hint">S'applique aux nouveaux messages uniquement.</span></div>
+      <button class="btn primary" style="margin-top:14px" type="button" data-act="toast" data-a="Paramètres enregistrés.">Enregistrer</button></div>
+    <div class="card card-pad"><h2>${ico('spark')}Assistant IA</h2>
+      <div class="row" style="margin-top:12px"><div style="flex:1"><b style="font-weight:500">Activer l'assistant pour cet espace</b><br><span class="muted small">Les étudiants posent leurs questions ; l'IA répond à partir des PDF indexés.</span></div>
+        <button class="switch" type="button" role="switch" aria-checked="${actif}" aria-label="Activer l'Assistant IA" data-act="assistant"></button></div>
+      <div class="field" style="margin-top:14px"><label for="pc">Consigne pour l'assistant (facultatif)</label><textarea id="pc" class="input" placeholder="Ex. : Donne des exemples SQL quand c'est possible.">Donne des exemples SQL quand c'est possible.</textarea></div>
+      <p class="hint" style="margin-top:8px">Quota : 20 questions par étudiant et par jour. Fournisseurs : Gemini, puis Groq en secours.</p></div>
+  </div>`
+}
+
+/* ------------------------------------------------------------------ créer un espace (E06) */
+function wizard() {
+  const w = S.wizard
+  const etapes = ['Type', 'Informations', 'Visibilité', 'Invitations', 'Récapitulatif']
+  const corps = [
+    `<div class="choice sel"><input type="radio" checked aria-label="Groupe privé"><div><b style="font-weight:500">Groupe privé</b><br><span class="muted small">Sur invitation, pour un projet ou des révisions.</span></div></div>
+     <div class="choice off"><input type="radio" disabled aria-label="Channel"><div><b style="font-weight:500">Channel</b> <span class="chip">v1.1</span><br><span class="muted small">Espace thématique ouvert (club, vie étudiante).</span></div></div>`,
+    `<div class="field"><label for="wn">Nom de l'espace</label><input id="wn" class="input" data-w="nom" value="${esc(w.nom)}" placeholder="Ex. : Révisions BD"><span class="hint">3 à 80 caractères.</span></div>
+     <div class="field"><label for="wd">Description (facultatif)</label><textarea id="wd" class="input" data-w="desc">${esc(w.desc)}</textarea></div>`,
+    ['24 heures', '7 jours', '30 jours'].map((d) => `<label class="choice ${w.duree === d ? 'sel' : ''}"><input type="radio" name="duree" data-w="duree" value="${d}" ${w.duree === d ? 'checked' : ''}><div><b style="font-weight:500">${d}</b><br><span class="muted small">Les messages sont supprimés ${d} après leur envoi.</span></div></label>`).join(''),
+    `<div class="field"><label for="wi">Rechercher par nom ou prénom</label><input id="wi" class="input" placeholder="Tapez au moins 2 lettres…" value="Ben"></div>
+     <div class="list">${['Nour Ben Ali · Étudiant · L2 Info – Groupe A', 'Yasmine Trabelsi · Étudiant · L2 Info – Groupe A'].map((p, i) => `<label class="list-item clickable"><input type="checkbox" data-w="inv${i}" ${w['inv' + i] ? 'checked' : ''}><span class="avatar sm">${p.split(' ').map((x) => x[0]).slice(0, 2).join('')}</span><span>${p}</span></label>`).join('')}</div>
+     <p class="hint">Facultatif : vous pourrez inviter d'autres personnes depuis l'onglet Membres.</p>`,
+    `<div class="list"><div class="list-item"><b style="width:140px;font-weight:500">Type</b>Groupe privé</div><div class="list-item"><b style="width:140px;font-weight:500">Nom</b>${esc(w.nom || '—')}</div><div class="list-item"><b style="width:140px;font-weight:500">Visibilité</b>${w.duree}</div><div class="list-item"><b style="width:140px;font-weight:500">Invitations</b>${[w.inv0 && 'Nour Ben Ali', w.inv1 && 'Yasmine Trabelsi'].filter(Boolean).join(', ') || 'Aucune'}</div></div>`,
+  ]
+  const peutContinuer = w.etape !== 1 || w.nom.trim().length >= 3
+  return `<div class="page" style="max-width:820px"><div class="page-head"><div><h1>Créer un espace</h1></div><button class="btn text" type="button" data-act="go" data-a="accueil">Annuler</button></div>
+    <div class="card card-pad" style="display:flex;flex-direction:column;gap:18px">
+      <div class="stepper">${etapes.map((t, i) => `<div class="step ${i === w.etape ? 'on' : i < w.etape ? 'done' : ''}"><span class="n">${i < w.etape ? '✓' : i + 1}</span><span>${t}</span></div>`).join('')}</div>
+      <div style="display:flex;flex-direction:column;gap:12px">${corps[w.etape]}</div>
+      <div class="row"><button class="btn text" type="button" data-act="wprev" ${w.etape ? '' : 'disabled'}>Retour</button><span class="spacer"></span>
+        ${w.etape < 4 ? `<button class="btn primary" type="button" data-act="wnext" ${peutContinuer ? '' : 'disabled'}>Continuer</button>` : `<button class="btn primary" type="button" data-act="wcreer">Créer l'espace</button>`}</div>
+    </div></div>`
+}
+
+/* ------------------------------------------------------------------ administration (A01, A02, A03, A06) */
+function annees() {
+  return `<div class="page"><div class="page-head"><div><h1>Années universitaires</h1><p class="muted">Une seule année active à la fois : elle sert à rattacher les comptes et à générer les groupes.</p></div><button class="btn primary" type="button" data-act="toast" data-a="Année créée (démo).">${ico('plus')}Nouvelle année</button></div>
+    <div class="card table-wrap"><table><thead><tr><th>Année</th><th>Début</th><th>Fin</th><th>État</th><th></th></tr></thead><tbody>
+    ${D.annees.map((a, i) => `<tr><td><b style="font-weight:500">${a.libelle}</b></td><td>${a.debut}</td><td>${a.fin}</td><td>${a.active ? '<span class="chip success">Active</span>' : '<span class="chip">Préparée</span>'}</td><td>${a.active ? '' : `<button class="btn outlined sm" type="button" data-act="activer" data-a="${i}">Activer</button>`}</td></tr>`).join('')}
+    </tbody></table></div></div>`
+}
+function referentiels() {
+  const t = S.refOnglet || 'Classes'
+  return `<div class="page"><div class="page-head"><div><h1>Référentiels</h1><p class="muted">Un élément utilisé ne peut pas être supprimé : il est désactivé.</p></div><button class="btn primary" type="button" data-act="toast" data-a="Élément ajouté (démo).">${ico('plus')}Ajouter</button></div>
+    <div class="tabs">${Object.keys(D.referentiels).map((k) => `<button class="tab" type="button" data-act="ref" data-a="${k}" aria-selected="${t === k}">${k}</button>`).join('')}</div>
+    <div class="card table-wrap"><table><thead><tr><th>Code</th><th>Libellé</th><th>État</th></tr></thead><tbody>${D.referentiels[t].map(([c, l]) => `<tr><td><b style="font-weight:500">${c}</b></td><td>${l}</td><td><span class="chip success">Actif</span></td></tr>`).join('')}</tbody></table></div></div>`
+}
+function comptes() {
+  return `<div class="page"><div class="page-head"><div><h1>Comptes autorisés</h1><p class="muted">Personnes qui peuvent créer un compte (année 2026/2027).</p></div>
+      <button class="btn outlined" type="button" data-act="toast" data-a="Modèle Excel téléchargé.">${ico('download')}Modèle Excel</button><button class="btn primary" type="button" data-act="dialog" data-a="import">${ico('upload')}Importer un fichier Excel</button></div>
+    <div class="card table-wrap"><table><thead><tr><th>Matricule</th><th>Nom</th><th>E-mail</th><th>Profil</th><th>Classe</th><th>État</th></tr></thead><tbody>
+    ${D.comptes.map((c) => `<tr><td>${c.matricule}</td><td>${esc(c.nom)}</td><td class="muted">${c.email}</td><td>${c.profil}</td><td>${c.classe}</td><td><span class="chip ${c.etat === 'Actif' ? 'success' : ''}">${c.etat}</span></td></tr>`).join('')}
+    </tbody></table></div></div>`
+}
+function groupes() {
+  const g = [['L2 Info – Groupe A', 'Classe', 32], ['L2 Info – Groupe A · Bases de données', 'Matière', 33], ['L2 Info – Groupe A · Développement Web', 'Matière', 33], ['L2 Info – Groupe B', 'Classe', 30]]
+  return `<div class="page"><div class="page-head"><div><h1>Groupes organisationnels</h1><p class="muted">Un groupe par classe et un par matière de l'année active. On peut relancer la génération sans créer de doublons.</p></div>
+      <button class="btn primary" type="button" data-act="dialog" data-a="generer">${ico('group')}Générer les groupes</button></div>
+    ${S.groupesGeneres ? `<div class="card table-wrap"><table><thead><tr><th>Groupe</th><th>Type</th><th>Membres</th><th></th></tr></thead><tbody>${g.map(([n, t, m]) => `<tr><td>${n}</td><td><span class="chip ${t === 'Classe' ? 'primary' : 'secondary'}">${t}</span></td><td>${m}</td><td><button class="btn text sm" type="button" data-act="toast" data-a="Membres synchronisés avec les comptes de la classe.">Synchroniser</button></td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="card"><div class="empty">${ico('group')}<p>Aucun groupe pour l'année 2026/2027.<br>Cliquez sur « Générer les groupes » : un aperçu s'affiche avant toute création.</p></div></div>`}</div>`
+}
+
+/* ------------------------------------------------------------------ fenêtres */
+function dialog() {
+  if (!S.dialog) return ''
+  const d = {
+    perimetre: `<h2>Périmètre de la version 1.0 (19/11/2026)</h2>
+      <div class="grid-2">
+        <div class="scope-col"><h3>✅ Livré (sprints S0 à S2)</h3><ul><li>Inscription contrôlée, activation, connexion</li><li>Accueil : mes espaces, non-lus, invitations</li><li>Groupes de classe et de matières automatiques</li><li>Groupes privés, invitations, membres et rôles</li><li>Discussion, pièces jointes protégées</li><li>Annonces, ressources par chapitre</li><li>Notifications dans l'application</li><li>Assistant IA : réponses sourcées, avis, quota de 20/jour</li><li>Administration : années, référentiels, comptes autorisés et import Excel, génération des groupes</li><li>Responsive (téléphone) et accessibilité</li></ul></div>
+        <div class="scope-col"><h3>🕓 Prévu en v1.1</h3><ul><li>Mot de passe oublié</li><li>Annuaire des channels</li><li>Épinglés, onglet Fichiers</li><li>Signalement et modération</li><li>Utilisateurs et droits, historique</li><li>Tableau de bord, recherche</li><li>Résumé IA de la discussion</li><li>Purge automatique, profil</li></ul></div>
+      </div><p class="hint">Sources : Jira (sprints S0, S1, S2 ; stories étiquetées v1.1). Données de démonstration fictives.</p>
+      <div class="actions"><button class="btn primary" type="button" data-act="close">Fermer</button></div>`,
+    annonce: `<h2>Publier une annonce</h2><div class="field"><label for="at">Titre</label><input id="at" class="input" value="Rappel : rendu du projet"></div><div class="field"><label for="ax">Texte</label><textarea id="ax" class="input">Le rendu du mini-projet est fixé au 30/11 à 23 h 59 sur la plateforme.</textarea></div><p class="hint">Les membres de l'espace reçoivent une notification.</p><div class="actions"><button class="btn text" type="button" data-act="close">Annuler</button><button class="btn primary" type="button" data-act="publier">Publier</button></div>`,
+    ressource: `<h2>Ajouter une ressource</h2><div class="field"><label for="rt">Titre</label><input id="rt" class="input" value="Chapitre 4 – Déclencheurs.pdf"></div><div class="field"><label>Chapitre</label><select class="input"><option>Chapitre 3 – PL/SQL</option></select></div><div class="field"><label>Fichier ou lien</label><div class="choice sel">${ico('file')}<span>Chapitre4-Declencheurs.pdf · 1,1 Mo</span></div></div><p class="hint">Les PDF sont découpés et indexés pour l'Assistant IA en arrière-plan.</p><div class="actions"><button class="btn text" type="button" data-act="close">Annuler</button><button class="btn primary" type="button" data-act="ajoutress">Ajouter</button></div>`,
+    inviter: `<h2>Inviter des personnes</h2><div class="field"><label for="ii">Rechercher par nom ou prénom</label><input id="ii" class="input" value="Ben"></div><div class="list"><label class="list-item clickable"><input type="checkbox" checked><span class="avatar sm">NB</span>Nour Ben Ali · Étudiant</label><label class="list-item clickable"><input type="checkbox"><span class="avatar sm">SB</span>Salma Ben Romdhane · Étudiant</label></div><p class="hint">L'invitation expire au bout de 14 jours.</p><div class="actions"><button class="btn text" type="button" data-act="close">Annuler</button><button class="btn primary" type="button" data-act="closetoast" data-a="1 invitation envoyée.">Inviter</button></div>`,
+    import: `<h2>Importer des comptes autorisés</h2>
+      ${S.importApercu ? `<div class="alert info">${ico('info')}<div><b>40 lignes lues</b> : 38 valides, 2 erreurs. Rien n'est enregistré avant la validation.</div></div>
+        <div class="table-wrap"><table><thead><tr><th>Ligne</th><th>Matricule</th><th>Erreur</th></tr></thead><tbody><tr><td>12</td><td>ETU-2026-012</td><td class="muted">E-mail invalide</td></tr><tr><td>27</td><td>ETU-2026-027</td><td class="muted">Classe inconnue : L2-INFO-Z</td></tr></tbody></table></div>
+        <div class="actions"><button class="btn text" type="button" data-act="close">Annuler</button><button class="btn primary" type="button" data-act="closetoast" data-a="38 comptes autorisés importés.">Importer les 38 lignes valides</button></div>`
+        : `<div class="choice sel">${ico('upload')}<div><b style="font-weight:500">comptes-L2-2026.xlsx</b><br><span class="muted small">Colonnes : matricule, nom, prenom, email, profil, classe_code</span></div></div>
+        <div class="actions"><button class="btn text" type="button" data-act="close">Annuler</button><button class="btn primary" type="button" data-act="apercu">Voir l'aperçu</button></div>`}`,
+    generer: `<h2>Générer les groupes 2026/2027</h2><div class="alert info">${ico('info')}<div>Aperçu : <b>12 groupes</b> seront créés (3 classes, 9 matières) et <b>96 membres</b> rattachés. Les groupes déjà existants ne sont pas recréés.</div></div><div class="actions"><button class="btn text" type="button" data-act="close">Annuler</button><button class="btn primary" type="button" data-act="generer">Générer</button></div>`,
+  }[S.dialog]
+  return `<div class="overlay" data-act="closeov"><div class="dialog" role="dialog" aria-modal="true">${d}</div></div>`
+}
+
+/* ------------------------------------------------------------------ rendu */
+function render() {
+  const root = document.getElementById('root')
+  if (!S.connecte) {
+    root.innerHTML = strip() + auth() + dialog() + (S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : '')
+    return
+  }
+  const pages = { accueil, notifications, espace, wizard, annees, referentiels, comptes, groupes }
+  root.innerHTML = strip() + `<div class="app">${topbar()}${drawer()}<main class="main">${(pages[S.vue] || accueil)()}</main></div>` + bottomNav() + dialog() + (S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : '')
+  const chat = document.getElementById('chat')
+  if (chat) chat.scrollTop = chat.scrollHeight
+}
+
+/* ------------------------------------------------------------------ actions */
+function poser(q) {
+  if (!S.quota || !q.trim()) return
+  S.quota -= 1
+  const horsCours = /capitale|météo|football/i.test(q)
+  S.ia.push(horsCours ? { q, sansSource: true } : { q, r: QR.r, sources: QR.sources, avis: null })
+  render()
+}
+const ACTIONS = {
+  role: (a) => { S.role = a; S.vue = 'accueil'; S.ia = []; S.sourceActive = {}; S.dialog = null; render() },
+  auth: (a) => { S.ecranAuth = a; render() },
+  logout: () => { S.connecte = false; S.ecranAuth = 'connexion'; render() },
+  go: (a) => go(a),
+  drawer: () => { S.drawer = !S.drawer; render() },
+  espace: (a, el) => go('espace', { espaceId: +a, onglet: el.dataset.o || 'discussion', hl: null }),
+  onglet: (a) => { S.onglet = a; if (a !== 'ressources') S.hl = null; render() },
+  toast: (a) => toast(a),
+  dialog: (a) => { S.dialog = a; S.importApercu = false; render() },
+  close: () => { S.dialog = null; render() },
+  closeov: (a, el, ev) => { if (ev.target === el) ACTIONS.close() },
+  closetoast: (a) => { S.dialog = null; toast(a) },
+  accepter: (a) => {
+    D.invitations[S.role] = invitations().filter((i) => i.id !== +a)
+    D.espaces.push({ id: 5, type: 'PRIVE', icone: 'lock', nom: 'Révisions BD', visibilite: '7 jours', membres: 6, roles: { [S.role]: 'MEMBRE' }, assistant: false, nonLus: 0 })
+    go('espace', { espaceId: 5, onglet: 'discussion' })
+    toast('Invitation acceptée : vous êtes membre de « Révisions BD ».')
+  },
+  refuser: (a) => { D.invitations[S.role] = invitations().filter((i) => i.id !== +a); toast('Invitation refusée.') },
+  lire: (a) => { const n = D.notifications.find((x) => x.id === +a); n.lue = true; render() },
+  toutlire: () => { D.notifications.forEach((n) => { n.lue = true }); render() },
+  pj: () => { S.pj = 'exercices-curseurs.pdf'; render() },
+  pjx: () => { S.pj = null; render() },
+  poser: (a) => poser(a),
+  nouvelle: () => { S.ia = []; S.sourceActive = {}; render() },
+  cite: (a, el) => { S.sourceActive = { ...S.sourceActive, [a]: +el.dataset.n }; render() },
+  source: (a) => { S.onglet = 'ressources'; S.hl = +a; render() },
+  avis: (a, el) => { S.ia[+a].avis = +el.dataset.v; toast('Merci pour votre avis.') },
+  assistant: () => { S.assistantActif[S.espaceId] = !S.assistantActif[S.espaceId]; toast(S.assistantActif[S.espaceId] ? 'Assistant IA activé : l\'onglet est visible par les membres.' : 'Assistant IA désactivé.') },
+  publier: () => { D.annonces[S.espaceId] = [{ titre: 'Rappel : rendu du projet', texte: 'Le rendu du mini-projet est fixé au 30/11 à 23 h 59 sur la plateforme.', auteur: `${user().prenom} ${user().nom}`, date: '19 nov. 2026' }, ...(D.annonces[S.espaceId] || [])]; S.dialog = null; toast('Annonce publiée : les membres ont été notifiés.') },
+  ajoutress: () => { const c = D.chapitres[S.espaceId]; if (c) c[2].ress.push({ id: 15, nom: 'Chapitre 4 – Déclencheurs.pdf', taille: '1,1 Mo', indexee: true }); S.dialog = null; toast('Ressource ajoutée. Indexation pour l\'IA terminée.') },
+  wizard: () => go('wizard', { wizard: { etape: 0, nom: '', desc: '', duree: '7 jours', inv0: true, inv1: false } }),
+  wnext: () => { S.wizard.etape += 1; render() },
+  wprev: () => { S.wizard.etape -= 1; render() },
+  wcreer: () => {
+    const w = S.wizard
+    D.espaces.push({ id: 6, type: 'PRIVE', icone: 'lock', nom: w.nom, visibilite: w.duree, membres: 1, roles: { [S.role]: 'PROPRIETAIRE' }, assistant: false, nonLus: 0 })
+    go('espace', { espaceId: 6, onglet: 'membres' })
+    toast('Espace créé. Les invitations ont été envoyées.')
+  },
+  activer: (a) => { D.annees.forEach((x, i) => { x.active = i === +a }); toast(`Année ${D.annees[+a].libelle} activée.`) },
+  ref: (a) => { S.refOnglet = a; render() },
+  apercu: () => { S.importApercu = true; render() },
+  generer: () => { S.groupesGeneres = true; S.dialog = null; toast('12 groupes créés, 96 membres rattachés.') },
+}
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('[data-act]')
+  if (!el) return
+  const f = ACTIONS[el.dataset.act]
+  if (f) f(el.dataset.a, el, ev)
+})
+document.addEventListener('input', (ev) => {
+  const k = ev.target.dataset.w
+  if (!k || !S.wizard) return
+  S.wizard[k] = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value
+  if (k === 'nom') {
+    const b = document.querySelector('[data-act="wnext"]')
+    if (b) b.disabled = S.wizard.nom.trim().length < 3
+  }
+  if (k === 'duree') render()
+})
+document.addEventListener('submit', (ev) => {
+  ev.preventDefault()
+  const f = ev.target
+  switch (f.dataset.submit) {
+    case 'connexion': S.connecte = true; S.vue = 'accueil'; render(); break
+    case 'inscription': S.ecranAuth = 'envoye'; render(); break
+    case 'activation': S.connecte = true; S.vue = 'accueil'; toast('Compte activé : vos groupes de classe ont été rejoints automatiquement.'); break
+    case 'message': {
+      const t = f.texte.value.trim()
+      if (!t && !S.pj) return
+      const u = user()
+      D.messages[S.espaceId] = [...(D.messages[S.espaceId] || []), { id: Date.now(), auteur: `${u.prenom} ${u.nom}`, initiales: initiales(u), badge: u.profil === 'Enseignant' ? 'Enseignant' : null, heure: '10:30', texte: t, pj: S.pj ? { nom: S.pj, taille: '256 Ko' } : null, jour: "Aujourd'hui" }]
+      S.pj = null
+      render()
+      break
+    }
+    case 'question': poser(f.q.value); break
+  }
+})
+document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && S.dialog) ACTIONS.close() })
+render()
+</script>
+</body>
+</html>
