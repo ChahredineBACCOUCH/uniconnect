@@ -140,6 +140,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // SCRUM-145 : activer l'assistant et sa consigne (enseignant propriétaire / co-gestionnaire).
     Route::patch('/espaces/{espace}/assistant', [AssistantIAController::class, 'configurer']);
+
+    // SCRUM-146 : avis 👍/👎 sur une réponse de l'assistant (auteur de la question).
+    Route::patch('/ia/echanges/{echange}/avis', [AssistantIAController::class, 'avis']);
 });
 
 // SCRUM-72 : gestion des années universitaires (paramétrage).
