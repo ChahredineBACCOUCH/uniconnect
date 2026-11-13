@@ -22,7 +22,9 @@ Il fonctionne sur ordinateur et sur téléphone. Sur téléphone, le menu est en
 ## 2. Étudiant
 
 ### Retrouver ses espaces
-L'**accueil** affiche vos espaces : votre classe, chacune de vos matières et vos groupes privés. Le chiffre bleu indique le nombre de messages non lus.
+Le **menu de gauche** classe vos espaces en trois rubriques : **Mes classes et matières**, **Mes groupes privés** et **Mes channels**. Le chiffre bleu à côté d'un espace indique le nombre de messages non lus ; il revient à zéro quand vous ouvrez la discussion.
+
+L'**accueil** résume votre journée : messages non lus, invitations en attente et nombre d'espaces, puis la liste de vos invitations et de vos espaces (pratique sur téléphone, où le menu est replié).
 
 ### Discuter
 1. Ouvrez un espace : l'onglet **Discussion** s'affiche.
@@ -36,19 +38,28 @@ L'**accueil** affiche vos espaces : votre classe, chacune de vos matières et vo
 ### Poser une question à l'Assistant IA
 1. Dans l'espace d'une matière, ouvrez l'onglet **Assistant IA** (visible si l'enseignant l'a activé).
 2. Posez votre question en français, par exemple : « Quelle est la différence entre la 2FN et la 3FN ? »
-3. La réponse indique ses **sources** (« [1] Chapitre 3 – Normalisation.pdf · p. 14 ») : cliquez dessus pour ouvrir le document.
+3. La réponse indique ses **sources** (« [1] Chapitre 3 – Normalisation.pdf · p. 14 »). Dans le texte, cliquez sur un numéro comme **[1]** pour mettre en évidence la source correspondante, puis cliquez sur la source pour la retrouver dans l'onglet **Ressources**.
 4. Donnez votre avis avec 👍 ou 👎 : cela aide à améliorer l'assistant.
 
 À savoir :
 - l'assistant répond **uniquement à partir des documents du cours**. Si l'information n'y est pas, il le dit ;
-- **20 questions par jour** au maximum ;
+- **20 questions par jour** au maximum, tous espaces confondus (le compteur s'affiche sous la zone de saisie) ;
 - vos questions sont **privées** : ni l'enseignant ni les autres étudiants ne les voient ;
 - l'IA peut se tromper : **vérifiez toujours dans les sources**.
 
 ### Groupes privés
-1. Cliquez sur **Créer un groupe privé**, donnez-lui un nom, puis invitez des personnes.
-2. Les invités reçoivent une notification et choisissent **Accepter** ou **Refuser**.
-3. Vous pouvez quitter un groupe privé, mais pas le groupe de votre classe.
+1. Cliquez sur **Créer un espace** (en haut du menu), puis suivez les 5 étapes : type, informations (nom, description), visibilité des messages (24 h, 7 jours ou 30 jours), invitations, récapitulatif.
+2. Pour inviter quelqu'un, tapez au moins 2 lettres de son **nom ou prénom** (la recherche ne se fait pas par adresse e-mail).
+3. Les invités voient l'invitation sur leur **accueil** (et un chiffre sur la cloche 🔔) et choisissent **Accepter** ou **Refuser**. Une invitation expire au bout de 14 jours.
+4. Vous pouvez quitter un groupe privé (onglet **Membres** → **Quitter l'espace**), mais pas le groupe de votre classe.
+
+### Assistant IA : bonnes pratiques
+- **Posez une question précise**, sur une notion du cours : « Quels sont les attributs d'un curseur explicite ? » plutôt que « Explique le chapitre 3 ».
+- **Une question à la fois** : l'assistant cherche les passages du cours qui correspondent à vos mots ; une question qui mélange plusieurs sujets donne une réponse moins fiable.
+- **Reprenez les mots du cours** (« normalisation », « clé étrangère »…) : ils aident l'assistant à trouver le bon passage.
+- **Vérifiez les sources** : chaque information est suivie d'un numéro [n] qui renvoie à un document et à une page. Une réponse sans source n'est pas fiable.
+- Si l'assistant répond qu'il n'a **pas trouvé de réponse fiable** dans les ressources, l'information n'est pas dans les supports publiés : demandez à votre enseignant.
+- Gardez vos **20 questions par jour** pour les points difficiles ; **Nouvelle conversation** repart de zéro quand vous changez de sujet.
 
 ---
 
@@ -61,7 +72,7 @@ Vous avez accès à tout ce que fait un étudiant, et en plus :
 | Publier une annonce | Onglet **Annonces** | Titre + texte → **Publier** : les membres reçoivent une notification |
 | Partager un support de cours | Onglet **Ressources** | **Nouveau chapitre**, puis **Ajouter une ressource** (PDF ou lien). Les PDF sont indexés pour l'IA : la puce « Indexée pour l'IA » apparaît. |
 | Activer l'Assistant IA | Onglet **Paramètres** | Interrupteur « Assistant IA ». Vous pouvez ajouter une consigne, par exemple « Donne des exemples SQL ». |
-| Gérer les membres | Onglet **Membres** | Inviter, nommer un co-gestionnaire, retirer un membre (l'accès est coupé immédiatement) |
+| Gérer les membres | Onglet **Membres** | Inviter, nommer un co-gestionnaire, retirer un membre (l'accès aux messages est coupé immédiatement), transférer la propriété. Un espace a toujours un propriétaire : s'il part, la propriété passe au plus ancien co-gestionnaire. |
 
 Conseil : l'assistant n'est utile que si vos PDF sont **en texte** (pas des scans d'images) et classés par chapitre.
 
