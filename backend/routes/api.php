@@ -12,12 +12,14 @@ use App\Http\Controllers\Admin\MatiereController;
 use App\Http\Controllers\Admin\NiveauController;
 use App\Http\Controllers\AssistantIAController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ChapitreController;
 use App\Http\Controllers\EspaceController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MesEspacesController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\UtilisateurController;
 use App\Http\Middleware\VerifierLienActivation;
 use App\Http\Resources\UtilisateurResource;
@@ -110,6 +112,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/espaces/{espace}/messages', [MessageController::class, 'store']);
     Route::patch('/messages/{message}', [MessageController::class, 'update']);
     Route::delete('/messages/{message}', [MessageController::class, 'destroy']);
+
+    // SCRUM-126 : chapitres et ressources pédagogiques (organisation du cours).
+    Route::get('/espaces/{espace}/chapitres', [ChapitreController::class, 'index']);
+    Route::post('/espaces/{espace}/chapitres', [ChapitreController::class, 'store']);
+    Route::post('/espaces/{espace}/chapitres/ordre', [ChapitreController::class, 'reordonner']);
+    Route::patch('/chapitres/{chapitre}', [ChapitreController::class, 'update']);
+    Route::delete('/chapitres/{chapitre}', [ChapitreController::class, 'destroy']);
+
+    Route::get('/espaces/{espace}/ressources', [RessourceController::class, 'index']);
+    Route::post('/espaces/{espace}/ressources', [RessourceController::class, 'store']);
+    Route::post('/chapitres/{chapitre}/ressources', [RessourceController::class, 'storeDansChapitre']);
+    Route::patch('/ressources/{ressource}', [RessourceController::class, 'update']);
+    Route::delete('/ressources/{ressource}', [RessourceController::class, 'destroy']);
+    Route::patch('/ressources/{ressource}/deplacer', [RessourceController::class, 'deplacer']);
+    Route::get('/ressources/{ressource}/telecharger', [RessourceController::class, 'telecharger'])
+        ->name('ressources.telecharger');
 
     // SCRUM-102 : question à l'Assistant IA (membre, assistant actif, 20 questions par jour).
     Route::post('/espaces/{espace}/ia/questions', [AssistantIAController::class, 'poser']);

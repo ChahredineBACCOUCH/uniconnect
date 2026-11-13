@@ -24,8 +24,11 @@ class MembreApiTest extends TestCase
 
     public function test_un_membre_liste_les_membres_avec_leur_role(): void
     {
-        [$espace, $proprietaire] = $this->groupe();
-        $co = $this->membre($espace, RoleMembre::CO_GESTIONNAIRE, ['nom' => 'Zitouni']);
+        // Noms fixes : la recherche porte sur un fragment de nom, et faker peut
+        // générer un autre membre dont le nom contient « lina » (Célina…).
+        $espace = Espace::create(['type' => 'PRIVE', 'nom' => 'Groupe de révision']);
+        $proprietaire = $this->membre($espace, RoleMembre::PROPRIETAIRE, ['nom' => 'Trabelsi', 'prenom' => 'Sami']);
+        $co = $this->membre($espace, RoleMembre::CO_GESTIONNAIRE, ['nom' => 'Zitouni', 'prenom' => 'Karim']);
         $membre = $this->membre($espace, RoleMembre::MEMBRE, ['nom' => 'Ayari', 'prenom' => 'Lina']);
 
         Sanctum::actingAs($membre);
