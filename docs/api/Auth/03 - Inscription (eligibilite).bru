@@ -1,0 +1,27 @@
+meta {
+  name: 03 - Inscription (eligibilite)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "matricule": "LI2-2026-0457",
+    "nom": "Ben Salah",
+    "prenom": "Yassine",
+    "email": "yassine.bensalah@univ.tn",
+    "accepte_charte": true
+  }
+}
+
+tests {
+  test("201 ou 422 selon la liste des comptes autorises", function () {
+    expect([201, 422]).to.include(res.status);
+  });
+}
