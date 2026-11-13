@@ -10,6 +10,7 @@ use App\Enums\TypeEspace;
 use App\Models\Adhesion;
 use App\Models\Espace;
 use App\Models\User;
+use App\Notifications\RetraitEspace;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -112,7 +113,14 @@ class MembreController extends Controller
             abort(403, 'Seul le propriétaire peut retirer un co-gestionnaire.');
         }
 
+        $notificationsActives = $adhesion->notifications_actives;
+
         $adhesion->delete();
+
+        // SCRUM-121 : le membre retiré est prévenu dans l'application.
+        if ($notificationsActives) {
+            $user->notify(new RetraitEspace($espace, $request->user()));
+        }
 
         return response()->noContent();
     }
