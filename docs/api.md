@@ -126,8 +126,8 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/espaces/{id}/annonces` | membre | → `{ data: [{ id, titre, contenu, auteur, cree_le }] }` (les plus récentes d'abord) | SCRUM-123 |
-| POST | `/espaces/{id}/annonces` | propriétaire / co-gestionnaire | `{ titre, contenu, notifier_email? }` → **201** annonce (+ notification aux membres) | SCRUM-123 |
+| GET | `/espaces/{id}/annonces` | membre | → `{ data: [{ id, titre, contenu, auteur, notifier_email, cree_le, pieces_jointes: [{ id, nom, mime, taille_octets }] }] }` (les plus récentes d'abord) | SCRUM-123, 124 |
+| POST | `/espaces/{id}/annonces` | propriétaire / co-gestionnaire | JSON ou multipart : `titre`, `contenu`, `notifier_email?`, `fichiers[]?` (5 maximum) → **201** annonce (+ notification aux membres) | SCRUM-123, 124 |
 | DELETE | `/annonces/{id}` | auteur | → **204** | SCRUM-123 |
 | GET | `/espaces/{id}/chapitres` | membre | → `{ data: [{ id, titre, ordre, ressources: [{ id, chapitre_id, titre, description, mime, taille, url, indexee_ia, auteur_id, cree_le }] }] }` (chapitres triés par `ordre`, ressources par `id`) | SCRUM-126 |
 | POST | `/espaces/{id}/chapitres` | enseignant de l'espace | `{ titre, ordre? }` → **201** chapitre (sans `ordre`, il passe en dernier) | SCRUM-126 |
@@ -142,6 +142,7 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 | DELETE | `/ressources/{id}` | enseignant | → **204** (supprime le fichier du disque et les fragments IA) | SCRUM-126 |
 | GET | `/ressources/{id}/telecharger` | membre | → **302** lien temporaire (S3) ou fichier en pièce jointe (disque local) · **404** pour un lien ou un fichier introuvable | SCRUM-126 |
 
+- Les pièces jointes d'une annonce sont facultatives (5 maximum, mêmes règles de taille et de format que les messages) et rangées dans `espaces/{espace_id}/annonces` sur le disque par défaut.
 - Une ressource est un **fichier OU un lien**, jamais les deux (**422** sinon) : les fichiers sont rangés dans `espaces/{espace_id}/ressources` sur le disque par défaut (`S3` en production, `local` en développement).
 - Taille et formats des fichiers : mêmes règles que les pièces jointes (`regles_plateforme`, **422** si dépassement).
 - L'observer de SCRUM-98 lance `IndexerRessource` après le commit à l'ajout ou au remplacement d'un PDF : `indexee_ia` passe à `true` quand le job a créé les fragments. Remplacer un fichier par un lien supprime les fragments et remet `indexee_ia` à `false`.

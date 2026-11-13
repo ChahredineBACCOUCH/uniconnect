@@ -9,16 +9,26 @@ use App\Models\Annonce;
 use App\Models\Espace;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
- * SCRUM-123 : API des annonces d'un espace.
+ * SCRUM-123 / SCRUM-124 : API des annonces d'un espace.
  */
 class AnnonceApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Aucun fichier réel n'est écrit dans storage/ pendant les tests.
+        Storage::fake('local');
+    }
 
     public function test_un_membre_lit_les_annonces_de_la_plus_recente_a_la_plus_ancienne(): void
     {
@@ -164,6 +174,117 @@ class AnnonceApiTest extends TestCase
             'contenu' => 'Test',
         ])->assertUnauthorized();
         $this->deleteJson("/api/annonces/{$annonce->id}")->assertUnauthorized();
+    }
+
+    public function test_un_gestionnaire_joint_des_fichiers_a_une_annonce(): void
+    {
+        Mail::fake();
+
+        $espace = $this->creerEspace();
+        $gestionnaire = $this->creerMembre($espace, RoleMembre::PROPRIETAIRE);
+
+        Sanctum::actingAs($gestionnaire);
+
+        $this->post("/api/espaces/{$espace->id}/annonces", [
+            'titre' => 'Planning des soutenances',
+            'contenu' => 'Le calendrier est en pièce jointe.',
+            // Valeur envoyée par le frontend en multipart (checkbox cochée).
+            'notifier_email' => '1',
+            'fichiers' => [
+                UploadedFile::fake()->create('planning.pdf', 120, 'application/pdf'),
+                UploadedFile::fake()->create('consignes.docx', 40, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+            ],
+        ], ['Accept' => 'application/json'])
+            ->assertCreated()
+            ->assertJsonCount(2, 'data.pieces_jointes')
+            ->assertJsonPath('data.pieces_jointes.0.nom', 'planning.pdf')
+            ->assertJsonPath('data.pieces_jointes.1.nom', 'consignes.docx');
+
+        $annonce = Annonce::query()->firstOrFail();
+
+        $this->assertDatabaseCount('pieces_jointes', 2);
+        $this->assertTrue($annonce->notifier_email);
+        $this->assertSame($annonce->id, $annonce->piecesJointes()->firstOrFail()->annonce_id);
+
+        foreach ($annonce->piecesJointes as $piece) {
+            $this->assertNull($piece->message_id);
+            $this->assertMatchesRegularExpression(
+                '#^espaces/'.$espace->id.'/annonces/[0-9a-f-]{36}\.[a-z0-9]+$#',
+                $piece->chemin,
+            );
+            Storage::disk('local')->assertExists($piece->chemin);
+        }
+
+        // Les pièces jointes sont aussi renvoyées dans la liste des annonces.
+        $this->getJson("/api/espaces/{$espace->id}/annonces")
+            ->assertOk()
+            ->assertJsonCount(2, 'data.0.pieces_jointes')
+            ->assertJsonPath('data.0.pieces_jointes.0.nom', 'planning.pdf');
+    }
+
+    public function test_un_fichier_trop_volumineux_est_refuse_pour_une_annonce(): void
+    {
+        $espace = $this->creerEspace();
+        $gestionnaire = $this->creerMembre($espace, RoleMembre::PROPRIETAIRE);
+
+        Sanctum::actingAs($gestionnaire);
+
+        $this->post("/api/espaces/{$espace->id}/annonces", [
+            'titre' => 'Annonce trop lourde',
+            'contenu' => 'Le fichier dépasse la limite.',
+            'fichiers' => [
+                UploadedFile::fake()->create('memoire.pdf', 30 * 1024, 'application/pdf'),
+            ],
+        ], ['Accept' => 'application/json'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('fichiers.0');
+
+        $this->assertDatabaseCount('annonces', 0);
+        $this->assertDatabaseCount('pieces_jointes', 0);
+    }
+
+    public function test_plus_de_cinq_fichiers_sont_refuses_pour_une_annonce(): void
+    {
+        $espace = $this->creerEspace();
+        $gestionnaire = $this->creerMembre($espace, RoleMembre::PROPRIETAIRE);
+
+        Sanctum::actingAs($gestionnaire);
+
+        $fichiers = array_map(
+            fn (int $numero): UploadedFile => UploadedFile::fake()->create("page-{$numero}.pdf", 10, 'application/pdf'),
+            range(1, 6),
+        );
+
+        $this->post("/api/espaces/{$espace->id}/annonces", [
+            'titre' => 'Trop de pièces jointes',
+            'contenu' => 'Six fichiers sont refusés.',
+            'fichiers' => $fichiers,
+        ], ['Accept' => 'application/json'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('fichiers');
+
+        $this->assertDatabaseCount('annonces', 0);
+        $this->assertDatabaseCount('pieces_jointes', 0);
+    }
+
+    public function test_un_etudiant_ne_peut_pas_joindre_de_fichier_a_une_annonce(): void
+    {
+        $espace = $this->creerEspace();
+        $etudiant = $this->creerMembre($espace, RoleMembre::MEMBRE);
+
+        Sanctum::actingAs($etudiant);
+
+        $this->post("/api/espaces/{$espace->id}/annonces", [
+            'titre' => 'Annonce interdite',
+            'contenu' => 'Un simple membre ne peut pas publier.',
+            'fichiers' => [
+                UploadedFile::fake()->create('notes.pdf', 20, 'application/pdf'),
+            ],
+        ], ['Accept' => 'application/json'])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('annonces', 0);
+        $this->assertDatabaseCount('pieces_jointes', 0);
     }
 
     /**
