@@ -11,6 +11,7 @@ Livraison : **jeudi 19/11/2026** · gel du code : **mardi 17/11 à 18 h**.
 | [maquette/](maquette/) | Maquette des écrans, à donner à votre IA de développement | — |
 | [deploiement.md](deploiement.md) | Mettre en ligne (Neon, Render, Vercel), variables d'environnement, retour arrière | SCRUM-34 |
 | [plan-de-tests.md](plan-de-tests.md) | Parcours à tester par profil et règles à vérifier avant la livraison | SCRUM-174 |
+| [tests.md](tests.md) | **Plan de tests de la recette finale** : tableau parcours × profils, règles bloquantes et test automatique qui les couvre, procédure de recette croisée | SCRUM-174 |
 | [demo.md](demo.md) | Scénario de la démonstration du 19/11 (15 minutes) | SCRUM-187 |
 | [guide-utilisateur.md](guide-utilisateur.md) | Mode d'emploi pour l'étudiant, l'enseignant et l'administration | SCRUM-185 |
 
