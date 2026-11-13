@@ -128,4 +128,39 @@ describe('AssistantIATab', () => {
     expect(wrapper.text()).not.toContain('Résume les notions clés du cours')
     expect(wrapper.find('textarea').element.disabled).toBe(true)
   })
+  it('rend les marqueurs [n] cliquables et met la source en évidence (SCRUM-143)', async () => {
+    http.post.mockResolvedValue({
+      data: {
+        conversation_id: 1,
+        echange_id: 1,
+        reponse: 'Le curseur nomme une zone [1]. Les attributs sont listés [2]. Voir aussi [9].',
+        statut: 'OK',
+        sources: [
+          { n: 1, fichier: 'chap03.pdf', page: 1, ressource_id: 4 },
+          { n: 2, fichier: 'chap03.pdf', page: 3, ressource_id: 4 },
+        ],
+        quota_restant: 18,
+      },
+    })
+    const wrapper = monter()
+
+    await wrapper.find('textarea').setValue('Que fait un curseur ?')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    const marqueurs = wrapper.findAll('button.citation')
+    // [9] n'a pas de source : il reste du texte simple.
+    expect(marqueurs.map((m) => m.text())).toEqual(['[1]', '[2]'])
+    expect(wrapper.text()).toContain('Voir aussi [9].')
+
+    const chip = () => wrapper.find('#source-0-2')
+    expect(chip().classes()).toContain('v-chip--variant-outlined')
+
+    await marqueurs[1].trigger('click')
+    await flushPromises()
+
+    expect(marqueurs[1].classes()).toContain('citation--active')
+    expect(chip().classes()).toContain('v-chip--variant-flat')
+    expect(chip().attributes('href')).toBe('/espaces/3/ressources?ressource=4')
+  })
 })

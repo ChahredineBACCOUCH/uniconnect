@@ -4,8 +4,10 @@
  * affiché par EspaceView. L'étudiant pose une question sur le cours ; l'assistant répond
  * à partir des ressources de l'espace et cite ses sources [n] (fichier + page).
  *
- * Pas encore ici : avis 👍/👎 (SCRUM-146), composant SourcesCitees (SCRUM-143),
- * panneau latéral « Résumé » et « Sources de l'assistant » (SCRUM-158).
+ * Les marqueurs [n] de la réponse sont cliquables et mettent en évidence la source
+ * correspondante (SourcesCitees, SCRUM-143).
+ * Pas encore ici : avis 👍/👎 (SCRUM-146), panneau latéral « Résumé » (SCRUM-158) et
+ * « Sources de l'assistant », qui attend GET /espaces/{id}/ressources (SCRUM-126).
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -13,6 +15,7 @@ import { useDisplay } from 'vuetify'
 import { useAuthStore } from '@/stores/auth'
 import { QUESTION_MAX, QUESTION_MIN, QUOTA_JOUR, useIaStore } from '@/stores/ia'
 import { decouperReponse } from './reponseIa'
+import SourcesCitees from './SourcesCitees.vue'
 
 const props = defineProps({
   // Espace renvoyé par GET /espaces/{id} (docs/api.md) : id, nom, assistant { actif, … }.
@@ -56,6 +59,25 @@ onMounted(() => {
 onBeforeUnmount(() => window.removeEventListener('resize', ajusterHauteur))
 
 const espaceId = computed(() => props.espace.id)
+
+// SCRUM-143 : source mise en évidence pour chaque réponse (index de l'échange → n).
+const sourceActive = ref({})
+
+// Nouvelle conversation : les index des échanges repartent de zéro.
+watch(
+  () => ia.echanges.length,
+  (nombre, avant) => {
+    if (nombre < avant) sourceActive.value = {}
+  },
+)
+
+async function surlignerSource(index, n) {
+  sourceActive.value = { ...sourceActive.value, [index]: n }
+  await nextTick()
+  document
+    .getElementById(`source-${index}-${n}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+}
 const nomCours = computed(() => props.espace.nom ?? '')
 
 watch(espaceId, (id) => ia.ouvrir(id), { immediate: true })
@@ -242,35 +264,52 @@ watch(
             </v-alert>
 
             <template v-else>
-              <template v-for="(bloc, b) in decouperReponse(echange.reponse)" :key="b">
+              <template
+                v-for="(bloc, b) in decouperReponse(echange.reponse, echange.sources)"
+                :key="b"
+              >
                 <p v-if="bloc.type === 'paragraphe'">
                   <template v-for="(s, k) in bloc.segments" :key="k">
-                    <strong v-if="s.gras">{{ s.texte }}</strong>
+                    <button
+                      v-if="s.citations"
+                      type="button"
+                      class="citation"
+                      :class="{ 'citation--active': s.citations.includes(sourceActive[index]) }"
+                      :aria-label="`Voir la source ${s.citations.join(', ')}`"
+                      @click="surlignerSource(index, s.citations[0])"
+                    >
+                      {{ s.texte }}
+                    </button>
+                    <strong v-else-if="s.gras">{{ s.texte }}</strong>
                     <template v-else>{{ s.texte }}</template>
                   </template>
                 </p>
                 <ul v-else>
                   <li v-for="(item, j) in bloc.items" :key="j">
                     <template v-for="(s, k) in item" :key="k">
-                      <strong v-if="s.gras">{{ s.texte }}</strong>
+                      <button
+                        v-if="s.citations"
+                        type="button"
+                        class="citation"
+                        :class="{ 'citation--active': s.citations.includes(sourceActive[index]) }"
+                        :aria-label="`Voir la source ${s.citations.join(', ')}`"
+                        @click="surlignerSource(index, s.citations[0])"
+                      >
+                        {{ s.texte }}
+                      </button>
+                      <strong v-else-if="s.gras">{{ s.texte }}</strong>
                       <template v-else>{{ s.texte }}</template>
                     </template>
                   </li>
                 </ul>
               </template>
 
-              <div v-if="echange.sources.length" class="sources" aria-label="Sources citées">
-                <v-chip
-                  v-for="source in echange.sources"
-                  :key="source.n"
-                  variant="outlined"
-                  prepend-icon="mdi-file-document-outline"
-                  :to="{ name: 'espace', params: { id: espaceId, onglet: 'ressources' } }"
-                >
-                  <strong class="mr-1">[{{ source.n }}]</strong>
-                  {{ source.fichier }} · p. {{ source.page }}
-                </v-chip>
-              </div>
+              <SourcesCitees
+                :sources="echange.sources"
+                :espace-id="espaceId"
+                :prefixe="`source-${index}`"
+                :active="sourceActive[index] ?? null"
+              />
 
               <span class="text-caption text-medium-emphasis">
                 Réponse générée par IA, à vérifier dans les sources.
@@ -465,6 +504,20 @@ watch(
   align-items: center;
   gap: 10px;
   color: rgb(var(--v-theme-on-surface-variant));
+}
+
+.citation {
+  padding: 0 2px;
+  border-radius: 4px;
+  color: rgb(var(--v-theme-primary));
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.citation:hover,
+.citation:focus-visible,
+.citation--active {
+  background: rgb(var(--v-theme-primary-soft));
 }
 
 .sources,
