@@ -10,7 +10,12 @@ import http from '@/api/http'
 import AssistantIATab from '../AssistantIATab.vue'
 
 vi.mock('@/api/http', () => ({
-  default: { post: vi.fn(), patch: vi.fn() },
+  // get : chapitres du panneau « Sources de l'assistant » (SCRUM-143).
+  default: {
+    post: vi.fn(),
+    patch: vi.fn(),
+    get: vi.fn(() => Promise.resolve({ data: { data: [] } })),
+  },
 }))
 
 const ESPACE = {

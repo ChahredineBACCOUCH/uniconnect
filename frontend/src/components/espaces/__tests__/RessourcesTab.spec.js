@@ -1,5 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { reactive } from 'vue'
 
 import {
   creerChapitre,
@@ -11,6 +12,10 @@ import {
 } from '@/api/ressources'
 import RessourcesTab from '@/components/espaces/RessourcesTab.vue'
 import vuetify from '@/plugins/vuetify'
+
+// Route simulée : `?ressource=<id>` vient d'une source citée par l'Assistant IA (SCRUM-143).
+const routeSimulee = reactive({ query: {} })
+vi.mock('vue-router', () => ({ useRoute: () => routeSimulee }))
 
 vi.mock('@/api/ressources', () => ({
   recupererChapitres: vi.fn(),
@@ -113,6 +118,8 @@ async function ouvrirActions(titre) {
 describe('RessourcesTab', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    routeSimulee.query = {}
+    Element.prototype.scrollIntoView = vi.fn()
     recupererChapitres.mockResolvedValue(chapitres())
   })
 
@@ -299,5 +306,45 @@ describe('RessourcesTab', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Chapitre 1 – Introduction')
+  })
+  describe('mise en évidence depuis une source citée (SCRUM-143)', () => {
+    it('surligne et ramène à l’écran la ressource de ?ressource=', async () => {
+      routeSimulee.query = { ressource: '21' }
+      monter()
+      await flushPromises()
+
+      const ligne = document.getElementById('ressource-21')
+      expect(ligne.classList.contains('ressources__ligne--evidence')).toBe(true)
+      expect(ligne.getAttribute('aria-current')).toBe('true')
+      expect(ligne.scrollIntoView).toHaveBeenCalled()
+      expect(document.getElementById('ressource-11').classList).not.toContain(
+        'ressources__ligne--evidence',
+      )
+    })
+
+    it('change de ressource quand une autre source est cliquée', async () => {
+      routeSimulee.query = { ressource: '11' }
+      monter()
+      await flushPromises()
+
+      routeSimulee.query = { ressource: '12' }
+      await flushPromises()
+
+      expect(document.getElementById('ressource-12').classList).toContain(
+        'ressources__ligne--evidence',
+      )
+      expect(document.getElementById('ressource-11').classList).not.toContain(
+        'ressources__ligne--evidence',
+      )
+    })
+
+    it('prévient quand la ressource n’existe plus', async () => {
+      routeSimulee.query = { ressource: '999' }
+      monter()
+      await flushPromises()
+
+      expect(document.body.textContent).toContain("Cette ressource n'existe plus dans l'espace.")
+      expect(document.querySelector('.ressources__ligne--evidence')).toBeNull()
+    })
   })
 })
