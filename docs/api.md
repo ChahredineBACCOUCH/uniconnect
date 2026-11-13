@@ -129,12 +129,22 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 | GET | `/espaces/{id}/annonces` | membre | → `{ data: [{ id, titre, contenu, auteur, cree_le }] }` (les plus récentes d'abord) | SCRUM-123 |
 | POST | `/espaces/{id}/annonces` | enseignant de l'espace | `{ titre, contenu, notifier_email? }` → **201** annonce (+ notification aux membres) | SCRUM-123 |
 | DELETE | `/annonces/{id}` | auteur | → **204** | SCRUM-123 |
-| GET | `/espaces/{id}/chapitres` | membre | → `{ data: [{ id, titre, ordre, ressources: [{ id, titre, description, mime, url, indexee_ia, cree_le }] }] }` | SCRUM-126 |
-| POST | `/espaces/{id}/chapitres` | enseignant de l'espace | `{ titre }` → **201** chapitre | SCRUM-126 |
+| GET | `/espaces/{id}/chapitres` | membre | → `{ data: [{ id, titre, ordre, ressources: [{ id, chapitre_id, titre, description, mime, taille, url, indexee_ia, auteur_id, cree_le }] }] }` (chapitres triés par `ordre`, ressources par `id`) | SCRUM-126 |
+| POST | `/espaces/{id}/chapitres` | enseignant de l'espace | `{ titre, ordre? }` → **201** chapitre (sans `ordre`, il passe en dernier) | SCRUM-126 |
+| POST | `/espaces/{id}/chapitres/ordre` | enseignant | `{ ids: [3, 1, 2] }` → chapitres réordonnés (`ordre` = position dans `ids`) | SCRUM-126 |
 | PATCH | `/chapitres/{id}` | enseignant | `{ titre?, ordre? }` → chapitre | SCRUM-126 |
+| DELETE | `/chapitres/{id}` | enseignant | → **204** (supprime aussi les ressources, leurs fichiers et les fragments IA) | SCRUM-126 |
+| GET | `/espaces/{id}/ressources` | membre | → `{ data: [...] }` : chapitres et ressources groupées (même forme que `GET /espaces/{id}/chapitres`) | SCRUM-126 |
+| POST | `/espaces/{id}/ressources` | enseignant | multipart : `chapitre_id`, `titre`, `description?`, `fichier` **ou** `url` → **201** ressource | SCRUM-126 |
 | POST | `/chapitres/{id}/ressources` | enseignant | multipart : `titre`, `description?`, `fichier` **ou** `url` → **201** ressource (un PDF lance l'indexation IA) | SCRUM-126, 98 |
-| DELETE | `/ressources/{id}` | enseignant | → **204** (supprime aussi les fragments IA) | SCRUM-126 |
-| GET | `/ressources/{id}/telecharger` | membre | → **302** lien temporaire | SCRUM-126 |
+| PATCH | `/ressources/{id}` | enseignant | multipart : `titre?`, `description?`, `fichier` **ou** `url` → ressource (remplacer le fichier relance l'indexation IA) | SCRUM-126 |
+| PATCH | `/ressources/{id}/deplacer` | enseignant | `{ chapitre_id }` → ressource déplacée dans un chapitre du même espace | SCRUM-126 |
+| DELETE | `/ressources/{id}` | enseignant | → **204** (supprime le fichier du disque et les fragments IA) | SCRUM-126 |
+| GET | `/ressources/{id}/telecharger` | membre | → **302** lien temporaire (S3) ou fichier en pièce jointe (disque local) · **404** pour un lien ou un fichier introuvable | SCRUM-126 |
+
+- Une ressource est un **fichier OU un lien**, jamais les deux (**422** sinon) : les fichiers sont rangés dans `espaces/{espace_id}/ressources` sur le disque par défaut (`S3` en production, `local` en développement).
+- Taille et formats des fichiers : mêmes règles que les pièces jointes (`regles_plateforme`, **422** si dépassement).
+- L'observer de SCRUM-98 lance `IndexerRessource` après le commit à l'ajout ou au remplacement d'un PDF : `indexee_ia` passe à `true` quand le job a créé les fragments. Remplacer un fichier par un lien supprime les fragments et remet `indexee_ia` à `false`.
 
 ## 7. Assistant IA
 
