@@ -37,7 +37,8 @@ class AssistantConfigurationApiTest extends TestCase
         parent::setUp();
         Queue::fake(); // pas d'indexation automatique : les fragments sont créés à la main
 
-        $this->espace = Espace::create(['type' => 'ORGANISATIONNEL', 'nom' => 'Bases de données']);
+        // PRIVE : un espace ORGANISATIONNEL exige année et classe (CHECK PostgreSQL).
+        $this->espace = Espace::create(['type' => 'PRIVE', 'nom' => 'Bases de données']);
         $this->enseignant = $this->membre(RoleMembre::PROPRIETAIRE, Profil::ENSEIGNANT);
     }
 
