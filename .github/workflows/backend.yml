@@ -89,3 +89,24 @@ jobs:
 
       - name: Lancer les tests
         run: php artisan test
+
+  # Construit l'image de production (backend/Dockerfile) comme Render.
+  # Ajouté après l'incident du 12/11 : maatwebsite/excel exigeait ext-gd, les tests
+  # passaient (setup-php installe gd) mais le build Render échouait sans que la CI
+  # le voie. L'image n'est pas publiée : on vérifie seulement qu'elle se construit.
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construire l'image de production
+        run: docker build --file backend/Dockerfile --tag uniconnect-api:ci backend
+
+      - name: Vérifier les extensions PHP de l'image
+        run: |
+          modules="$(docker run --rm --entrypoint php uniconnect-api:ci -m)"
+          for ext in gd zip pdo_pgsql; do
+            echo "$modules" | grep -qx "$ext" || { echo "Extension PHP manquante : $ext"; exit 1; }
+          done

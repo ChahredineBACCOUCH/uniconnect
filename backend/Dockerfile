@@ -18,15 +18,23 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 # - nginx / supervisor : serveur web et superviseur de processus
 # - libpq-dev          : en-têtes PostgreSQL pour compiler pdo_pgsql
 # - unzip / curl       : outils requis par Composer et le healthcheck
+# - libpng / libjpeg / libfreetype / libzip : extensions gd et zip, exigées par
+#   phpoffice/phpspreadsheet (import Excel des comptes autorisés, SCRUM-76).
+#   Sans elles, `composer install` échoue et Render ne peut plus déployer.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         nginx \
         supervisor \
         libpq-dev \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+        libfreetype6-dev \
+        libzip-dev \
         unzip \
         curl \
         ca-certificates \
-    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pcntl opcache \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" pdo_pgsql pcntl opcache gd zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
