@@ -1,0 +1,23 @@
+meta {
+  name: 03 - Activer une annee
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/admin/annees/1/activer
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "archiver_precedente": false
+  }
+}
+
+tests {
+  test("200", function () {
+    expect([200, 404]).to.include(res.status);
+  });
+}

@@ -1,0 +1,23 @@
+meta {
+  name: 10 - Ajouter une ressource (lien)
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/espaces/{{espaceId}}/ressources
+  body: multipartForm
+  auth: bearer
+}
+
+body:multipart-form {
+  chapitre_id: {{chapitreId}}
+  titre: Cours en ligne
+  url: https://exemple.tn/cours
+}
+
+tests {
+  test("201", function () {
+    expect(res.status).to.equal(201);
+  });
+}

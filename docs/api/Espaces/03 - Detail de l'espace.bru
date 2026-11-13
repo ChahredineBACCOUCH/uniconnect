@@ -1,0 +1,17 @@
+meta {
+  name: 03 - Detail de l'espace
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/espaces/{{espaceId}}
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

@@ -1,0 +1,32 @@
+meta {
+  name: 02 - Creer un groupe prive
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/espaces
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "nom": "Groupe de revision BD",
+    "description": "Espace prive pour les revisions",
+    "duree_visibilite_heures": 168
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("espaceId", res.body.data.id);
+  }
+}
+
+tests {
+  test("201 et le createur devient proprietaire", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.role).to.equal("PROPRIETAIRE");
+  });
+}

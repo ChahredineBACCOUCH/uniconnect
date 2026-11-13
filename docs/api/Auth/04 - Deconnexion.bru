@@ -1,0 +1,17 @@
+meta {
+  name: 04 - Deconnexion
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("204", function () {
+    expect(res.status).to.equal(204);
+  });
+}
