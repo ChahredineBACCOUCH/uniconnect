@@ -69,7 +69,7 @@ Toutes les routes commencent par `/api`. Sauf mention, elles exigent un jeton Sa
 | Chapitres et ressources | `/espaces/{id}/chapitres`, `/ressources/{id}` | membre / gestionnaire | `create`/`update`/`delete` (propriétaire / co-gestionnaire) |
 | Assistant IA | `/espaces/{id}/ia/questions`, `/espaces/{id}/assistant` | membre / enseignant gestionnaire | `configurerAssistant` |
 | Notifications | `/notifications` | connecté | destinataire pour marquer comme lue |
-| Administration | `/admin/*` | `profil = ADMINISTRATION` | selon la route (`GERER_PARAMETRAGE`, `GERER_UTILISATEURS`, `CREER_GROUPE_ORGA`) |
+| Administration | `/admin/*` | droit individuel (Gate `can:…`), quel que soit le profil | selon la route (`GERER_PARAMETRAGE`, `GERER_UTILISATEURS`, `CREER_GROUPE_ORGA`) |
 
 Les codes d'erreur possibles sont résumés dans la section **Conventions → Codes de réponse** (401, 403, 404, 409, 422, 423, 429, 503). Exemples de requêtes et de réponses : annexe **Exemples** en fin de document. Collection Bruno prête à l'emploi : [`docs/api/`](api/) (variables `{{baseUrl}}` et `{{token}}`).
 

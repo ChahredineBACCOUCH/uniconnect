@@ -133,7 +133,7 @@ Le seeder crée également 40 entrées dans `comptes_autorises` : 35 étudiants 
 | `npm` bloqué sous Windows (`npm.ps1 cannot be loaded`) | Utilisez `npm.cmd` à la place de `npm`, ou changez la politique d'exécution : `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`. |
 | L'Assistant IA répond **503** | Vérifiez `GEMINI_API_KEY` et `GROQ_API_KEY` dans `backend/.env`, puis `php artisan config:clear`. |
 | L'Assistant IA répond **429** | Vous avez atteint vos 20 questions du jour : attendez minuit, ou utilisez un autre compte. |
-| Les PDF ne sont pas indexés (`indexee_ia` reste `false`) | Vérifiez que `php -m` contient `gd` et `zip` ; relancez `php artisan queue:work` si la file n'est pas en `sync`. |
+| Les PDF ne sont pas indexés (`indexee_ia` reste `false`) | L'indexation passe par la file d'attente : lancez `php artisan queue:work` (sauf si `QUEUE_CONNECTION=sync`). Un PDF scanné (images, sans texte) ne peut pas être indexé : voir `storage/logs/laravel.log`. |
 | `composer install` échoue sur `ext-gd` | Activez `extension=gd` dans `php.ini` (voir § 1). |
 
 ## 9. Commandes utiles
