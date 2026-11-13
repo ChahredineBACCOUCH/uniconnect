@@ -3,27 +3,40 @@
 namespace App\Notifications;
 
 use App\Enums\TypeNotification;
-use App\Models\Espace;
-use App\Models\User;
+use App\Models\Annonce;
+use Illuminate\Support\Str;
 
 /**
- * SCRUM-121 : une nouvelle annonce a été publiée dans un espace (SCRUM-123).
+ * SCRUM-123 : notification applicative envoyée à tous les membres lorsqu'une
+ * annonce est publiée dans leur espace.
  *
- * Envoyée aux membres de l'espace, à l'exception de son auteur.
+ * SCRUM-121 : respecte le réglage `adhesions.notifications_actives` de chaque
+ * membre (via `NotificationBase`).
  */
 class NouvelleAnnonce extends NotificationBase
 {
-    public function __construct(private Espace $espace, private string $titreAnnonce, private User $auteur)
+    public function __construct(public Annonce $annonce)
     {
-        $this->espaceId = $espace->id;
-        $this->titre = 'Annonce : '.$titreAnnonce;
-        $this->texte = $auteur->prenom.' '.$auteur->nom
-            .' a publié une annonce dans l\'espace « '.$espace->nom.' ».';
-        $this->lien = '/espaces/'.$espace->id.'/annonces';
+        $this->espaceId = $annonce->espace_id;
+        $this->titre = $annonce->titre;
+        $this->texte = Str::limit($annonce->contenu, 140);
+        $this->lien = '/espaces/'.$annonce->espace_id.'/annonces';
     }
 
     public function type(): TypeNotification
     {
         return TypeNotification::ANNONCE;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return array_merge(parent::toArray($notifiable), [
+            'annonce_id' => $this->annonce->id,
+            'espace_id' => $this->annonce->espace_id,
+            'espace_nom' => $this->annonce->espace?->nom,
+        ]);
     }
 }

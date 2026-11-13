@@ -4,13 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * SCRUM-121 : table `notifications` de Laravel (canal `database`).
- *
- * Table standard de Laravel, déjà prévue dans docs/conception/schema.sql.
- */
 return new class extends Migration
 {
+    /**
+     * Table des notifications applicatives (canal `database` de Laravel).
+     *
+     * SCRUM-123 s'en sert pour prévenir les membres d'une nouvelle annonce ;
+     * les routes de consultation sont livrées avec SCRUM-121.
+     */
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
@@ -23,6 +24,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('notifications');

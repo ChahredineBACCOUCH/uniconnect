@@ -100,6 +100,12 @@ class Espace extends Model
         return $this->hasManyThrough(Ressource::class, Chapitre::class);
     }
 
+    /** Annonces officielles de l'espace (SCRUM-123). @return HasMany<Annonce, $this> */
+    public function annonces(): HasMany
+    {
+        return $this->hasMany(Annonce::class);
+    }
+
     /** Réglages de l'Assistant IA (null tant qu'il n'a jamais été activé). @return HasOne<AssistantIA, $this> */
     public function assistant(): HasOne
     {
