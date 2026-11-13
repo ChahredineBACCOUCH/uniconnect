@@ -33,6 +33,7 @@ uniconnect/
 │   ├── app/Http/Requests/        validation des formulaires (FormRequest), messages en français
 │   ├── app/Http/Resources/       format JSON renvoyé au frontend
 │   ├── app/Models/               modèles Eloquent (une classe par table de schema.sql)
+│   ├── app/Notifications/        notifications de l'application (canal `database` de Laravel)
 │   ├── app/Policies/             qui a le droit de faire quoi (EspacePolicy, MessagePolicy, ...)
 │   ├── app/Services/             règles métier (EligibiliteService, GenerationGroupesService,
 │   │                             RattachementService, IndexationService, AssistantService, ...)
