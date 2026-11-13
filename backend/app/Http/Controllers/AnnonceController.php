@@ -90,7 +90,13 @@ class AnnonceController extends Controller
             abort(403, "Seul l'auteur peut supprimer cette annonce.");
         }
 
+        // Les lignes pieces_jointes sont supprimées en cascade ; les fichiers du
+        // disque doivent l'être explicitement, sinon ils resteraient orphelins.
+        $chemins = $annonce->piecesJointes()->pluck('chemin')->all();
+
         $annonce->delete();
+
+        Storage::delete($chemins);
 
         return response()->noContent();
     }

@@ -222,6 +222,30 @@ class AnnonceApiTest extends TestCase
             ->assertJsonPath('data.0.pieces_jointes.0.nom', 'planning.pdf');
     }
 
+    public function test_supprimer_une_annonce_supprime_aussi_ses_fichiers(): void
+    {
+        Mail::fake();
+
+        $espace = $this->creerEspace();
+        $gestionnaire = $this->creerMembre($espace, RoleMembre::PROPRIETAIRE);
+
+        Sanctum::actingAs($gestionnaire);
+
+        $id = $this->post("/api/espaces/{$espace->id}/annonces", [
+            'titre' => 'Annonce avec fichier',
+            'contenu' => 'Voir la pièce jointe.',
+            'fichiers' => [UploadedFile::fake()->create('planning.pdf', 50, 'application/pdf')],
+        ], ['Accept' => 'application/json'])->assertCreated()->json('data.id');
+
+        $chemin = Annonce::findOrFail($id)->piecesJointes()->value('chemin');
+        Storage::disk('local')->assertExists($chemin);
+
+        $this->deleteJson("/api/annonces/{$id}")->assertNoContent();
+
+        $this->assertDatabaseCount('pieces_jointes', 0);
+        Storage::disk('local')->assertMissing($chemin);
+    }
+
     public function test_un_fichier_trop_volumineux_est_refuse_pour_une_annonce(): void
     {
         $espace = $this->creerEspace();
