@@ -53,6 +53,18 @@ describe('PieceJointeItem (SCRUM-137)', () => {
     expect(apercuFichier).not.toHaveBeenCalled()
   })
 
+  it('affiche une icône adaptée au type de fichier', () => {
+    const wrapper = monter({
+      id: 6,
+      nom: 'budget.xlsx',
+      mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      taille_octets: 10,
+    })
+
+    expect(wrapper.html()).toContain('mdi-file-excel-outline')
+    expect(wrapper.text()).toContain('XLSX')
+  })
+
   it("charge l'aperçu d'une image avec un Blob authentifié", async () => {
     const blob = new Blob(['image'], { type: 'image/png' })
     apercuFichier.mockResolvedValue(blob)

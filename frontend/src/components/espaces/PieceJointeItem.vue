@@ -27,9 +27,51 @@ let monte = true
 const mime = computed(() => (props.piece.mime ?? '').toLowerCase())
 const estImage = computed(() => mime.value.startsWith('image/'))
 const taille = computed(() => formaterTaille(props.piece.taille_octets))
+const extension = computed(() => {
+  const nom = props.piece.nom ?? ''
+  const point = nom.lastIndexOf('.')
+  return point > 0 ? nom.slice(point + 1).toLowerCase() : ''
+})
 const type = computed(() => {
-  const extension = props.piece.nom?.split('.').pop()
-  return extension && extension !== props.piece.nom ? extension.toUpperCase() : 'Fichier'
+  return extension.value ? extension.value.toUpperCase() : 'Fichier'
+})
+const icone = computed(() => {
+  switch (extension.value) {
+    case 'pdf':
+      return 'mdi-file-pdf-box'
+    case 'doc':
+    case 'docx':
+      return 'mdi-file-word-outline'
+    case 'xls':
+    case 'xlsx':
+      return 'mdi-file-excel-outline'
+    case 'ppt':
+    case 'pptx':
+      return 'mdi-file-powerpoint-outline'
+    case 'zip':
+      return 'mdi-folder-zip-outline'
+    default:
+      return estImage.value ? 'mdi-image-outline' : 'mdi-file-document-outline'
+  }
+})
+const couleurIcone = computed(() => {
+  switch (extension.value) {
+    case 'pdf':
+      return '#C62828'
+    case 'doc':
+    case 'docx':
+      return '#1E4FB8'
+    case 'xls':
+    case 'xlsx':
+      return '#1D6F42'
+    case 'ppt':
+    case 'pptx':
+      return '#C43E1C'
+    case 'zip':
+      return '#8A6D00'
+    default:
+      return estImage.value ? 'primary' : 'error'
+  }
 })
 
 function libererApercu() {
@@ -91,7 +133,7 @@ async function telecharger() {
 </script>
 
 <template>
-  <div class="piece">
+  <div class="piece" :class="{ 'piece--image': estImage }">
     <div class="piece__vignette">
       <v-progress-circular v-if="chargementApercu" indeterminate size="18" color="primary" />
       <a
@@ -104,12 +146,7 @@ async function telecharger() {
       >
         <img :src="apercu" :alt="`Aperçu de ${piece.nom}`" class="piece__image" />
       </a>
-      <v-icon
-        v-else
-        :icon="estImage ? 'mdi-image-outline' : 'mdi-file-document-outline'"
-        :color="estImage ? 'primary' : 'error'"
-        size="24"
-      />
+      <v-icon v-else :icon="icone" :color="couleurIcone" size="24" />
     </div>
 
     <div class="piece__texte">
@@ -153,6 +190,11 @@ async function telecharger() {
   overflow: hidden;
   border-radius: 6px;
   background: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.piece--image .piece__vignette {
+  width: 96px;
+  height: 72px;
 }
 
 .piece__lien-apercu {

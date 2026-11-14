@@ -53,3 +53,6 @@ Remarques :
   (utilisez le stockage S3 prévu dans `docs/deploiement.md`).
 - L'image utilise **PHP 8.4** (et non 8.3) car `backend/composer.lock` verrouille Symfony 8.1,
   qui exige PHP >= 8.4.1.
+- Les pièces jointes (5 fichiers de 25 Mo maximum) exigent des limites adaptées :
+  `docker/php.ini` fixe `upload_max_filesize = 25M` et `post_max_size = 130M`,
+  `docker/nginx.conf` fixe `client_max_body_size 130m`.

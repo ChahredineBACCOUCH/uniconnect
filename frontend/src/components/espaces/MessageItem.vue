@@ -136,7 +136,7 @@ function signaler() {
         </div>
       </div>
 
-      <p v-else class="message__contenu">{{ message.contenu }}</p>
+      <p v-else-if="message.contenu" class="message__contenu">{{ message.contenu }}</p>
 
       <div v-if="message.pieces_jointes?.length" class="message__pieces">
         <PieceJointeItem
