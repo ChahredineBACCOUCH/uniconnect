@@ -108,8 +108,8 @@ async function verifierNouveaux() {
   else nouveauxNonLus.value += ajoutes
 }
 
-async function envoyer(payload) {
-  const message = await envoyerMessage(props.espace.id, payload)
+async function envoyer(payload, options) {
+  const message = await envoyerMessage(props.espace.id, payload, options)
 
   messages.value = fusionnerMessages(messages.value, [message])
   reponseA.value = null

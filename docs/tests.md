@@ -114,7 +114,7 @@ Chaque règle a **un** test automatique qui la couvre. La colonne « Test automa
 | R38 | Téléchargement d'une **pièce jointe** de message ou d'annonce (`GET /api/fichiers/{id}/telecharger`) | membre actuel seulement ; non-membre, membre retiré, message masqué/expiré ou fichier expiré → **403** | `Feature/Espaces/TelechargementFichiersTest.php` · `Feature/Espaces/RetraitMembreTest.php::test_un_membre_retire_ne_peut_plus_telecharger_les_fichiers` | ✅ |
 | R39 | Notification : liste paginée, filtre « non lues », marquage comme lue, « tout lire » | `meta.non_lues` juste, **404** sur la notification d'autrui | `Feature/NotificationApiTest.php` | ✅ |
 
-> Tests du frontend (Vitest) : `src/router/__tests__/guards.spec.js` (accès aux pages d'administration), `src/stores/__tests__/auth.spec.js` (droits et session), `src/api/__tests__/http.spec.js` (401, 422), `src/composables/__tests__/usePolling.spec.js` (rafraîchissement toutes les 5 s).
+> Tests du frontend (Vitest) : `src/router/__tests__/guards.spec.js` (accès aux pages d'administration), `src/stores/__tests__/auth.spec.js` (droits et session), `src/api/__tests__/http.spec.js` (401, 422), `src/composables/__tests__/usePolling.spec.js` (rafraîchissement toutes les 5 s), `src/components/espaces/__tests__/Composer.spec.js` (pièces jointes, validation et progression, SCRUM-139), `src/utils/__tests__/fichiers.spec.js` (règles des fichiers joints).
 
 ## 4. Procédure de recette croisée
 

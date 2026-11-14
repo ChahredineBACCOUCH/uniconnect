@@ -15,8 +15,32 @@ export async function recupererMessages(espaceId, params = {}) {
   return data
 }
 
-export async function envoyerMessage(espaceId, payload) {
-  const { data } = await http.post(`/espaces/${espaceId}/messages`, payload)
+/**
+ * SCRUM-139 : les fichiers joints imposent un corps multipart. Sans fichier,
+ * la requête reste un JSON classique ; `options` permet de suivre la
+ * progression du téléversement (`onUploadProgress`).
+ */
+export async function envoyerMessage(espaceId, payload, options) {
+  const { fichiers = [], ...champs } = payload
+  let corps = champs
+
+  if (fichiers.length > 0) {
+    corps = new FormData()
+
+    for (const [cle, valeur] of Object.entries(champs)) {
+      if (valeur === undefined || valeur === null) continue
+      corps.append(cle, valeur)
+    }
+
+    for (const fichier of fichiers) {
+      corps.append('fichiers[]', fichier)
+    }
+  }
+
+  const { data } = options
+    ? await http.post(`/espaces/${espaceId}/messages`, corps, options)
+    : await http.post(`/espaces/${espaceId}/messages`, corps)
+
   return data.data
 }
 
