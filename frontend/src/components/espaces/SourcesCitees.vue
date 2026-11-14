@@ -4,9 +4,8 @@
  * Une chip par source « [1] chap03.pdf · p. 12 » ; la chip `active` est mise en
  * évidence quand l'étudiant clique sur le marqueur [n] correspondant dans la réponse.
  *
- * Clic sur une chip → onglet Ressources avec `?ressource=<id>` pour mettre le fichier
- * en évidence. L'ouverture directe du PDF arrivera avec la route protégée
- * GET /fichiers/{id}/telecharger (SCRUM-137) et l'onglet Ressources (SCRUM-127).
+ * Clic sur une chip → onglet Ressources avec `?ressource=<id>` : le chapitre s'ouvre et
+ * la ressource est surlignée (RessourcesTab), prête à être téléchargée par la route protégée.
  */
 import { libelleSource } from './reponseIa'
 

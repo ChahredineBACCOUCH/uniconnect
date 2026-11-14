@@ -1,5 +1,6 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 import {
   creerChapitre,
@@ -41,6 +42,14 @@ const erreur = ref('')
 const recherche = ref('')
 const filtre = ref('TOUT')
 const panneaux = ref([])
+
+/*
+ * SCRUM-143 : ressource ouverte depuis une source citée par l'Assistant IA
+ * (`?ressource=<id>`) : son chapitre est ouvert, la ligne est surlignée et
+ * ramenée à l'écran.
+ */
+const route = useRoute()
+const ressourceEnEvidence = ref(null)
 
 const gestionnaire = computed(() => estGestionnaire(props.espace.role))
 const archive = computed(() => props.espace.etat === 'ARCHIVE')
@@ -116,7 +125,41 @@ async function charger() {
   } finally {
     chargement.value = false
   }
+
+  await mettreEnEvidence(route?.query?.ressource)
 }
+
+async function mettreEnEvidence(valeur) {
+  const id = Number(valeur)
+  if (!id) return
+
+  const chapitre = chapitres.value.find((element) =>
+    (element.ressources ?? []).some((ressource) => ressource.id === id),
+  )
+  if (!chapitre) {
+    if (!erreur.value) afficher("Cette ressource n'existe plus dans l'espace.")
+    return
+  }
+
+  // La recherche ou le filtre en cours ne doivent pas cacher la ressource demandée.
+  recherche.value = ''
+  filtre.value = 'TOUT'
+  if (!panneaux.value.includes(chapitre.id)) panneaux.value.push(chapitre.id)
+  ressourceEnEvidence.value = id
+
+  await nextTick()
+  document
+    .getElementById(`ressource-${id}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
+// Autre source cliquée alors que l'onglet est déjà ouvert.
+watch(
+  () => route?.query?.ressource,
+  (valeur) => {
+    if (!chargement.value) mettreEnEvidence(valeur)
+  },
+)
 
 function afficher(texte) {
   snackbar.value = { actif: true, texte }
@@ -434,7 +477,13 @@ async function telecharger(ressource) {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="ressource in chapitre.ressourcesFiltrees" :key="ressource.id">
+                <tr
+                  v-for="ressource in chapitre.ressourcesFiltrees"
+                  :id="`ressource-${ressource.id}`"
+                  :key="ressource.id"
+                  :class="{ 'ressources__ligne--evidence': ressource.id === ressourceEnEvidence }"
+                  :aria-current="ressource.id === ressourceEnEvidence ? 'true' : undefined"
+                >
                   <td>
                     <div class="ressources__ligne">
                       <v-icon
@@ -754,6 +803,11 @@ async function telecharger(ressource) {
   display: flex;
   align-items: center;
   min-width: 0;
+}
+
+.ressources__ligne--evidence {
+  background: rgb(var(--v-theme-primary-soft));
+  box-shadow: inset 4px 0 0 rgb(var(--v-theme-primary));
 }
 
 .ressources__table {
