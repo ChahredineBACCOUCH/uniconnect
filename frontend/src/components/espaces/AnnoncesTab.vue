@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 
 import { publierAnnonce, recupererAnnonces } from '@/api/espaces'
+import PieceJointeItem from './PieceJointeItem.vue'
 import {
   couleurAuteur,
   estGestionnaire,
@@ -81,19 +82,6 @@ function formaterDateAnnonce(iso) {
   const jour = formaterJour(iso)
   const heure = formaterHeure(iso)
   return heure ? `${jour}, ${heure}` : jour
-}
-
-function formaterTaille(octets) {
-  if (octets === null || octets === undefined) return ''
-  if (octets < 1024) return `${octets} o`
-  if (octets < 1024 * 1024) return `${Math.round(octets / 1024)} Ko`
-
-  return `${(octets / (1024 * 1024)).toFixed(1).replace('.', ',')} Mo`
-}
-
-function typeFichier(nom) {
-  const extension = nom?.split('.').pop()
-  return extension && extension !== nom ? extension.toUpperCase() : 'Fichier'
 }
 
 function regleFichiers(fichiers) {
@@ -214,18 +202,12 @@ function notifier(texte) {
           <p class="annonce__contenu">{{ annonce.contenu }}</p>
 
           <div v-if="annonce.pieces_jointes?.length" class="annonce__pieces">
-            <div v-for="piece in annonce.pieces_jointes" :key="piece.id" class="annonce__piece">
-              <v-icon icon="mdi-file-document-outline" color="error" size="26" />
-              <span class="annonce__piece-texte">
-                <span class="annonce__piece-nom">{{ piece.nom }}</span>
-                <span class="annonce__piece-meta">
-                  {{ typeFichier(piece.nom) }}
-                  <template v-if="piece.taille_octets">
-                    · {{ formaterTaille(piece.taille_octets) }}</template
-                  >
-                </span>
-              </span>
-            </div>
+            <PieceJointeItem
+              v-for="piece in annonce.pieces_jointes"
+              :key="piece.id"
+              :piece="piece"
+              @erreur="notifier"
+            />
           </div>
         </v-card-text>
       </v-card>
@@ -424,32 +406,6 @@ function notifier(texte) {
   flex-direction: column;
   gap: 6px;
   margin-top: 4px;
-}
-
-.annonce__piece {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border: 1px solid rgb(var(--v-theme-outline));
-  border-radius: 8px;
-  background: rgb(var(--v-theme-surface));
-}
-
-.annonce__piece-texte {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.annonce__piece-nom {
-  font-weight: 500;
-  overflow-wrap: anywhere;
-}
-
-.annonce__piece-meta {
-  font-size: 12px;
-  color: rgb(var(--v-theme-on-surface-variant));
 }
 
 .annonce-formulaire {

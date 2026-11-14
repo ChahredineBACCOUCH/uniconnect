@@ -135,7 +135,7 @@ Objet `Message` : `{ id, auteur: { id, nom, prenom, profil, badge } | null, cont
 | POST | `/espaces/{id}/messages` | membre | `{ contenu, parent_id?, duree_visibilite_heures? }` (+ `fichiers[]` en SCRUM-136) → **201** `Message`. `expire_le` est calculé à l'envoi ; 403 si l'espace est archivé ou en mode annonce pour un membre simple. | SCRUM-94, 136 |
 | PATCH | `/messages/{id}` | auteur | `{ contenu }` → `Message` (remplit `modifie_le`) | SCRUM-94 |
 | DELETE | `/messages/{id}` | auteur | → **204** | SCRUM-94 |
-| GET | `/fichiers/{id}/telecharger` | membre de l'espace | → **302** vers un lien temporaire (5 min), ou envoi direct du fichier en local | SCRUM-137 |
+| GET | `/fichiers/{id}/telecharger?apercu=1` | membre actuel de l'espace | → fichier servi directement par l'API, jamais par une URL publique du bucket ; `?apercu=1` renvoie les images en `inline` ; **403** hors espace, membre retiré, message masqué/expiré ou fichier expiré ; **404** si le fichier est absent du disque | SCRUM-137 |
 
 Chaque lecture met à jour `adhesions.dernier_message_lu_id` (le curseur ne recule jamais). Les messages masqués et les messages expirés ne sont pas renvoyés.
 

@@ -15,6 +15,7 @@ use App\Http\Controllers\AssistantIAController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ChapitreController;
 use App\Http\Controllers\EspaceController;
+use App\Http\Controllers\FichierController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MesEspacesController;
@@ -135,6 +136,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/ressources/{ressource}/deplacer', [RessourceController::class, 'deplacer']);
     Route::get('/ressources/{ressource}/telecharger', [RessourceController::class, 'telecharger'])
         ->name('ressources.telecharger');
+
+    // SCRUM-137 : téléchargement d'une pièce jointe de message ou d'annonce,
+    // réservé aux membres actuels de l'espace. `?apercu=1` affiche les images
+    // dans le navigateur au lieu de les télécharger.
+    Route::get('/fichiers/{pj}/telecharger', [FichierController::class, 'telecharger'])
+        ->name('fichiers.telecharger');
 
     // SCRUM-102 : question à l'Assistant IA (membre, assistant actif, 20 questions par jour).
     Route::post('/espaces/{espace}/ia/questions', [AssistantIAController::class, 'poser']);
