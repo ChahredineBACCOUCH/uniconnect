@@ -45,7 +45,7 @@ Une ligne par parcours, une colonne par profil. La cellule donne le **résultat 
 | P3 | **Connexion** (E01) et blocage | **OK** (jeton) ; 5 échecs → **423** « bloqué 15 minutes » ; lien d'activation expiré → refusé | idem | idem |
 | P4 | **Accueil / mes espaces** | ses espaces seulement (groupes de classe + de matière), compteurs de non-lus justes | + les groupes dont il est propriétaire et ses groupes privés | tous les espaces ; section « Administration » visible |
 | P5 | **Discussion** (messages) | lire et envoyer ; en **mode annonce** : bouton de publication **caché** et **403** ; message expiré : invisible ; message d'un autre : modification/suppression **403** | publier ; modifier et supprimer **son** message ; celui d'un autre : **403** ; espace archivé : **403** | comme l'enseignant s'il est membre de l'espace, sinon **403** |
-| P6 | **Pièces jointes** | joindre un PDF (≤ 25 Mo — règle `regles_plateforme`, formats autorisés) → sinon **422** ; plus de 5 fichiers → **422** ; **téléchargement : voir § 5** (SCRUM-137, non livré) | idem | idem |
+| P6 | **Pièces jointes** | joindre un PDF (≤ 25 Mo — règle `regles_plateforme`, formats autorisés) → sinon **422** ; plus de 5 fichiers → **422** ; **téléchargement protégé** réservé aux membres actuels, images avec aperçu — voir § 5 | idem | idem |
 | P7 | **Groupe privé** | bouton « Créer un groupe privé » **caché** sans le droit `CREER_GROUPE_PRIVE` (défaut des comptes de démo) ; sinon **403** en API ; peut quitter un espace | créer, renommer, supprimer (propriétaire) ; nom trop court → **422** | idem |
 | P8 | **Membres et rôles** | voir la liste et les rôles ; pas de bouton « retirer » / « nommer co-gestionnaire » (**caché**, **403** en API) | nommer un co-gestionnaire ; retirer un membre → **accès coupé immédiatement** (**403**) ; transférer la propriété ; le propriétaire qui part sans successeur → **409** | peut reprendre un espace quand il n'y a plus de co-gestionnaire |
 | P9 | **Invitation** | accepter / refuser une invitation reçue (une notification non lue est créée, SCRUM-121) ; invitation expirée → **422** ; seule l'invitation reçue est acceptable (**403** sinon) | inviter des membres (propriétaire / co-gestionnaire) ; simple membre → **403** ; groupe organisationnel → **422** ; annulable par son auteur ou le propriétaire | idem |
@@ -111,7 +111,7 @@ Chaque règle a **un** test automatique qui la couvre. La colonne « Test automa
 | R35 | Rattachement automatique à l'activation (classe pour l'étudiant, matières pour l'enseignant) | groupes créés et propriétaire désigné | `Feature/RattachementServiceTest.php::test_rattache_un_etudiant_aux_groupes_de_sa_classe` · `::test_un_enseignant_responsable_devient_proprietaire_des_groupes_de_ses_matieres` | ✅ |
 | R36 | Un groupe organisationnel exige une année et une classe, et reste unique | contrainte CHECK + index unique | `Feature/EspacesAdhesionsTest.php::test_un_groupe_organisationnel_exige_une_annee_et_une_classe` · `::test_un_groupe_organisationnel_est_unique_par_annee_classe_matiere` | ✅ |
 | R37 | Channels, signalements, modération, demandes d'adhésion, purge automatique | — | — | ⚠️ v1.1 (non livré) |
-| R38 | Téléchargement d'une **pièce jointe** de message (`GET /api/fichiers/{id}/telecharger`) | membre de l'espace seulement | — | ⚠️ hors périmètre du 19/11 (SCRUM-137 non livré) |
+| R38 | Téléchargement d'une **pièce jointe** de message ou d'annonce (`GET /api/fichiers/{id}/telecharger`) | membre actuel seulement ; non-membre, membre retiré, message masqué/expiré ou fichier expiré → **403** | `Feature/Espaces/TelechargementFichiersTest.php` · `Feature/Espaces/RetraitMembreTest.php::test_un_membre_retire_ne_peut_plus_telecharger_les_fichiers` | ✅ |
 | R39 | Notification : liste paginée, filtre « non lues », marquage comme lue, « tout lire » | `meta.non_lues` juste, **404** sur la notification d'autrui | `Feature/NotificationApiTest.php` | ✅ |
 
 > Tests du frontend (Vitest) : `src/router/__tests__/guards.spec.js` (accès aux pages d'administration), `src/stores/__tests__/auth.spec.js` (droits et session), `src/api/__tests__/http.spec.js` (401, 422), `src/composables/__tests__/usePolling.spec.js` (rafraîchissement toutes les 5 s).
@@ -170,7 +170,6 @@ Ces fonctionnalités sont listées dans [`api.md` § « Routes reportées en v1.
 | Channels (`/channels`) | v1.1 | page de garde, on ne teste rien |
 | Signalements et modération | v1.1 | P15 et P16 ne se testent pas |
 | Demandes d'adhésion (`SUR_DEMANDE`) | v1.1 | pas de notification `DEMANDE_ADHESION` à vérifier |
-| Téléchargement d'une pièce jointe (`GET /api/fichiers/{id}/telecharger`) | SCRUM-137 | **P6 s'arrête à l'envoi de la pièce jointe** ; pas de téléchargement à tester |
 | Purge automatique des messages et fichiers expirés | à faire | le message expiré est **masqué** (R21) mais pas supprimé |
 | Mot de passe oublié, recherche, profil, épingles, onglet Fichiers, tableau de bord, historique | v1.1 | pas de test |
 

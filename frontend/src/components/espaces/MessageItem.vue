@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 
+import PieceJointeItem from './PieceJointeItem.vue'
 import {
   badgeAuteur,
   couleurAuteur,
@@ -138,10 +139,12 @@ function signaler() {
       <p v-else class="message__contenu">{{ message.contenu }}</p>
 
       <div v-if="message.pieces_jointes?.length" class="message__pieces">
-        <div v-for="piece in message.pieces_jointes" :key="piece.id" class="message__piece">
-          <v-icon icon="mdi-file-document-outline" color="error" size="24" />
-          <span>{{ piece.nom }}</span>
-        </div>
+        <PieceJointeItem
+          v-for="piece in message.pieces_jointes"
+          :key="piece.id"
+          :piece="piece"
+          @erreur="emit('notifier', $event)"
+        />
       </div>
 
       <span v-if="expiration" class="message__expiration">
@@ -267,18 +270,6 @@ function signaler() {
   flex-direction: column;
   gap: 6px;
   margin-top: 4px;
-}
-
-.message__piece {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid rgb(var(--v-theme-outline));
-  border-radius: 8px;
-  background: rgb(var(--v-theme-surface));
-  font-weight: 500;
-  overflow-wrap: anywhere;
 }
 
 .message__expiration {
