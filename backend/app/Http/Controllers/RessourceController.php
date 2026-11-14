@@ -162,8 +162,8 @@ class RessourceController extends Controller
     }
 
     /**
-     * GET /api/ressources/{ressource}/telecharger : lien temporaire (S3) ou
-     * envoi direct du fichier (disque local).
+     * GET /api/ressources/{ressource}/telecharger : envoi du fichier par l'API
+     * (disque local en développement, bucket S3 privé en production).
      */
     public function telecharger(Ressource $ressource)
     {
@@ -179,14 +179,10 @@ class RessourceController extends Controller
             abort(404, 'Le fichier de cette ressource est introuvable.');
         }
 
-        $pilote = config('filesystems.disks.'.config('filesystems.default').'.driver');
-
-        if ($pilote === 's3') {
-            return redirect()->away(
-                $disque->temporaryUrl($ressource->chemin_fichier, now()->addMinutes(5)),
-            );
-        }
-
+        // Le fichier passe par l'API, quel que soit le disque (local ou S3). Une
+        // redirection vers une URL signée du stockage (autre domaine) casserait le
+        // téléchargement du front, qui envoie le jeton et lit la réponse en blob
+        // (CORS). Le bucket reste privé : aucune URL de stockage n'est exposée.
         return $disque->download(
             $ressource->chemin_fichier,
             basename($ressource->chemin_fichier),

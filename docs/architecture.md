@@ -7,7 +7,7 @@ flowchart LR
   N["Navigateur<br/>(PC ou téléphone)"] -->|HTTPS| V["Frontend Vue 3 + Vuetify<br/>hébergé sur Vercel"]
   V -->|"API REST JSON<br/>jeton Bearer (Sanctum)"| R["API Laravel<br/>Docker sur Render"]
   R -->|SQL| P[("PostgreSQL 16<br/>Neon")]
-  R -->|"fichiers (disque S3)"| F[("Cloudflare R2")]
+  R -->|"fichiers (disque S3)"| F[("Supabase Storage")]
   R -->|"HTTP, offre gratuite"| G["Gemini<br/>(IA principale)"]
   R -.->|"si Gemini répond 429"| Q["Groq<br/>(IA de secours)"]
   R -->|SMTP| M["E-mails<br/>(Mailpit en local)"]
@@ -18,7 +18,7 @@ flowchart LR
 | Interface | Vue 3 (Composition API), Vuetify 3, Pinia, Vue Router, Axios | Écrans de la maquette, sur ordinateur et sur mobile |
 | API | Laravel 13 + Sanctum 4 | Règles métier, droits, validation, accès aux données |
 | Base de données | PostgreSQL 16 | Données ; recherche plein texte en français (`tsvector`) |
-| Fichiers | Disque `local` en développement, Cloudflare R2 (compatible S3) en production | Pièces jointes et PDF de cours, jamais exposés directement |
+| Fichiers | Disque `local` en développement, Supabase Storage, bucket privé compatible S3 (SCRUM-138) en production | Pièces jointes et PDF de cours, jamais exposés directement |
 | IA | Gemini (gratuit), Groq en secours (gratuit) | Réponses de l'Assistant de cours, avec citations |
 | Local | Docker Compose : PostgreSQL et Mailpit | Même environnement pour toute l'équipe |
 
@@ -63,7 +63,7 @@ uniconnect/
 | Connexion | Blocage pendant 15 min après 5 échecs ; un compte suspendu ou désactivé est refusé. |
 | Droits | Le **profil** (étudiant, enseignant, administration) et les **droits** (`droits_utilisateur`) sont vérifiés **côté serveur** par des Policies et des Gates. Masquer un bouton dans l'interface ne suffit pas. |
 | Espaces | Un non-membre reçoit **403** sur les messages, fichiers et ressources d'un espace, même avec un lien direct. |
-| Fichiers | Téléchargement uniquement par une route protégée (vérification des droits, puis lien temporaire). Le chemin de stockage n'est jamais renvoyé. |
+| Fichiers | Téléchargement uniquement par une route protégée : l'API vérifie les droits puis renvoie le fichier elle-même (bucket privé, aucune URL de stockage exposée). Le chemin de stockage n'est jamais renvoyé. |
 | Secrets | Clés et mots de passe uniquement dans `.env` (jamais dans Git, Jira ou WhatsApp). En production : variables d'environnement de Render et Vercel. |
 | Validation | Tout ce qui arrive du frontend passe par une `FormRequest`. Les erreurs renvoient **422** avec les messages par champ. |
 

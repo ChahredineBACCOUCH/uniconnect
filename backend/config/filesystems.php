@@ -47,6 +47,9 @@ return [
             'report' => false,
         ],
 
+        // SCRUM-138 : stockage de production, bucket PRIVÉ compatible S3
+        // (Supabase Storage, voir docs/deploiement.md). Render efface son disque à
+        // chaque déploiement : en production, FILESYSTEM_DISK=s3.
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -56,8 +59,10 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
-            'report' => false,
+            // Un envoi qui échoue lève une exception (au lieu d'enregistrer un chemin
+            // vide en base) et apparaît dans les logs Render.
+            'throw' => true,
+            'report' => true,
         ],
 
     ],
