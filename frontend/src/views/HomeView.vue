@@ -214,7 +214,14 @@ function invitePar(invitation) {
           @action="router.push({ name: 'espace-nouveau' })"
         />
 
-        <v-list v-else density="comfortable" class="pa-0">
+        <!-- SCRUM-173 : liste de liens → rôle navigation (role="list" n'admet que des listitem). -->
+        <v-list
+          v-else
+          density="comfortable"
+          class="pa-0"
+          role="navigation"
+          aria-label="Mes espaces"
+        >
           <v-list-item
             v-for="espace in espaces.tous"
             :key="espace.id"

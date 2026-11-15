@@ -160,6 +160,9 @@ function onBottomNavChange(value) {
 
 <template>
   <v-app>
+    <!-- SCRUM-173 : lien d'évitement, visible au premier Tab, pour sauter le menu. -->
+    <a href="#contenu-principal" class="lien-evitement">Aller au contenu</a>
+
     <v-app-bar flat height="64" color="surface" class="app-bar">
       <v-app-bar-nav-icon v-if="!mdAndUp" aria-label="Ouvrir le menu" @click="drawer = !drawer" />
 
@@ -306,7 +309,7 @@ function onBottomNavChange(value) {
     </v-navigation-drawer>
 
     <v-main>
-      <div class="app-content">
+      <div id="contenu-principal" class="app-content" tabindex="-1">
         <router-view />
       </div>
     </v-main>
@@ -335,6 +338,28 @@ function onBottomNavChange(value) {
 </template>
 
 <style scoped>
+.lien-evitement {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 3000;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-weight: 500;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.lien-evitement:focus {
+  transform: none;
+}
+
+.app-content:focus {
+  outline: none;
+}
+
 .app-bar {
   border-bottom: 1px solid rgb(var(--v-theme-outline));
 }

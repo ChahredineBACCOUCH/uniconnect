@@ -25,6 +25,11 @@ export default createVuetify({
     themes: {
       uniconnectLight: {
         dark: false,
+        // SCRUM-173 : textes secondaires et libellés de champs à 4,5:1 minimum
+        // (0,6 par défaut donnait 4,2:1 sur fond blanc).
+        variables: {
+          'medium-emphasis-opacity': 0.7,
+        },
         colors: {
           primary: '#1E4FB8',
           secondary: '#00796B',
