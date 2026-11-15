@@ -1,0 +1,17 @@
+meta {
+  name: 06 - Retirer un membre
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/espaces/{{espaceId}}/membres/2
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("204", function () {
+    expect(res.status).to.equal(204);
+  });
+}

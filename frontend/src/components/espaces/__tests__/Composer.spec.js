@@ -22,6 +22,18 @@ function monterComposer(surcharge = {}, envoyer = vi.fn().mockResolvedValue({}))
   })
 }
 
+function fichier(nom = 'photo.png', taille = 1024, type = 'image/png') {
+  const element = new File(['contenu'], nom, { type })
+  Object.defineProperty(element, 'size', { value: taille })
+  return element
+}
+
+async function joindre(wrapper, ...fichiers) {
+  const input = wrapper.find('input[type="file"]')
+  Object.defineProperty(input.element, 'files', { value: fichiers, configurable: true })
+  await input.trigger('change')
+}
+
 describe('Composer', () => {
   it('envoie le texte et vide la zone de saisie', async () => {
     const envoyer = vi.fn().mockResolvedValue({ id: 9 })
@@ -83,5 +95,91 @@ describe('Composer', () => {
 
     expect(wrapper.text()).toContain('Le serveur est indisponible.')
     expect(wrapper.find('textarea').element.value).toBe('Message important')
+  })
+
+  it('joint des fichiers, envoie en multipart et suit la progression (SCRUM-139)', async () => {
+    let terminer
+    const envoyer = vi.fn().mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          terminer = resolve
+        }),
+    )
+    const wrapper = monterComposer({}, envoyer)
+    const photo = fichier('photo.png', 2048)
+
+    await joindre(wrapper, photo)
+    expect(wrapper.text()).toContain('photo.png')
+    expect(wrapper.text()).toContain('2 Ko')
+
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    const [payload, options] = envoyer.mock.calls[0]
+
+    expect(payload).toEqual({
+      contenu: '',
+      parent_id: null,
+      duree_visibilite_heures: null,
+      fichiers: [photo],
+    })
+    expect(options.onUploadProgress).toEqual(expect.any(Function))
+
+    options.onUploadProgress({ loaded: 1, total: 4 })
+    await flushPromises()
+    expect(wrapper.text()).toContain('Téléversement : 25 %')
+
+    terminer({ id: 12 })
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('photo.png')
+    expect(wrapper.text()).not.toContain('Téléversement')
+  })
+
+  it('accepte un dépôt de fichiers sur le composer', async () => {
+    const wrapper = monterComposer()
+    const planning = fichier('planning.pdf', 4096, 'application/pdf')
+
+    await wrapper.find('form').trigger('drop', { dataTransfer: { files: [planning] } })
+
+    expect(wrapper.text()).toContain('planning.pdf')
+    expect(wrapper.text()).toContain('4 Ko')
+  })
+
+  it('refuse un fichier trop gros avant l’envoi', async () => {
+    const envoyer = vi.fn().mockResolvedValue({})
+    const wrapper = monterComposer({}, envoyer)
+    const gros = fichier('memoire.pdf', 26 * 1024 * 1024, 'application/pdf')
+
+    await joindre(wrapper, gros)
+
+    expect(wrapper.text()).toContain('dépasse la taille maximale de 25 Mo')
+    expect(wrapper.find('.v-chip').exists()).toBe(false)
+
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(envoyer).not.toHaveBeenCalled()
+  })
+
+  it('refuse un format interdit avant l’envoi', async () => {
+    const wrapper = monterComposer()
+
+    await joindre(wrapper, fichier('script.exe', 1024, 'application/x-msdownload'))
+
+    expect(wrapper.text()).toContain("Le format de « script.exe » n'est pas autorisé.")
+    expect(wrapper.find('.v-chip').exists()).toBe(false)
+  })
+
+  it('retire un fichier avec la croix de sa puce', async () => {
+    const wrapper = monterComposer()
+
+    await joindre(wrapper, fichier('notes.pdf', 1024, 'application/pdf'))
+    expect(wrapper.text()).toContain('notes.pdf')
+
+    await wrapper.find('.v-chip__close').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('notes.pdf')
   })
 })

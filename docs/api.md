@@ -54,6 +54,25 @@ Si une route doit changer, modifiez ce fichier **dans la même PR** et prévenez
 
 ---
 
+## Vue d'ensemble des groupes de routes
+
+Toutes les routes commencent par `/api`. Sauf mention, elles exigent un jeton Sanctum (`Authorization: Bearer <jeton>`). Les droits sont vérifiés **côté serveur** par des Policies et des Gates ; masquer un bouton dans l'interface ne suffit pas.
+
+| Groupe | Base | Accès | Droits typiques |
+|---|---|---|---|
+| Santé | `/health` | public | — |
+| Authentification | `/auth/*`, `/me` | public ou connecté | — |
+| Espaces | `/espaces`, `/me/espaces` | connecté / membre | `CREER_GROUPE_PRIVE` pour créer |
+| Invitations et membres | `/espaces/{id}/invitations`, `/espaces/{id}/membres`, `/invitations/{id}/*` | membre ou gestionnaire | `manageMembers` (propriétaire / co-gestionnaire) |
+| Messages | `/espaces/{id}/messages`, `/messages/{id}` | membre | auteur pour modifier/supprimer |
+| Annonces | `/espaces/{id}/annonces`, `/annonces/{id}` | membre / gestionnaire | `update` (propriétaire / co-gestionnaire) |
+| Chapitres et ressources | `/espaces/{id}/chapitres`, `/ressources/{id}` | membre / gestionnaire | `create`/`update`/`delete` (propriétaire / co-gestionnaire) |
+| Assistant IA | `/espaces/{id}/ia/questions`, `/espaces/{id}/assistant` | membre / enseignant gestionnaire | `configurerAssistant` |
+| Notifications | `/notifications` | connecté | destinataire pour marquer comme lue |
+| Administration | `/admin/*` | droit individuel (Gate `can:…`), quel que soit le profil | selon la route (`GERER_PARAMETRAGE`, `GERER_UTILISATEURS`, `CREER_GROUPE_ORGA`) |
+
+Les codes d'erreur possibles sont résumés dans la section **Conventions → Codes de réponse** (401, 403, 404, 409, 422, 423, 429, 503). Exemples de requêtes et de réponses : annexe **Exemples** en fin de document. Collection Bruno prête à l'emploi : [`docs/api/`](api/) (variables `{{baseUrl}}` et `{{token}}`).
+
 ## 1. Santé
 
 | Méthode | Route | Accès | Réponse | Ticket |
@@ -116,7 +135,7 @@ Objet `Message` : `{ id, auteur: { id, nom, prenom, profil, badge } | null, cont
 | POST | `/espaces/{id}/messages` | membre | `{ contenu, parent_id?, duree_visibilite_heures? }` (+ `fichiers[]` en SCRUM-136) → **201** `Message`. `expire_le` est calculé à l'envoi ; 403 si l'espace est archivé ou en mode annonce pour un membre simple. | SCRUM-94, 136 |
 | PATCH | `/messages/{id}` | auteur | `{ contenu }` → `Message` (remplit `modifie_le`) | SCRUM-94 |
 | DELETE | `/messages/{id}` | auteur | → **204** | SCRUM-94 |
-| GET | `/fichiers/{id}/telecharger` | membre de l'espace | → **302** vers un lien temporaire (5 min), ou envoi direct du fichier en local | SCRUM-137 |
+| GET | `/fichiers/{id}/telecharger?apercu=1` | membre actuel de l'espace | → fichier servi directement par l'API, jamais par une URL publique du bucket ; `?apercu=1` renvoie les images en `inline` ; **403** hors espace, membre retiré, message masqué/expiré ou fichier expiré ; **404** si le fichier est absent du disque | SCRUM-137 |
 
 Chaque lecture met à jour `adhesions.dernier_message_lu_id` (le curseur ne recule jamais). Les messages masqués et les messages expirés ne sont pas renvoyés.
 
@@ -126,8 +145,8 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 
 | Méthode | Route | Accès | Corps → Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/espaces/{id}/annonces` | membre | → `{ data: [{ id, titre, contenu, auteur, cree_le }] }` (les plus récentes d'abord) | SCRUM-123 |
-| POST | `/espaces/{id}/annonces` | propriétaire / co-gestionnaire | `{ titre, contenu, notifier_email? }` → **201** annonce (+ notification aux membres) | SCRUM-123 |
+| GET | `/espaces/{id}/annonces` | membre | → `{ data: [{ id, titre, contenu, auteur, notifier_email, cree_le, pieces_jointes: [{ id, nom, mime, taille_octets }] }] }` (les plus récentes d'abord) | SCRUM-123, 124 |
+| POST | `/espaces/{id}/annonces` | propriétaire / co-gestionnaire | JSON ou multipart : `titre`, `contenu`, `notifier_email?`, `fichiers[]?` (5 maximum) → **201** annonce (+ notification aux membres) | SCRUM-123, 124 |
 | DELETE | `/annonces/{id}` | auteur | → **204** | SCRUM-123 |
 | GET | `/espaces/{id}/chapitres` | membre | → `{ data: [{ id, titre, ordre, ressources: [{ id, chapitre_id, titre, description, mime, taille, url, indexee_ia, auteur_id, cree_le }] }] }` (chapitres triés par `ordre`, ressources par `id`) | SCRUM-126 |
 | POST | `/espaces/{id}/chapitres` | enseignant de l'espace | `{ titre, ordre? }` → **201** chapitre (sans `ordre`, il passe en dernier) | SCRUM-126 |
@@ -142,6 +161,7 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 | DELETE | `/ressources/{id}` | enseignant | → **204** (supprime le fichier du disque et les fragments IA) | SCRUM-126 |
 | GET | `/ressources/{id}/telecharger` | membre | → **302** lien temporaire (S3) ou fichier en pièce jointe (disque local) · **404** pour un lien ou un fichier introuvable | SCRUM-126 |
 
+- Les pièces jointes d'une annonce sont facultatives (5 maximum, mêmes règles de taille et de format que les messages) et rangées dans `espaces/{espace_id}/annonces` sur le disque par défaut.
 - Une ressource est un **fichier OU un lien**, jamais les deux (**422** sinon) : les fichiers sont rangés dans `espaces/{espace_id}/ressources` sur le disque par défaut (`S3` en production, `local` en développement).
 - Taille et formats des fichiers : mêmes règles que les pièces jointes (`regles_plateforme`, **422** si dépassement).
 - L'observer de SCRUM-98 lance `IndexerRessource` après le commit à l'ajout ou au remplacement d'un PDF : `indexee_ia` passe à `true` quand le job a créé les fragments. Remplacer un fichier par un lien supprime les fragments et remet `indexee_ia` à `false`.
@@ -161,13 +181,21 @@ Règles des fichiers : taille maximale fixée par `regles_plateforme.taille_max_
 
 ## 8. Notifications
 
+Les notifications sont enregistrées dans la table `notifications` (canal `database` de Laravel) et lues par le frontend avec `GET /api/notifications`.
+
 | Méthode | Route | Accès | Réponse | Ticket |
 |---|---|---|---|---|
-| GET | `/notifications?non_lues=1` | connecté | → `{ data: [{ id, type, titre, texte, lien, lue, cree_le }], meta: { non_lues } }` | SCRUM-121 |
-| POST | `/notifications/{id}/lu` | destinataire | → **204** | SCRUM-121 |
-| POST | `/notifications/tout-lu` | connecté | → **204** | SCRUM-121 |
+| GET | `/notifications?non_lues=1&page=&par_page=` | connecté | → `{ data: [{ id, type, titre, texte, lien, lue, cree_le }], meta: { page, par_page, total, non_lues } }`, les plus récentes d'abord. `non_lues=1` : uniquement les notifications pas encore lues ; `meta.non_lues` = nombre total de notifications non lues | SCRUM-121 |
+| PATCH | `/notifications/{id}/lue` | destinataire | → **204** (la notification est marquée comme lue) ; **404** si elle n'est pas la sienne | SCRUM-121 |
+| POST | `/notifications/tout-lire` | connecté | → **204** (toutes les notifications non lues sont marquées comme lues) | SCRUM-121 |
 
-`type` peut valoir : `INVITATION`, `ANNONCE`, `RESSOURCE`, `MEMBRE_AJOUTE`.
+`type` peut valoir : `INVITATION`, `DEMANDE_ADHESION`, `ANNONCE`, `RESSOURCE`, `SIGNALEMENT_TRAITE`, `RETRAIT_ESPACE`.
+
+- Une notification n'est envoyée que si la personne a les notifications **actives** pour l'espace concerné (`adhesions.notifications_actives`). Une personne pas encore membre de l'espace (cas d'une invitation) n'a pas encore ce réglage : elle est prévenue.
+- `lien` est une route de l'application Vue, à ouvrir au clic : `/notifications`, `/espaces/{id}/annonces`, `/espaces/{id}/ressources`, `/espaces/{id}/membres` ou `/espaces`.
+- Les notifications sont créées par le backend : invitation (SCRUM-88), ressource pédagogique (SCRUM-126), retrait d'un membre (SCRUM-90), et à venir : demande d'adhésion (SCRUM-119), annonce (SCRUM-123), signalement traité (modération).
+
+> Les noms de route de cette section ont changé depuis le premier brouillon : `POST /notifications/{id}/lu` et `POST /notifications/tout-lu` sont remplacés par `PATCH /notifications/{id}/lue` et `POST /notifications/tout-lire`.
 
 ## 9. Administration
 
@@ -203,6 +231,98 @@ Référentiels : `code` unique (et `code` + `annee_id` pour une classe). `POST`/
 Format du fichier d'import : Excel (`.xlsx` ou `.xls`), première feuille, colonnes `matricule`, `nom`, `prenom`, `email`, `profil`, `classe_code`. `classe_code` est vide pour les non-étudiants et doit exister pour l'année universitaire active. L'aperçu n'enregistre rien ; la validation ignore les lignes invalides ou devenues des doublons et conserve l'historique dans `imports_comptes`.
 
 ---
+
+## Exemples de requêtes et de réponses
+
+Un exemple par groupe, avec le code d'erreur le plus fréquent. La collection Bruno (`docs/api/`) contient les requêtes prêtes à l'emploi.
+
+### Auth — connexion
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{ "email": "etudiant@demo.uniconnect", "password": "Demo1234!" }
+```
+
+```json
+{ "token": "1|abc...", "user": { "id": 12, "profil": "ETUDIANT", "droits": ["CREER_GROUPE_PRIVE"] } }
+```
+
+Erreurs : **422** (identifiants incorrects), **423** (bloqué 15 min après 5 échecs), **403** (suspendu ou désactivé).
+
+### Espaces — créer un groupe privé
+
+```http
+POST /api/espaces
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "nom": "Groupe de révision BD", "duree_visibilite_heures": 168 }
+```
+
+```json
+{ "data": { "id": 42, "type": "PRIVE", "nom": "Groupe de révision BD", "role": "PROPRIETAIRE" } }
+```
+
+Erreurs : **403** (droit `CREER_GROUPE_PRIVE` manquant), **422** (nom trop court, durée non proposée).
+
+### Messages — envoyer un message
+
+```http
+POST /api/espaces/42/messages
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "contenu": "Bonjour à tous !", "duree_visibilite_heures": 168 }
+```
+
+```json
+{ "id": 7, "auteur": { "id": 12, "nom": "Ben Salah", "prenom": "Yassine" }, "contenu": "Bonjour à tous !", "expire_le": "2026-11-20T14:05:00+01:00" }
+```
+
+Erreurs : **403** (non-membre, espace archivé, mode annonce pour un membre simple), **422** (durée non autorisée).
+
+### Fichiers — télécharger une ressource
+
+```http
+GET /api/ressources/7/telecharger
+Authorization: Bearer <jeton>
+```
+
+Réponse : **302** vers un lien temporaire (5 min) en production, ou envoi direct du fichier en local. Erreurs : **403** (non-membre), **404** (lien ou fichier introuvable).
+
+### IA — poser une question
+
+```http
+POST /api/espaces/42/ia/questions
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "question": "Qu'est-ce qu'une base de données relationnelle ?" }
+```
+
+```json
+{ "conversation_id": 3, "echange_id": 12, "reponse": "...", "statut": "OK", "sources": [{ "n": 1, "fichier": "cours.pdf", "page": 4, "ressource_id": 7 }], "quota_restant": 19 }
+```
+
+Erreurs : **401** (non connecté), **403** (non-membre), **404** (assistant désactivé), **422** (question trop courte ou trop longue), **429** (quota de 20 questions atteint), **503** (Gemini et Groq indisponibles).
+
+### Admin — créer une année universitaire
+
+```http
+POST /api/admin/annees
+Authorization: Bearer <jeton>
+Content-Type: application/json
+
+{ "libelle": "2027/2028", "date_debut": "2027-09-01", "date_fin": "2028-06-30" }
+```
+
+```json
+{ "id": 2, "libelle": "2027/2028", "active": false }
+```
+
+Erreurs : **401** (non connecté), **403** (pas le droit `GERER_PARAMETRAGE` ou profil ≠ `ADMINISTRATION`), **422** (libellé déjà utilisé, dates incohérentes).
 
 ## Routes reportées en v1.1 (ne pas coder avant le 19/11)
 

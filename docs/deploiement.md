@@ -15,18 +15,18 @@ flowchart LR
   B["Navigateur"] -->|"HTTPS"| VE["Vercel<br/>frontend Vue"]
   VE -->|"HTTPS + CORS"| RE["Render<br/>API Laravel (Docker)"]
   RE -->|"SQL"| NE[("Neon<br/>PostgreSQL 16")]
-  RE -.->|"plus tard"| R2[("Cloudflare R2<br/>fichiers / PDF")]
+  RE -->|"S3 (privé)"| SB[("Supabase Storage<br/>fichiers / PDF")]
   RE -.->|"plus tard"| IA["Gemini<br/>Groq (secours)"]
 ```
 
-Le navigateur ne parle **jamais directement** à Render : il charge l'application servie par Vercel, qui appelle ensuite l'API Render. Les fichiers iront sur R2 et l'Assistant IA utilisera Gemini (Groq en secours) : ces deux briques ne sont pas encore branchées en production.
+Le navigateur ne parle **jamais directement** à Render : il charge l'application servie par Vercel, qui appelle ensuite l'API Render. Les fichiers (pièces jointes, PDF de cours) sont stockés dans un bucket **privé** Supabase Storage, par son API compatible S3 (SCRUM-138) ; l'Assistant IA utilise Gemini, avec Groq en secours.
 
 | Service | Rôle | Offre | Point d'attention |
 |---|---|---|---|
 | **Vercel** | Frontend Vue | Hobby (gratuite) | Dossier racine du projet : `frontend` |
 | **Render** | API Laravel (Docker) | Free | Le service **s'endort après une période d'inactivité** : la première requête peut prendre environ une minute. Ouvrez `/api/health` 5 minutes avant la démo. |
 | **Neon** | PostgreSQL 16 | Free | La base se met en pause sans activité, puis redémarre toute seule en quelques secondes |
-| **Cloudflare R2** | Pièces jointes, PDF de cours | Prévu (compatible S3, sans carte bancaire) | Le disque de Render est **effacé à chaque déploiement** : ne stockez pas les fichiers dessus en production. |
+| **Supabase Storage** | Pièces jointes, PDF de cours | Free (1 Go, sans carte bancaire), projet `uniconnect-fichiers`, bucket privé `uniconnect-prod` | Le disque de Render est **effacé à chaque déploiement** : en production, `FILESYSTEM_DISK=s3`. Le projet gratuit se met en pause après une semaine sans activité : à réactiver depuis le tableau de bord Supabase. |
 | **Gemini / Groq** | Assistant IA | Gratuites | Gemini par défaut, Groq en secours. Voir SCRUM-43 pour créer les clés. |
 
 Les conditions des offres gratuites changent souvent : vérifiez-les au moment de créer les comptes.
@@ -78,20 +78,20 @@ Mise en place les 08/11 et 09/11 (SCRUM-31, SCRUM-32, SCRUM-33). État vérifié
 | `MAIL_PASSWORD` | Render | Mot de passe SMTP | **Oui** |
 | `MAIL_FROM_ADDRESS` | Render | Adresse d'expéditeur des e-mails d'activation | Non |
 | `MAIL_FROM_NAME` | Render | Nom d'expéditeur (`UniConnect`) | Non |
-| `FILESYSTEM_DISK` | Render | `s3` quand R2 sera branché (aujourd'hui : `local`, non persistant) | Non |
-| `AWS_ACCESS_KEY_ID` | Render | Identifiant R2 (prévu) | **Oui** |
-| `AWS_SECRET_ACCESS_KEY` | Render | Secret R2 (prévu) | **Oui** |
-| `AWS_DEFAULT_REGION` | Render | Région R2, `auto` (prévu) | Non |
-| `AWS_BUCKET` | Render | Nom du bucket R2 (prévu) | Non |
-| `AWS_ENDPOINT` | Render | Endpoint S3 de R2 (prévu) | Non |
-| `AWS_USE_PATH_STYLE_ENDPOINT` | Render | `true` pour R2 (prévu) | Non |
+| `FILESYSTEM_DISK` | Render | `s3` (bucket Supabase). `local` n'est pas persistant sur Render | Non |
+| `AWS_ACCESS_KEY_ID` | Render | Access key ID S3 de Supabase (section 3.6) | **Oui** |
+| `AWS_SECRET_ACCESS_KEY` | Render | Secret access key S3 de Supabase | **Oui** |
+| `AWS_DEFAULT_REGION` | Render | Région du projet Supabase : `eu-central-1` | Non |
+| `AWS_BUCKET` | Render | `uniconnect-prod` | Non |
+| `AWS_ENDPOINT` | Render | `https://<ref-du-projet>.storage.supabase.co/storage/v1/s3` (Storage → S3 Configuration) | Non |
+| `AWS_USE_PATH_STYLE_ENDPOINT` | Render | `true` (obligatoire pour Supabase) | Non |
 | `LLM_PROVIDER` | Render | `gemini` par défaut, `groq` pour basculer sur le secours (prévu) | Non |
 | `GEMINI_API_KEY` | Render | Clé gratuite Google Gemini — **ne jamais la commiter ni la copier dans un ticket** (prévu) | **Oui** |
 | `GEMINI_MODEL` | Render | Modèle Gemini utilisé, `gemini-3.5-flash-lite` (prévu) | Non |
 | `GROQ_API_KEY` | Render | Clé gratuite Groq, utilisée en secours (prévu) | **Oui** |
 | `GROQ_MODEL` | Render | Modèle Groq de secours, `openai/gpt-oss-120b` (`llama-3.3-70b-versatile` n'existe plus) (prévu) | Non |
 
-> Les lignes marquées **prévu** concernent R2 et l'Assistant IA : ne les créez que lorsque la fonctionnalité est livrée. Les noms sont déjà fixés par `backend/config/filesystems.php` et `backend/.env.example`.
+> Les lignes marquées **prévu** concernent l'Assistant IA : ne les créez que lorsque la fonctionnalité est livrée. Les noms sont déjà fixés par `backend/config/filesystems.php` et `backend/.env.example`.
 
 ### 2.2 Frontend — Vercel
 
@@ -157,6 +157,17 @@ su -s /bin/sh www-data -c "php artisan db:seed --class=DemoSeeder --force"
 Le Shell s'ouvre en `root` : passez par `www-data` pour ne pas créer de fichiers appartenant à `root` dans `storage/`.
 
 **Sans Shell (offre gratuite de Render)** : ajoutez la variable `SEED_DEMO=true` (Environment), laissez Render redéployer, vérifiez dans les logs que `DemoSeeder` s'est exécuté, puis **supprimez la variable**. Le seeder est idempotent : il met à jour les comptes de démo sans créer de doublons. Les comptes de démo ont un mot de passe public (README) : ne les gardez pas après la soutenance.
+
+### 3.6 Stockage des fichiers (Supabase Storage)
+
+SCRUM-138. Le disque de Render est effacé à chaque déploiement : en production, les fichiers vont dans un bucket **privé** de Supabase Storage, par son API compatible S3 (disque `s3` de Laravel, paquet `league/flysystem-aws-s3-v3`). Le navigateur ne reçoit **jamais** d'URL du bucket : chaque téléchargement passe par l'API, qui vérifie les droits puis relit le fichier.
+
+1. **Projet et bucket** (déjà faits) : projet `uniconnect-fichiers` (région `eu-central-1`, comme Render), bucket `uniconnect-prod`, **privé**, 25 Mo maximum par fichier.
+2. **Clés S3** : tableau de bord Supabase → projet `uniconnect-fichiers` → **Storage** → **S3 Configuration** → **New access key**. Notez l'*Access key ID* et la *Secret access key* (affichée une seule fois). Ces clés donnent un accès complet au stockage : **uniquement côté serveur**, jamais dans Git, un ticket ou une conversation.
+3. **Render** → Environment : ajoutez les 7 variables `FILESYSTEM_DISK` et `AWS_*` du tableau de la section 2.1 (l'endpoint se copie depuis la même page *S3 Configuration*). Render redéploie.
+4. **Vérification** : envoyez une pièce jointe ou une ressource depuis l'application en ligne, puis ouvrez **Storage** → `uniconnect-prod` : le fichier doit apparaître sous `espaces/<id>/…`. Téléchargez-le ensuite depuis l'application.
+
+Les fichiers envoyés **avant** le passage à `s3` étaient sur le disque de Render : ils ont déjà été perdus au déploiement suivant.
 
 ## 4. Revenir en arrière
 

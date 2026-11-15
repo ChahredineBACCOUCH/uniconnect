@@ -40,7 +40,13 @@ class AnneeTest extends TestCase
      */
     private function etudiant(): User
     {
-        $annee = AnneeUniversitaire::factory()->create();
+        // Libellé fixe hors de la plage de la factory (2000 à 2098) : une année tirée au
+        // hasard pouvait valoir 2025/2026 ou 2026/2027, créées par les tests (doublon).
+        $annee = AnneeUniversitaire::factory()->create([
+            'libelle' => '1999/2000',
+            'date_debut' => '1999-09-01',
+            'date_fin' => '2000-06-30',
+        ]);
 
         $departement = Departement::create(['code' => 'INFO', 'libelle' => 'Informatique']);
 

@@ -10,6 +10,8 @@ use App\Http\Resources\RessourceResource;
 use App\Models\Chapitre;
 use App\Models\Espace;
 use App\Models\Ressource;
+use App\Models\User;
+use App\Notifications\NouvelleRessource;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -160,8 +162,8 @@ class RessourceController extends Controller
     }
 
     /**
-     * GET /api/ressources/{ressource}/telecharger : lien temporaire (S3) ou
-     * envoi direct du fichier (disque local).
+     * GET /api/ressources/{ressource}/telecharger : envoi du fichier par l'API
+     * (disque local en développement, bucket S3 privé en production).
      */
     public function telecharger(Ressource $ressource)
     {
@@ -177,14 +179,10 @@ class RessourceController extends Controller
             abort(404, 'Le fichier de cette ressource est introuvable.');
         }
 
-        $pilote = config('filesystems.disks.'.config('filesystems.default').'.driver');
-
-        if ($pilote === 's3') {
-            return redirect()->away(
-                $disque->temporaryUrl($ressource->chemin_fichier, now()->addMinutes(5)),
-            );
-        }
-
+        // Le fichier passe par l'API, quel que soit le disque (local ou S3). Une
+        // redirection vers une URL signée du stockage (autre domaine) casserait le
+        // téléchargement du front, qui envoie le jeton et lit la réponse en blob
+        // (CORS). Le bucket reste privé : aucune URL de stockage n'est exposée.
         return $disque->download(
             $ressource->chemin_fichier,
             basename($ressource->chemin_fichier),
@@ -215,9 +213,28 @@ class RessourceController extends Controller
             'taille' => $fichier?->getSize(),
         ]);
 
+        // SCRUM-121 : les autres membres de l'espace sont prévenus.
+        $this->prevenirLesMembres($espace, $ressource, $request->user());
+
         return (new RessourceResource($ressource))
             ->response()
             ->setStatusCode(201);
+    }
+
+    /**
+     * SCRUM-121 : chaque membre de l'espace (sauf l'auteur) reçoit une
+     * notification, sauf s'il a désactivé les notifications pour cet espace.
+     */
+    private function prevenirLesMembres(Espace $espace, Ressource $ressource, User $auteur): void
+    {
+        $membres = $espace->membres()
+            ->where('users.id', '!=', $auteur->id)
+            ->where('adhesions.notifications_actives', true)
+            ->get();
+
+        foreach ($membres as $membre) {
+            $membre->notify(new NouvelleRessource($espace, $ressource, $auteur));
+        }
     }
 
     private function chapitresAvecRessources(Espace $espace): Collection

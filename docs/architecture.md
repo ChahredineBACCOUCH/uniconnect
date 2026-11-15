@@ -7,7 +7,7 @@ flowchart LR
   N["Navigateur<br/>(PC ou téléphone)"] -->|HTTPS| V["Frontend Vue 3 + Vuetify<br/>hébergé sur Vercel"]
   V -->|"API REST JSON<br/>jeton Bearer (Sanctum)"| R["API Laravel<br/>Docker sur Render"]
   R -->|SQL| P[("PostgreSQL 16<br/>Neon")]
-  R -->|"fichiers (disque S3)"| F[("Cloudflare R2")]
+  R -->|"fichiers (disque S3)"| F[("Supabase Storage")]
   R -->|"HTTP, offre gratuite"| G["Gemini<br/>(IA principale)"]
   R -.->|"si Gemini répond 429"| Q["Groq<br/>(IA de secours)"]
   R -->|SMTP| M["E-mails<br/>(Mailpit en local)"]
@@ -18,7 +18,7 @@ flowchart LR
 | Interface | Vue 3 (Composition API), Vuetify 3, Pinia, Vue Router, Axios | Écrans de la maquette, sur ordinateur et sur mobile |
 | API | Laravel 13 + Sanctum 4 | Règles métier, droits, validation, accès aux données |
 | Base de données | PostgreSQL 16 | Données ; recherche plein texte en français (`tsvector`) |
-| Fichiers | Disque `local` en développement, Cloudflare R2 (compatible S3) en production | Pièces jointes et PDF de cours, jamais exposés directement |
+| Fichiers | Disque `local` en développement, Supabase Storage, bucket privé compatible S3 (SCRUM-138) en production | Pièces jointes et PDF de cours, jamais exposés directement |
 | IA | Gemini (gratuit), Groq en secours (gratuit) | Réponses de l'Assistant de cours, avec citations |
 | Local | Docker Compose : PostgreSQL et Mailpit | Même environnement pour toute l'équipe |
 
@@ -33,6 +33,7 @@ uniconnect/
 │   ├── app/Http/Requests/        validation des formulaires (FormRequest), messages en français
 │   ├── app/Http/Resources/       format JSON renvoyé au frontend
 │   ├── app/Models/               modèles Eloquent (une classe par table de schema.sql)
+│   ├── app/Notifications/        notifications de l'application (canal `database` de Laravel)
 │   ├── app/Policies/             qui a le droit de faire quoi (EspacePolicy, MessagePolicy, ...)
 │   ├── app/Services/             règles métier (EligibiliteService, GenerationGroupesService,
 │   │                             RattachementService, IndexationService, AssistantService, ...)
@@ -62,7 +63,7 @@ uniconnect/
 | Connexion | Blocage pendant 15 min après 5 échecs ; un compte suspendu ou désactivé est refusé. |
 | Droits | Le **profil** (étudiant, enseignant, administration) et les **droits** (`droits_utilisateur`) sont vérifiés **côté serveur** par des Policies et des Gates. Masquer un bouton dans l'interface ne suffit pas. |
 | Espaces | Un non-membre reçoit **403** sur les messages, fichiers et ressources d'un espace, même avec un lien direct. |
-| Fichiers | Téléchargement uniquement par une route protégée (vérification des droits, puis lien temporaire). Le chemin de stockage n'est jamais renvoyé. |
+| Fichiers | Téléchargement uniquement par une route protégée : l'API vérifie les droits puis renvoie le fichier elle-même (bucket privé, aucune URL de stockage exposée). Le chemin de stockage n'est jamais renvoyé. |
 | Secrets | Clés et mots de passe uniquement dans `.env` (jamais dans Git, Jira ou WhatsApp). En production : variables d'environnement de Render et Vercel. |
 | Validation | Tout ce qui arrive du frontend passe par une `FormRequest`. Les erreurs renvoient **422** avec les messages par champ. |
 
@@ -116,6 +117,48 @@ sequenceDiagram
 - **Héritage du modèle UML** : une seule table `users`, avec une colonne `profil`, et une seule table `espaces`, avec une colonne `type` (`ORGANISATIONNEL`, `PRIVE`, `CHANNEL`).
 - **Groupes organisationnels** : créés automatiquement à partir des référentiels (un groupe par classe et un seul groupe par matière, toutes classes confondues). La génération peut être relancée sans créer de doublons, grâce à l'index unique `espace_orga_unique`.
 - **Rattachement** : à l'activation de son compte, un étudiant rejoint automatiquement son groupe de classe et les groupes des matières enseignées dans sa classe, et un enseignant devient propriétaire des groupes des matières dont il est responsable (`RattachementService`).
+
+### Diagramme de classes (extrait)
+
+Le diagramme complet est dans [`conception/diagramme-classes.png`](conception/diagramme-classes.png) (32 tables). Extrait des entités centrales, en Mermaid :
+
+```mermaid
+classDiagram
+    User "1" --> "*" Adhesion : adhesions
+    User "1" --> "*" DroitUtilisateur : droits
+    Espace "1" --> "*" Adhesion : adhesions
+    Espace "1" --> "*" Invitation : invitations
+    Espace "1" --> "*" Chapitre : chapitres
+    Espace "1" --> "0..1" AssistantIA : assistant
+    Chapitre "1" --> "*" Ressource : ressources
+    Ressource "1" --> "*" FragmentDocument : fragments
+    Message "1" --> "*" PieceJointe : pieces_jointes
+    User "1" --> "*" Message : messages
+    Espace "1" --> "*" Message : messages
+    Espace "1" --> "*" Annonce : annonces
+```
+
+### Chaîne de l'Assistant IA (indexation puis question)
+
+```mermaid
+flowchart LR
+    A[Enseignant ajoute un PDF] --> B[RessourceObserver]
+    B --> C[Job IndexerRessource]
+    C --> D[smalot/pdfparser : texte page par page]
+    D --> E[decoupage en fragments ~1500 car.]
+    E --> F[(fragments_document + tsvector GIN)]
+    F --> G[ressources.indexee_ia = true]
+    U[Etudiant pose une question] --> H[AssistantService]
+    H --> I[6 meilleurs fragments ts_rank]
+    I -->|aucun| J[SANS_SOURCE, IA non appelee]
+    I -->|fragments| K[Gemini puis Groq en secours]
+    K --> L[reponse avec marqueurs n]
+    L --> M[relie n au fichier et a la page]
+    M --> N[enregistre echange, sources, tokens, fournisseur]
+    N --> O[reponse + sources cliquables]
+```
+
+**Pourquoi des offres gratuites ?** Gemini et Groq proposent des quotas gratuits suffisants pour un cours (20 questions par jour et par étudiant). La recherche plein texte PostgreSQL (`tsvector`/`ts_rank`) évite une base vectorielle payante. Les données envoyées à l'IA sont **uniquement des extraits de cours**, jamais de données personnelles — les offres gratuites de Gemini peuvent réutiliser les données envoyées.
 
 ## 6. Choix techniques et raisons
 

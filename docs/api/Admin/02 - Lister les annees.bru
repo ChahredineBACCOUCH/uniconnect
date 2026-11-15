@@ -1,0 +1,17 @@
+meta {
+  name: 02 - Lister les annees
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/annees
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

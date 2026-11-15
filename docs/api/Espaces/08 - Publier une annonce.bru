@@ -1,0 +1,31 @@
+meta {
+  name: 08 - Publier une annonce
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/espaces/{{espaceId}}/annonces
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "titre": "Examen de fin de semestre",
+    "contenu": "L'examen aura lieu mardi prochain.",
+    "notifier_email": false
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("annonceId", res.body.data.id);
+  }
+}
+
+tests {
+  test("201", function () {
+    expect(res.status).to.equal(201);
+  });
+}

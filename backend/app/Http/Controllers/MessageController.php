@@ -151,7 +151,13 @@ class MessageController extends Controller
             abort(403, "Seul l'auteur peut supprimer ce message.");
         }
 
+        // Les lignes pieces_jointes partent en cascade ; les fichiers du disque
+        // doivent être supprimés explicitement, sinon ils resteraient orphelins.
+        $chemins = $message->piecesJointes()->pluck('chemin')->all();
+
         $message->delete();
+
+        Storage::delete($chemins);
 
         return response()->noContent();
     }

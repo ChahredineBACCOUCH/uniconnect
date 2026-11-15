@@ -4,14 +4,17 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 import EspaceList from '@/components/EspaceList.vue'
+import { usePolling } from '@/composables/usePolling'
 import { useAuthStore } from '@/stores/auth'
 import { useEspacesStore } from '@/stores/espaces'
+import { useNotificationsStore } from '@/stores/notifications'
 import { initiales, nomComplet, sousTitreProfil } from '@/utils/utilisateur'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const espaces = useEspacesStore()
+const notifications = useNotificationsStore()
 const { mdAndUp, xs } = useDisplay()
 
 /*
@@ -37,9 +40,9 @@ const user = computed(() => ({
 // Même droit que la route /espaces/nouveau et POST /espaces (sinon page 403).
 const peutCreerEspace = computed(() => auth.hasDroit('CREER_GROUPE_PRIVE'))
 
-// Invitations en attente (GET /me/invitations) : seules notifications disponibles
-// tant que l'API des notifications (SCRUM-121) n'existe pas.
-const nbInvitations = computed(() => espaces.invitations.length)
+// Notifications non lues (GET /notifications, SCRUM-121) : badge de la cloche
+// et entrée « Notifications » du menu latéral.
+const nbNonLues = computed(() => notifications.nonLues)
 
 const navHaut = computed(() => [
   { title: 'Accueil', icon: 'mdi-home-outline', to: '/', exact: true },
@@ -47,7 +50,7 @@ const navHaut = computed(() => [
     title: 'Notifications',
     icon: 'mdi-bell-outline',
     to: '/notifications',
-    badge: nbInvitations.value,
+    badge: nbNonLues.value,
   },
 ])
 
@@ -92,14 +95,28 @@ const navAdmin = computed(() => {
   ].filter((item) => auth.hasDroit(item.droit))
 })
 
-// Espaces du menu : chargés dès que la session est connue, vidés à la déconnexion.
+// Espaces du menu et compteur de notifications : chargés dès que la session est
+// connue, vidés à la déconnexion.
 watch(
   () => auth.user?.id,
   (id) => {
-    if (id) espaces.charger()
-    else espaces.vider()
+    if (id) {
+      espaces.charger()
+      notifications.charger({ discret: true })
+    } else {
+      espaces.vider()
+      notifications.vider()
+    }
   },
   { immediate: true },
+)
+
+// La cloche est rafraîchie toutes les 30 s, en pause quand l'onglet est masqué.
+usePolling(
+  async () => {
+    if (auth.user?.id) await notifications.charger({ discret: true })
+  },
+  { intervalle: 30_000 },
 )
 
 // À chaque changement de page : compteurs de non-lus, espace créé, rejoint ou quitté.
@@ -176,15 +193,15 @@ function onBottomNavChange(value) {
         variant="text"
         color="on-surface-variant"
         :aria-label="
-          nbInvitations
-            ? `Notifications, ${nbInvitations} invitation${nbInvitations > 1 ? 's' : ''} en attente`
+          nbNonLues
+            ? `Notifications, ${nbNonLues} non lue${nbNonLues > 1 ? 's' : ''}`
             : 'Notifications'
         "
         to="/notifications"
       >
         <v-badge
-          :model-value="nbInvitations > 0"
-          :content="nbInvitations"
+          :model-value="nbNonLues > 0"
+          :content="nbNonLues"
           color="error"
           offset-x="2"
           offset-y="2"

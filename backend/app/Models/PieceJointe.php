@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Fichier attaché à un message (SCRUM-136).
+ * Fichier attaché à un message (SCRUM-136) ou à une annonce (SCRUM-124).
  *
  * Le fichier lui-même est stocké sur le disque (`chemin`) ; la ligne ne conserve
  * que les métadonnées utiles à l'affichage et au téléchargement.
  */
 #[Fillable([
     'message_id',
+    'annonce_id',
     'nom',
     'mime',
     'taille_octets',
@@ -39,5 +40,11 @@ class PieceJointe extends Model
     public function message(): BelongsTo
     {
         return $this->belongsTo(Message::class);
+    }
+
+    /** @return BelongsTo<Annonce, $this> */
+    public function annonce(): BelongsTo
+    {
+        return $this->belongsTo(Annonce::class);
     }
 }

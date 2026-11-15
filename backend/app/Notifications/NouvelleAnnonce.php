@@ -2,27 +2,30 @@
 
 namespace App\Notifications;
 
+use App\Enums\TypeNotification;
 use App\Models\Annonce;
-use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 
 /**
  * SCRUM-123 : notification applicative envoyée à tous les membres lorsqu'une
  * annonce est publiée dans leur espace.
+ *
+ * SCRUM-121 : respecte le réglage `adhesions.notifications_actives` de chaque
+ * membre (via `NotificationBase`).
  */
-class NouvelleAnnonce extends Notification
+class NouvelleAnnonce extends NotificationBase
 {
-    use Queueable;
-
-    public function __construct(public Annonce $annonce) {}
-
-    /**
-     * @return list<string>
-     */
-    public function via(object $notifiable): array
+    public function __construct(public Annonce $annonce)
     {
-        return ['database'];
+        $this->espaceId = $annonce->espace_id;
+        $this->titre = $annonce->titre;
+        $this->texte = Str::limit($annonce->contenu, 140);
+        $this->lien = '/espaces/'.$annonce->espace_id.'/annonces';
+    }
+
+    public function type(): TypeNotification
+    {
+        return TypeNotification::ANNONCE;
     }
 
     /**
@@ -30,14 +33,10 @@ class NouvelleAnnonce extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            'type' => 'ANNONCE',
+        return array_merge(parent::toArray($notifiable), [
             'annonce_id' => $this->annonce->id,
             'espace_id' => $this->annonce->espace_id,
             'espace_nom' => $this->annonce->espace?->nom,
-            'titre' => $this->annonce->titre,
-            'texte' => Str::limit($this->annonce->contenu, 140),
-            'lien' => '/espaces/'.$this->annonce->espace_id.'/annonces',
-        ];
+        ]);
     }
 }

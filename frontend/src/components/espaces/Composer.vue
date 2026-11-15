@@ -2,6 +2,12 @@
 import { computed, nextTick, ref, watch } from 'vue'
 
 import {
+  ACCEPT_FICHIERS,
+  MAX_FICHIERS,
+  TAILLE_MAX_MO,
+  verifierFichiers,
+} from '@/utils/fichiers'
+import {
   estGestionnaire,
   extrait,
   libelleDuree,
@@ -10,6 +16,7 @@ import {
   optionsDuree,
   peutPublier,
 } from '@/utils/espaces'
+import { formaterTaille } from '@/utils/ressources'
 
 const props = defineProps({
   espace: { type: Object, required: true },
@@ -26,10 +33,21 @@ const envoiEnCours = ref(false)
 const erreur = ref(null)
 const zoneTexte = ref(null)
 
+// SCRUM-139 : fichiers choisis par le trombone ou déposés sur le composer.
+const fichiers = ref([])
+const champFichiers = ref(null)
+const progres = ref(0)
+const survol = ref(false)
+const profondeurSurvol = ref(0)
+
 const autorise = computed(() => peutPublier(props.espace))
 const gestionnaire = computed(() => estGestionnaire(props.espace.role))
 const optionsDureeDisponibles = computed(() => optionsDuree(props.espace))
 const afficherDuree = computed(() => autorise.value && optionsDureeDisponibles.value.length > 1)
+const aDesFichiers = computed(() => fichiers.value.length > 0)
+const peutEnvoyer = computed(
+  () => autorise.value && !envoiEnCours.value && (brouillon.value.trim() !== '' || aDesFichiers.value),
+)
 
 const blocage = computed(() => {
   if (props.espace.etat === 'ARCHIVE') {
@@ -56,6 +74,8 @@ const infoVisibilite = computed(() => {
   return `Les messages de cet espace sont supprimés définitivement ${libelleDuree(props.espace.duree_visibilite_heures)} après leur envoi.`
 })
 
+const infoFichiers = `${MAX_FICHIERS} fichiers maximum, ${TAILLE_MAX_MO} Mo par fichier.`
+
 watch(
   () => props.reponseA,
   async (message) => {
@@ -65,23 +85,81 @@ watch(
   },
 )
 
+function ouvrirSelecteur() {
+  if (!autorise.value || envoiEnCours.value) return
+  champFichiers.value?.click()
+}
+
+function ajouterFichiers(liste) {
+  const nouveaux = Array.from(liste ?? [])
+  if (nouveaux.length === 0) return
+
+  const { acceptes, erreur: message } = verifierFichiers(nouveaux, fichiers.value)
+
+  erreur.value = message
+  fichiers.value = [...fichiers.value, ...acceptes]
+}
+
+function surSelection(event) {
+  ajouterFichiers(event.target.files)
+  // Permet de rechoisir le même fichier après l'avoir retiré.
+  event.target.value = ''
+}
+
+function surEntreeGlisser() {
+  profondeurSurvol.value += 1
+  survol.value = true
+}
+
+function surSortieGlisser() {
+  profondeurSurvol.value = Math.max(0, profondeurSurvol.value - 1)
+  if (profondeurSurvol.value === 0) survol.value = false
+}
+
+function surDepot(event) {
+  profondeurSurvol.value = 0
+  survol.value = false
+  if (!autorise.value || envoiEnCours.value) return
+
+  ajouterFichiers(event.dataTransfer?.files)
+}
+
+function retirerFichier(index) {
+  fichiers.value = fichiers.value.filter((_, position) => position !== index)
+}
+
+function surProgression(event) {
+  if (!event.total) return
+  progres.value = Math.round((event.loaded * 100) / event.total)
+}
+
 async function soumettre() {
   const contenu = brouillon.value.trim()
 
-  if (!contenu || !autorise.value || envoiEnCours.value) return
+  if (!peutEnvoyer.value) return
 
   erreur.value = null
   envoiEnCours.value = true
+  progres.value = 0
 
   try {
-    await props.envoyer({
+    const payload = {
       contenu,
       parent_id: props.reponseA?.id ?? null,
       duree_visibilite_heures: duree.value || null,
-    })
+    }
+
+    if (aDesFichiers.value) {
+      payload.fichiers = fichiers.value
+      await props.envoyer(payload, { onUploadProgress: surProgression })
+    } else {
+      await props.envoyer(payload)
+    }
 
     brouillon.value = ''
     duree.value = null
+    fichiers.value = []
+    progres.value = 0
     emit('annuler-reponse')
   } catch (error) {
     erreur.value = messageErreur(error, "Le message n'a pas pu être envoyé.")
@@ -96,7 +174,30 @@ function annulerReponse() {
 </script>
 
 <template>
-  <form class="composer" @submit.prevent="soumettre">
+  <form
+    class="composer"
+    :class="{ 'composer--survol': survol }"
+    @submit.prevent="soumettre"
+    @dragenter.prevent="surEntreeGlisser"
+    @dragover.prevent
+    @dragleave.prevent="surSortieGlisser"
+    @drop.prevent="surDepot"
+  >
+    <input
+      ref="champFichiers"
+      type="file"
+      multiple
+      hidden
+      :accept="ACCEPT_FICHIERS"
+      aria-label="Choisir des fichiers à joindre"
+      @change="surSelection"
+    />
+
+    <div v-if="survol" class="composer__depot">
+      <v-icon icon="mdi-cloud-upload-outline" size="28" />
+      <span>Déposez vos fichiers ici</span>
+    </div>
+
     <v-alert v-if="blocage" type="info" variant="tonal" density="comfortable" class="mb-3">
       {{ blocage }}
     </v-alert>
@@ -124,7 +225,38 @@ function annulerReponse() {
       </v-btn>
     </div>
 
+    <div v-if="aDesFichiers" class="composer__fichiers">
+      <v-chip
+        v-for="(fichier, index) in fichiers"
+        :key="`${fichier.name}-${fichier.size}-${index}`"
+        size="small"
+        variant="tonal"
+        closable
+        :disabled="envoiEnCours"
+        @click:close="retirerFichier(index)"
+      >
+        <v-icon start icon="mdi-paperclip" size="14" />
+        {{ fichier.name }} · {{ formaterTaille(fichier.size) }}
+      </v-chip>
+    </div>
+
+    <div v-if="envoiEnCours && aDesFichiers" class="composer__progression">
+      <v-progress-linear v-model="progres" :height="6" color="primary" rounded />
+      <span class="composer__progression-texte">Téléversement : {{ progres }} %</span>
+    </div>
+
     <div class="composer__ligne">
+      <v-btn
+        icon="mdi-paperclip"
+        variant="text"
+        size="small"
+        height="44"
+        class="composer__joindre"
+        aria-label="Joindre des fichiers"
+        :disabled="!autorise || envoiEnCours"
+        @click="ouvrirSelecteur"
+      />
+
       <v-textarea
         ref="zoneTexte"
         v-model="brouillon"
@@ -165,24 +297,47 @@ function annulerReponse() {
         height="44"
         class="composer__envoyer"
         :loading="envoiEnCours"
-        :disabled="!autorise || !brouillon.trim()"
+        :disabled="!peutEnvoyer"
         prepend-icon="mdi-send"
       >
         Envoyer
       </v-btn>
     </div>
 
-    <span class="composer__info">{{ infoVisibilite }}</span>
+    <span class="composer__info">
+      {{ infoVisibilite }} {{ infoFichiers }}
+    </span>
   </form>
 </template>
 
 <style scoped>
 .composer {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 14px 16px 12px;
   border-top: 1px solid rgb(var(--v-theme-outline));
   background: rgb(var(--v-theme-surface));
+}
+
+.composer--survol {
+  outline: 2px dashed rgb(var(--v-theme-primary));
+  outline-offset: -6px;
+}
+
+.composer__depot {
+  position: absolute;
+  inset: 6px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 10px;
+  background: rgba(var(--v-theme-surface), 0.92);
+  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
+  pointer-events: none;
 }
 
 .composer__reponse {
@@ -218,10 +373,33 @@ function annulerReponse() {
   white-space: nowrap;
 }
 
+.composer__fichiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.composer__progression {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.composer__progression-texte {
+  font-size: 12px;
+  color: rgb(var(--v-theme-on-surface-variant));
+}
+
 .composer__ligne {
   display: flex;
   align-items: flex-end;
   gap: 10px;
+}
+
+.composer__joindre {
+  flex: none;
 }
 
 .composer__zone {
@@ -255,12 +433,23 @@ function annulerReponse() {
   }
 
   .composer__zone {
+    order: 1;
     flex-basis: 100%;
   }
 
+  .composer__joindre {
+    order: 2;
+  }
+
   .composer__duree {
+    order: 3;
     flex: 1;
     width: auto;
+  }
+
+  .composer__envoyer {
+    order: 4;
+    margin-left: auto;
   }
 }
 </style>

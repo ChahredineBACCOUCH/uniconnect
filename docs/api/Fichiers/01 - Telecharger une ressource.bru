@@ -1,0 +1,17 @@
+meta {
+  name: 01 - Telecharger une ressource
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/ressources/{{ressourceId}}/telecharger
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("200 ou 302", function () {
+    expect([200, 302]).to.include(res.status);
+  });
+}

@@ -29,17 +29,33 @@ L'**accueil** résume votre journée : messages non lus, invitations en attente 
 ### Discuter
 1. Ouvrez un espace : l'onglet **Discussion** s'affiche.
 2. Écrivez en bas, puis cliquez sur **Envoyer** (ou appuyez sur Entrée).
-3. Pour joindre un fichier, cliquez sur 📎. Les fichiers sont visibles **uniquement par les membres** de l'espace.
+3. Pour joindre un fichier, cliquez sur le trombone 📎 ou faites glisser le fichier dans la zone d'écriture (« Déposez vos fichiers ici »). On peut envoyer un fichier seul, sans texte.
 
-### Annonces et ressources
-- **Annonces** : informations officielles de l'enseignant (vous recevez une notification).
-- **Ressources** : supports de cours classés par chapitre, à consulter ou télécharger.
+### Fichiers joints
+- **5 fichiers** au maximum par message, **25 Mo** par fichier.
+- Formats acceptés : PDF, images (JPG, PNG, GIF, WebP), Word, Excel, PowerPoint et ZIP.
+- Sous le message, cliquez sur le fichier pour le **télécharger** ; une image peut aussi s'ouvrir en **aperçu**.
+- Les fichiers sont **réservés aux membres** de l'espace : quelqu'un qui quitte l'espace, ou qui en est retiré, ne peut plus les ouvrir, même avec un lien copié auparavant.
+
+### Annonces
+L'onglet **Annonces** regroupe les informations officielles de l'enseignant, séparées de la discussion (dates d'examen, consignes…). Une annonce publiée depuis moins de 3 jours porte la mention **Nouveau** ; ses pièces jointes se téléchargent comme les fichiers des messages. Chaque nouvelle annonce vous envoie une notification.
+
+### Ressources
+L'onglet **Ressources** présente les supports de cours **classés par chapitre**.
+- Le champ **Rechercher une ressource** et les filtres par type (PDF, documents, liens) aident à retrouver un support.
+- Cliquez sur l'icône de téléchargement pour enregistrer un fichier, ou sur l'icône d'ouverture pour suivre un lien.
+
+### Notifications
+La cloche 🔔 en haut de l'écran affiche le nombre de notifications **non lues** ; le compteur se met à jour tout seul toutes les 30 secondes. La page **Invitations et notifications** a deux onglets :
+- **Invitations** : accepter ou refuser une invitation à rejoindre un espace ;
+- **Notifications** : nouvelle annonce, nouvelle ressource, retrait d'un espace… Un point bleu signale une notification non lue ; un clic la marque comme lue et ouvre la page concernée. **Tout marquer comme lu** les marque toutes d'un coup.
 
 ### Poser une question à l'Assistant IA
 1. Dans l'espace d'une matière, ouvrez l'onglet **Assistant IA** (visible si l'enseignant l'a activé).
 2. Posez votre question en français, par exemple : « Quelle est la différence entre la 2FN et la 3FN ? »
-3. La réponse indique ses **sources** (« [1] Chapitre 3 – Normalisation.pdf · p. 14 »). Dans le texte, cliquez sur un numéro comme **[1]** pour mettre en évidence la source correspondante, puis cliquez sur la source pour la retrouver dans l'onglet **Ressources**.
-4. Donnez votre avis avec 👍 ou 👎 : cela aide à améliorer l'assistant.
+3. La réponse indique ses **sources** (« [1] Chapitre 3 – Normalisation.pdf · p. 14 »). Dans le texte, cliquez sur un numéro comme **[1]** pour mettre en évidence la source correspondante, puis cliquez sur la source : l'onglet **Ressources** s'ouvre, le document est **surligné** dans son chapitre et prêt à être téléchargé.
+4. Sur ordinateur, le panneau **Sources de l'assistant**, à droite, liste les documents du cours dans lesquels l'assistant cherche ; un clic ouvre le document de la même façon.
+5. Donnez votre avis sous la réponse avec 👍 (réponse utile) ou 👎 (pas utile) : cela aide l'enseignant à améliorer ses supports.
 
 À savoir :
 - l'assistant répond **uniquement à partir des documents du cours**. Si l'information n'y est pas, il le dit ;
@@ -69,9 +85,9 @@ Vous avez accès à tout ce que fait un étudiant, et en plus :
 
 | Action | Où | Comment |
 |---|---|---|
-| Publier une annonce | Onglet **Annonces** | Titre + texte → **Publier** : les membres reçoivent une notification |
-| Partager un support de cours | Onglet **Ressources** | **Nouveau chapitre**, puis **Ajouter une ressource** (PDF ou lien). Les PDF sont indexés pour l'IA : la puce « Indexée pour l'IA » apparaît. |
-| Activer l'Assistant IA | Onglet **Paramètres** | Interrupteur « Assistant IA ». Vous pouvez ajouter une consigne, par exemple « Donne des exemples SQL ». |
+| Publier une annonce | Onglet **Annonces** | **Nouvelle annonce** → titre, contenu, pièces jointes (facultatives) → **Publier**. Les membres reçoivent une notification ; cochez **Notifier aussi les membres par e-mail** pour leur envoyer un e-mail en plus. Seul l'auteur peut supprimer son annonce. |
+| Partager un support de cours | Onglet **Ressources** | **Nouveau chapitre**, puis **Ajouter une ressource** : un fichier (PDF, Word…) ou un lien. Le menu ⋮ d'une ressource permet de la **renommer**, de la **déplacer** vers un autre chapitre ou de la **supprimer**. Les PDF sont indexés pour l'IA en arrière-plan : la puce « Indexé pour l'IA » apparaît (visible des enseignants seulement). |
+| Activer l'Assistant IA | Onglet **Paramètres**, bloc « Assistant IA » | Activez l'interrupteur (« Assistant activé pour les membres ») : l'onglet **Assistant IA** apparaît pour les membres. Ajoutez si besoin une **consigne** (1 000 caractères au maximum), par exemple « Donne des exemples SQL », puis **Enregistrer**. |
 | Gérer les membres | Onglet **Membres** | Inviter, nommer un co-gestionnaire, retirer un membre (l'accès aux messages est coupé immédiatement), transférer la propriété. Un espace a toujours un propriétaire : s'il part, la propriété passe au plus ancien co-gestionnaire. |
 
 Conseil : l'assistant n'est utile que si vos PDF sont **en texte** (pas des scans d'images) et classés par chapitre.
@@ -103,3 +119,5 @@ Format du fichier Excel : colonnes `matricule`, `nom`, `prenom`, `email`, `profi
 | « Vous avez atteint vos 20 questions du jour » | Le quota se remet à zéro le lendemain. |
 | « L'assistant est momentanément indisponible » | Le service d'IA est saturé : réessayez dans quelques minutes. |
 | Un message ou un fichier a disparu | Il a peut-être été supprimé par son auteur, ou vous n'êtes plus membre de l'espace. |
+| « Le fichier dépasse la taille maximale de 25 Mo » | Compressez le fichier ou partagez un lien (onglet Ressources pour un enseignant). 5 fichiers au maximum par message. |
+| Je ne peux plus ouvrir un fichier (accès refusé) | Les fichiers sont réservés aux membres de l'espace : si vous avez quitté l'espace ou en avez été retiré, demandez une nouvelle invitation. |

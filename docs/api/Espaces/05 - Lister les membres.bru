@@ -1,0 +1,17 @@
+meta {
+  name: 05 - Lister les membres
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/espaces/{{espaceId}}/membres
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

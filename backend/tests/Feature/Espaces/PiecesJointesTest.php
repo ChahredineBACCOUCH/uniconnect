@@ -192,6 +192,27 @@ class PiecesJointesTest extends TestCase
             ->assertJsonPath('data.0.pieces_jointes.0.nom', 'resume.pdf');
     }
 
+    public function test_supprimer_un_message_supprime_aussi_ses_fichiers(): void
+    {
+        $espace = $this->creerEspace();
+        $membre = $this->creerMembre($espace);
+
+        Sanctum::actingAs($membre);
+
+        $id = $this->post("/api/espaces/{$espace->id}/messages", [
+            'contenu' => 'Mon TP',
+            'fichiers' => [UploadedFile::fake()->create('tp.pdf', 50, 'application/pdf')],
+        ], ['Accept' => 'application/json'])->assertCreated()->json('data.id');
+
+        $chemin = PieceJointe::query()->where('message_id', $id)->value('chemin');
+        Storage::disk('local')->assertExists($chemin);
+
+        $this->deleteJson("/api/messages/{$id}")->assertNoContent();
+
+        $this->assertDatabaseCount('pieces_jointes', 0);
+        Storage::disk('local')->assertMissing($chemin);
+    }
+
     public function test_les_regles_actuelles_viennent_de_la_configuration(): void
     {
         $regle = ReglePlateforme::actuelle();

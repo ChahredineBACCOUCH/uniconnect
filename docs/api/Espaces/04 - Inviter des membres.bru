@@ -1,0 +1,24 @@
+meta {
+  name: 04 - Inviter des membres
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/espaces/{{espaceId}}/invitations
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "user_ids": [2, 3]
+  }
+}
+
+tests {
+  test("201 avec creees", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body).to.have.property("creees");
+  });
+}

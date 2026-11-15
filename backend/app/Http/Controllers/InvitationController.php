@@ -12,10 +12,13 @@ use App\Http\Resources\InvitationResource;
 use App\Models\Adhesion;
 use App\Models\Espace;
 use App\Models\Invitation;
+use App\Models\User;
+use App\Notifications\InvitationRecue;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -66,6 +69,9 @@ class InvitationController extends Controller
                 ]);
             }
         });
+
+        // SCRUM-121 : l'invité est prévenu dans l'application.
+        $this->prevenirLesInvites($aInviter, $espace, $request->user());
 
         return response()->json([
             'creees' => $aInviter->count(),
@@ -163,6 +169,22 @@ class InvitationController extends Controller
         $invitation->update(['etat' => EtatInvitation::ANNULEE]);
 
         return response()->noContent();
+    }
+
+    /**
+     * SCRUM-121 : chaque personne invitée reçoit une notification.
+     *
+     * @param  Collection<int, int>  $invites
+     */
+    private function prevenirLesInvites($invites, Espace $espace, User $auteur): void
+    {
+        foreach ($invites as $userId) {
+            $invite = User::query()->find($userId);
+
+            if ($invite !== null) {
+                $invite->notify(new InvitationRecue($espace, $auteur));
+            }
+        }
     }
 
     private function verifierEspaceInvitable(Espace $espace): void

@@ -1,0 +1,17 @@
+meta {
+  name: 04 - Supprimer un message
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/messages/{{messageId}}
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("204", function () {
+    expect(res.status).to.equal(204);
+  });
+}

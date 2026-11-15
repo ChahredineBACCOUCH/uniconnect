@@ -1,0 +1,23 @@
+meta {
+  name: 01 - Poser une question
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/espaces/{{espaceId}}/ia/questions
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "question": "Qu'est-ce qu'une base de donnees relationnelle ?"
+  }
+}
+
+tests {
+  test("200 ou 404/429/503", function () {
+    expect([200, 404, 429, 503]).to.include(res.status);
+  });
+}

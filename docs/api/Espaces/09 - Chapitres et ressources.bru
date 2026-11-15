@@ -1,0 +1,17 @@
+meta {
+  name: 09 - Chapitres et ressources
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/espaces/{{espaceId}}/chapitres
+  body: none
+  auth: bearer
+}
+
+tests {
+  test("200", function () {
+    expect(res.status).to.equal(200);
+  });
+}

@@ -16,6 +16,7 @@ import { useDisplay } from 'vuetify'
 import { useAuthStore } from '@/stores/auth'
 import { QUESTION_MAX, QUESTION_MIN, QUOTA_JOUR, useIaStore } from '@/stores/ia'
 import { decouperReponse } from './reponseIa'
+import SourcesAssistant from './SourcesAssistant.vue'
 import SourcesCitees from './SourcesCitees.vue'
 
 const props = defineProps({
@@ -33,7 +34,7 @@ const props = defineProps({
 
 const ia = useIaStore()
 const auth = useAuthStore()
-const { xs } = useDisplay()
+const { xs, mdAndUp } = useDisplay()
 
 const brouillon = ref('')
 const zoneMessages = ref(null)
@@ -100,6 +101,9 @@ const erreurSaisie = computed(() =>
 )
 // Aucun support indexé (renvoyé par GET /espaces/{id}) : l'assistant n'a rien pour répondre (SCRUM-144).
 const sansSupport = computed(() => props.espace.assistant?.nb_documents_indexes === 0)
+
+// Panneau « Sources de l'assistant » : grand écran, et seulement s'il y a des supports.
+const afficherSources = computed(() => mdAndUp.value && !sansSupport.value)
 
 const peutEnvoyer = computed(
   () =>
@@ -179,126 +183,110 @@ watch(
 </script>
 
 <template>
-  <section
+  <div
     ref="racine"
-    class="assistant"
-    aria-label="Assistant IA"
+    class="assistant-cadre"
+    :class="{ 'assistant-cadre--avec-sources': afficherSources }"
     :style="hauteur ? { height: `${hauteur}px` } : undefined"
   >
-    <header class="assistant__entete">
-      <span class="assistant__avatar" aria-hidden="true">
-        <v-icon icon="mdi-creation" size="20" />
-      </span>
-      <div class="assistant__titre">
-        <div class="d-flex align-center ga-2">
-          <h2 class="text-h6">Assistant du cours</h2>
-          <v-chip class="chip-beta">Bêta</v-chip>
-        </div>
-        <span class="text-caption text-medium-emphasis">
-          Répond à partir des ressources publiées dans cet espace, en citant ses sources.
-        </span>
-      </div>
-      <v-btn
-        variant="outlined"
-        prepend-icon="mdi-plus"
-        :disabled="ia.estVide || ia.enCours"
-        @click="ia.nouvelleConversation()"
-      >
-        Nouvelle conversation
-      </v-btn>
-    </header>
-
-    <div v-if="sansSupport" class="assistant__vide">
-      <v-icon icon="mdi-book-open-page-variant-outline" size="40" />
-      <p class="text-subtitle-1 font-weight-medium">Pas encore de supports de cours</p>
-      <p class="text-body-2 text-medium-emphasis">
-        L'enseignant n'a pas encore ajouté de supports de cours pour l'assistant. Revenez quand des
-        ressources seront publiées dans l'onglet Ressources.
-      </p>
-    </div>
-
-    <div v-else ref="zoneMessages" class="assistant__messages" aria-live="polite">
-      <div class="message message--ia">
+    <section class="assistant" aria-label="Assistant IA">
+      <header class="assistant__entete">
         <span class="assistant__avatar" aria-hidden="true">
           <v-icon icon="mdi-creation" size="20" />
         </span>
-        <div class="bulle bulle--ia">
-          <p>
-            {{ accueil }}
-            <template v-if="nomCours">
-              Cours : <strong>{{ nomCours }}</strong
-              >.
-            </template>
-          </p>
+        <div class="assistant__titre">
+          <div class="d-flex align-center ga-2">
+            <h2 class="text-h6">Assistant du cours</h2>
+            <v-chip class="chip-beta">Bêta</v-chip>
+          </div>
+          <span class="text-caption text-medium-emphasis">
+            Répond à partir des ressources publiées dans cet espace, en citant ses sources.
+          </span>
         </div>
+        <v-btn
+          variant="outlined"
+          prepend-icon="mdi-plus"
+          :disabled="ia.estVide || ia.enCours"
+          @click="ia.nouvelleConversation()"
+        >
+          Nouvelle conversation
+        </v-btn>
+      </header>
+
+      <div v-if="sansSupport" class="assistant__vide">
+        <v-icon icon="mdi-book-open-page-variant-outline" size="40" />
+        <p class="text-subtitle-1 font-weight-medium">Pas encore de supports de cours</p>
+        <p class="text-body-2 text-medium-emphasis">
+          L'enseignant n'a pas encore ajouté de supports de cours pour l'assistant. Revenez quand
+          des ressources seront publiées dans l'onglet Ressources.
+        </p>
       </div>
 
-      <template v-for="(echange, index) in ia.echanges" :key="index">
-        <div class="message message--question">
-          <div class="bulle bulle--question">{{ echange.question }}</div>
-        </div>
-
+      <div v-else ref="zoneMessages" class="assistant__messages" aria-live="polite">
         <div class="message message--ia">
           <span class="assistant__avatar" aria-hidden="true">
             <v-icon icon="mdi-creation" size="20" />
           </span>
-
           <div class="bulle bulle--ia">
-            <div v-if="echange.statut === 'EN_COURS'" class="attente">
-              <v-progress-circular indeterminate size="18" width="2" color="#B45309" />
-              Recherche dans les ressources du cours…
-            </div>
-
-            <p v-else-if="echange.statut === 'SANS_SOURCE'" class="text-medium-emphasis">
-              Je n'ai pas trouvé de réponse fiable dans les ressources de cet espace. Essayez de
-              reformuler, ou posez votre question dans la Discussion.
+            <p>
+              {{ accueil }}
+              <template v-if="nomCours">
+                Cours : <strong>{{ nomCours }}</strong
+                >.
+              </template>
             </p>
+          </div>
+        </div>
 
-            <v-alert
-              v-else-if="echange.statut === 'ERREUR'"
-              :type="messageErreur(echange.erreur).type"
-              variant="tonal"
-              density="compact"
-              :title="messageErreur(echange.erreur).titre"
-            >
-              <p class="text-body-2">{{ messageErreur(echange.erreur).texte }}</p>
-              <v-btn
-                v-if="messageErreur(echange.erreur).reessayer"
-                class="mt-2"
-                size="small"
-                variant="outlined"
-                prepend-icon="mdi-refresh"
-                :disabled="ia.enCours"
-                @click="ia.reessayer(index)"
-              >
-                Réessayer
-              </v-btn>
-            </v-alert>
+        <template v-for="(echange, index) in ia.echanges" :key="index">
+          <div class="message message--question">
+            <div class="bulle bulle--question">{{ echange.question }}</div>
+          </div>
 
-            <template v-else>
-              <template
-                v-for="(bloc, b) in decouperReponse(echange.reponse, echange.sources)"
-                :key="b"
+          <div class="message message--ia">
+            <span class="assistant__avatar" aria-hidden="true">
+              <v-icon icon="mdi-creation" size="20" />
+            </span>
+
+            <div class="bulle bulle--ia">
+              <div v-if="echange.statut === 'EN_COURS'" class="attente">
+                <v-progress-circular indeterminate size="18" width="2" color="#B45309" />
+                Recherche dans les ressources du cours…
+              </div>
+
+              <p v-else-if="echange.statut === 'SANS_SOURCE'" class="text-medium-emphasis">
+                Je n'ai pas trouvé de réponse fiable dans les ressources de cet espace. Essayez de
+                reformuler, ou posez votre question dans la Discussion.
+              </p>
+
+              <v-alert
+                v-else-if="echange.statut === 'ERREUR'"
+                :type="messageErreur(echange.erreur).type"
+                variant="tonal"
+                density="compact"
+                :title="messageErreur(echange.erreur).titre"
               >
-                <p v-if="bloc.type === 'paragraphe'">
-                  <template v-for="(s, k) in bloc.segments" :key="k">
-                    <button
-                      v-if="s.citations"
-                      type="button"
-                      class="citation"
-                      :class="{ 'citation--active': s.citations.includes(sourceActive[index]) }"
-                      :aria-label="`Voir la source ${s.citations.join(', ')}`"
-                      @click="surlignerSource(index, s.citations[0])"
-                    >
-                      {{ s.texte }}
-                    </button>
-                    <strong v-else-if="s.gras">{{ s.texte }}</strong>
-                    <template v-else>{{ s.texte }}</template>
-                  </template>
-                </p>
-                <ul v-else>
-                  <li v-for="(item, j) in bloc.items" :key="j">
-                    <template v-for="(s, k) in item" :key="k">
+                <p class="text-body-2">{{ messageErreur(echange.erreur).texte }}</p>
+                <v-btn
+                  v-if="messageErreur(echange.erreur).reessayer"
+                  class="mt-2"
+                  size="small"
+                  variant="outlined"
+                  prepend-icon="mdi-refresh"
+                  :disabled="ia.enCours"
+                  @click="ia.reessayer(index)"
+                >
+                  Réessayer
+                </v-btn>
+              </v-alert>
+
+              <template v-else>
+                <template
+                  v-for="(bloc, b) in decouperReponse(echange.reponse, echange.sources)"
+                  :key="b"
+                >
+                  <p v-if="bloc.type === 'paragraphe'">
+                    <template v-for="(s, k) in bloc.segments" :key="k">
                       <button
                         v-if="s.citations"
                         type="button"
@@ -312,136 +300,173 @@ watch(
                       <strong v-else-if="s.gras">{{ s.texte }}</strong>
                       <template v-else>{{ s.texte }}</template>
                     </template>
-                  </li>
-                </ul>
+                  </p>
+                  <ul v-else>
+                    <li v-for="(item, j) in bloc.items" :key="j">
+                      <template v-for="(s, k) in item" :key="k">
+                        <button
+                          v-if="s.citations"
+                          type="button"
+                          class="citation"
+                          :class="{ 'citation--active': s.citations.includes(sourceActive[index]) }"
+                          :aria-label="`Voir la source ${s.citations.join(', ')}`"
+                          @click="surlignerSource(index, s.citations[0])"
+                        >
+                          {{ s.texte }}
+                        </button>
+                        <strong v-else-if="s.gras">{{ s.texte }}</strong>
+                        <template v-else>{{ s.texte }}</template>
+                      </template>
+                    </li>
+                  </ul>
+                </template>
+
+                <SourcesCitees
+                  :sources="echange.sources"
+                  :espace-id="espaceId"
+                  :prefixe="`source-${index}`"
+                  :active="sourceActive[index] ?? null"
+                />
+
+                <span class="text-caption text-medium-emphasis">
+                  Réponse générée par IA, à vérifier dans les sources.
+                </span>
               </template>
 
-              <SourcesCitees
-                :sources="echange.sources"
-                :espace-id="espaceId"
-                :prefixe="`source-${index}`"
-                :active="sourceActive[index] ?? null"
-              />
-
-              <span class="text-caption text-medium-emphasis">
-                Réponse générée par IA, à vérifier dans les sources.
-              </span>
-            </template>
-
-            <!-- SCRUM-146 : avis sur la réponse (aussi quand le cours ne contenait pas la réponse). -->
-            <div
-              v-if="echange.echangeId && ['OK', 'SANS_SOURCE'].includes(echange.statut)"
-              class="avis"
-            >
-              <span class="text-caption text-medium-emphasis">
-                {{
-                  echange.avis === null
-                    ? 'Cette réponse vous a-t-elle aidé ?'
-                    : 'Merci pour votre avis.'
-                }}
-              </span>
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                :color="echange.avis === true ? 'success' : undefined"
-                :aria-pressed="echange.avis === true"
-                aria-label="Réponse utile"
-                @click="donnerAvis(index, true)"
+              <!-- SCRUM-146 : avis sur la réponse (aussi quand le cours ne contenait pas la réponse). -->
+              <div
+                v-if="echange.echangeId && ['OK', 'SANS_SOURCE'].includes(echange.statut)"
+                class="avis"
               >
-                <v-icon
-                  :icon="echange.avis === true ? 'mdi-thumb-up' : 'mdi-thumb-up-outline'"
-                  size="18"
-                />
-              </v-btn>
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                :color="echange.avis === false ? 'error' : undefined"
-                :aria-pressed="echange.avis === false"
-                aria-label="Réponse pas utile"
-                @click="donnerAvis(index, false)"
-              >
-                <v-icon
-                  :icon="echange.avis === false ? 'mdi-thumb-down' : 'mdi-thumb-down-outline'"
-                  size="18"
-                />
-              </v-btn>
-              <span v-if="avisEnEchec[index]" class="text-caption text-error">
-                Votre avis n'a pas pu être enregistré.
-              </span>
+                <span class="text-caption text-medium-emphasis">
+                  {{
+                    echange.avis === null
+                      ? 'Cette réponse vous a-t-elle aidé ?'
+                      : 'Merci pour votre avis.'
+                  }}
+                </span>
+                <v-btn
+                  icon
+                  size="x-small"
+                  variant="text"
+                  :color="echange.avis === true ? 'success' : undefined"
+                  :aria-pressed="echange.avis === true"
+                  aria-label="Réponse utile"
+                  @click="donnerAvis(index, true)"
+                >
+                  <v-icon
+                    :icon="echange.avis === true ? 'mdi-thumb-up' : 'mdi-thumb-up-outline'"
+                    size="18"
+                  />
+                </v-btn>
+                <v-btn
+                  icon
+                  size="x-small"
+                  variant="text"
+                  :color="echange.avis === false ? 'error' : undefined"
+                  :aria-pressed="echange.avis === false"
+                  aria-label="Réponse pas utile"
+                  @click="donnerAvis(index, false)"
+                >
+                  <v-icon
+                    :icon="echange.avis === false ? 'mdi-thumb-down' : 'mdi-thumb-down-outline'"
+                    size="18"
+                  />
+                </v-btn>
+                <span v-if="avisEnEchec[index]" class="text-caption text-error">
+                  Votre avis n'a pas pu être enregistré.
+                </span>
+              </div>
             </div>
           </div>
+        </template>
+
+        <div v-if="ia.estVide" class="suggestions" aria-label="Questions suggérées">
+          <v-chip
+            v-for="suggestion in suggestions"
+            :key="suggestion"
+            variant="outlined"
+            prepend-icon="mdi-lightbulb-outline"
+            :disabled="ia.enCours || ia.quotaAtteint"
+            @click="poser(suggestion)"
+          >
+            {{ suggestion }}
+          </v-chip>
         </div>
-      </template>
+      </div>
 
-      <div v-if="ia.estVide" class="suggestions" aria-label="Questions suggérées">
-        <v-chip
-          v-for="suggestion in suggestions"
-          :key="suggestion"
-          variant="outlined"
-          prepend-icon="mdi-lightbulb-outline"
-          :disabled="ia.enCours || ia.quotaAtteint"
-          @click="poser(suggestion)"
-        >
-          {{ suggestion }}
-        </v-chip>
-      </div>
-    </div>
+      <form class="assistant__saisie" @submit.prevent="envoyer">
+        <div class="d-flex align-end ga-2">
+          <v-textarea
+            v-model="brouillon"
+            label="Votre question"
+            placeholder="Posez une question sur le cours…"
+            rows="1"
+            auto-grow
+            max-rows="5"
+            hide-details="auto"
+            :error-messages="erreurSaisie"
+            :disabled="ia.quotaAtteint || sansSupport"
+            @keydown.enter.exact.prevent="envoyer"
+          />
+          <!-- Mobile : bouton icône seul (un contenu, même vide, masquerait l'icône). -->
+          <v-btn
+            v-if="xs"
+            type="submit"
+            class="btn-ia"
+            icon="mdi-send"
+            aria-label="Demander"
+            rounded="lg"
+            :loading="ia.enCours"
+            :disabled="!peutEnvoyer"
+          />
+          <v-btn
+            v-else
+            type="submit"
+            class="btn-ia"
+            height="48"
+            prepend-icon="mdi-send"
+            :loading="ia.enCours"
+            :disabled="!peutEnvoyer"
+          >
+            Demander
+          </v-btn>
+        </div>
+        <div class="assistant__aide text-caption text-medium-emphasis">
+          <span>
+            L'assistant peut se tromper. Vos questions sont privées : ni l'enseignant ni les autres
+            membres ne les voient.
+          </span>
+          <span v-if="ia.quotaRestant !== null" class="font-weight-medium">
+            Questions restantes aujourd'hui : {{ ia.quotaRestant }} sur {{ QUOTA_JOUR }}
+          </span>
+        </div>
+      </form>
+    </section>
 
-    <form class="assistant__saisie" @submit.prevent="envoyer">
-      <div class="d-flex align-end ga-2">
-        <v-textarea
-          v-model="brouillon"
-          label="Votre question"
-          placeholder="Posez une question sur le cours…"
-          rows="1"
-          auto-grow
-          max-rows="5"
-          hide-details="auto"
-          :error-messages="erreurSaisie"
-          :disabled="ia.quotaAtteint || sansSupport"
-          @keydown.enter.exact.prevent="envoyer"
-        />
-        <!-- Mobile : bouton icône seul (un contenu, même vide, masquerait l'icône). -->
-        <v-btn
-          v-if="xs"
-          type="submit"
-          class="btn-ia"
-          icon="mdi-send"
-          aria-label="Demander"
-          rounded="lg"
-          :loading="ia.enCours"
-          :disabled="!peutEnvoyer"
-        />
-        <v-btn
-          v-else
-          type="submit"
-          class="btn-ia"
-          height="48"
-          prepend-icon="mdi-send"
-          :loading="ia.enCours"
-          :disabled="!peutEnvoyer"
-        >
-          Demander
-        </v-btn>
-      </div>
-      <div class="assistant__aide text-caption text-medium-emphasis">
-        <span>
-          L'assistant peut se tromper. Vos questions sont privées : ni l'enseignant ni les autres
-          membres ne les voient.
-        </span>
-        <span v-if="ia.quotaRestant !== null" class="font-weight-medium">
-          Questions restantes aujourd'hui : {{ ia.quotaRestant }} sur {{ QUOTA_JOUR }}
-        </span>
-      </div>
-    </form>
-  </section>
+    <!-- SCRUM-143 (étape 5) : documents indexés de l'espace, sur grand écran. -->
+    <SourcesAssistant v-if="afficherSources" :espace-id="espaceId" />
+  </div>
 </template>
 
 <style scoped>
 /* Hauteur calculée en JavaScript (ajusterHauteur) : tout l'espace restant sous l'en-tête et les onglets. */
+.assistant-cadre {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-height: 420px;
+}
+
+.assistant-cadre--avec-sources {
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+
+.assistant-cadre > .assistant {
+  height: 100%;
+  min-height: 0;
+}
+
 .assistant {
   display: flex;
   flex-direction: column;

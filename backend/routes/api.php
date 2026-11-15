@@ -15,10 +15,12 @@ use App\Http\Controllers\AssistantIAController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ChapitreController;
 use App\Http\Controllers\EspaceController;
+use App\Http\Controllers\FichierController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\MesEspacesController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\UtilisateurController;
@@ -135,11 +137,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ressources/{ressource}/telecharger', [RessourceController::class, 'telecharger'])
         ->name('ressources.telecharger');
 
+    // SCRUM-137 : téléchargement d'une pièce jointe de message ou d'annonce,
+    // réservé aux membres actuels de l'espace. `?apercu=1` affiche les images
+    // dans le navigateur au lieu de les télécharger.
+    Route::get('/fichiers/{pj}/telecharger', [FichierController::class, 'telecharger'])
+        ->name('fichiers.telecharger');
+
     // SCRUM-102 : question à l'Assistant IA (membre, assistant actif, 20 questions par jour).
     Route::post('/espaces/{espace}/ia/questions', [AssistantIAController::class, 'poser']);
 
     // SCRUM-145 : activer l'assistant et sa consigne (enseignant propriétaire / co-gestionnaire).
     Route::patch('/espaces/{espace}/assistant', [AssistantIAController::class, 'configurer']);
+
+    // SCRUM-121 : notifications de l'utilisateur (invitation, demande d'adhésion,
+    // annonce, ressource, signalement traité, retrait d'un espace).
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{id}/lue', [NotificationController::class, 'marquerLue']);
+    Route::post('/notifications/tout-lire', [NotificationController::class, 'toutLire']);
 
     // SCRUM-146 : avis 👍/👎 sur une réponse de l'assistant (auteur de la question).
     Route::patch('/ia/echanges/{echange}/avis', [AssistantIAController::class, 'avis']);

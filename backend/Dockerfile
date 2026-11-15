@@ -64,6 +64,7 @@ RUN composer install \
 # Configuration nginx (on retire le site par défaut) et Supervisor.
 RUN rm -f /etc/nginx/sites-enabled/default
 
+COPY docker/php.ini /usr/local/etc/php/conf.d/uniconnect.ini
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/start.sh /usr/local/bin/start.sh

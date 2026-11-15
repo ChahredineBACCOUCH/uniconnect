@@ -8,7 +8,6 @@ use App\Models\Espace;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -77,13 +76,30 @@ class RetraitMembreTest extends TestCase
 
     public function test_un_membre_retire_ne_peut_plus_telecharger_les_fichiers(): void
     {
-        Storage::fake();
+        Storage::fake('local');
 
-        // La table pieces_jointes et GET /api/fichiers/{id}/telecharger arrivent au
-        // sprint 2 (SCRUM-136 / SCRUM-137) : l'assertion sera complétée à ce moment-là.
-        if (! Route::has('fichiers.telecharger')) {
-            $this->markTestIncomplete('Route de téléchargement pas encore créée (SCRUM-137) : à compléter au sprint 2.');
-        }
+        $piece = $this->message->piecesJointes()->create([
+            'nom' => 'corrige.pdf',
+            'mime' => 'application/pdf',
+            'taille_octets' => 12,
+            'chemin' => 'espaces/'.$this->espace->id.'/corrige.pdf',
+        ]);
+
+        Storage::disk('local')->put($piece->chemin, 'le corrigé');
+
+        // 1. Avant le retrait : le membre télécharge le fichier.
+        Sanctum::actingAs($this->membre);
+        $this->get("/api/fichiers/{$piece->id}/telecharger")->assertOk();
+
+        // 2. Le propriétaire le retire.
+        Sanctum::actingAs($this->proprietaire);
+        $this->deleteJson("/api/espaces/{$this->espace->id}/membres/{$this->membre->id}")
+            ->assertNoContent();
+
+        // 3. Dès la requête suivante, le lien direct ne sert plus le fichier.
+        Sanctum::actingAs($this->membre);
+        $this->getJson("/api/fichiers/{$piece->id}/telecharger")->assertForbidden();
+        $this->getJson("/api/fichiers/{$piece->id}/telecharger?apercu=1")->assertForbidden();
     }
 
     /** @return list<int> */

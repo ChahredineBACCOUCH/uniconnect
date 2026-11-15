@@ -8,8 +8,10 @@ import {
   envoyerMessage,
   inviter,
   modifierMessage,
+  publierAnnonce,
   quitterEspace,
   rechercherUtilisateurs,
+  recupererAnnonces,
   recupererEspace,
   recupererInvitationsEspace,
   recupererMembres,
@@ -71,6 +73,34 @@ describe('API des espaces', () => {
     expect(http.delete).toHaveBeenCalledWith('/messages/9')
   })
 
+  it('envoie les pièces jointes en multipart avec la progression (SCRUM-139)', async () => {
+    http.post.mockResolvedValue({ data: { data: { id: 10 } } })
+    const photo = new File(['image'], 'photo.png', { type: 'image/png' })
+    const onUploadProgress = vi.fn()
+
+    await expect(
+      envoyerMessage(
+        2,
+        {
+          contenu: '',
+          parent_id: 4,
+          duree_visibilite_heures: null,
+          fichiers: [photo],
+        },
+        { onUploadProgress },
+      ),
+    ).resolves.toEqual({ id: 10 })
+
+    const corps = http.post.mock.calls[0][1]
+
+    expect(corps).toBeInstanceOf(FormData)
+    expect(corps.get('contenu')).toBe('')
+    expect(corps.get('parent_id')).toBe('4')
+    expect(corps.has('duree_visibilite_heures')).toBe(false)
+    expect(corps.getAll('fichiers[]')).toEqual([photo])
+    expect(http.post.mock.calls[0][2]).toEqual({ onUploadProgress })
+  })
+
   it('crée un groupe privé puis invite des personnes (SCRUM-89)', async () => {
     http.post
       .mockResolvedValueOnce({ data: { data: { id: 7, nom: 'Projet', role: 'PROPRIETAIRE' } } })
@@ -120,5 +150,50 @@ describe('API des espaces', () => {
 
     await quitterEspace(7)
     expect(http.post).toHaveBeenCalledWith('/espaces/7/quitter')
+  })
+
+  it('charge les annonces et les déballe (SCRUM-124)', async () => {
+    http.get.mockResolvedValue({ data: { data: [{ id: 4, titre: 'Examen' }] } })
+
+    await expect(recupererAnnonces(7)).resolves.toEqual([{ id: 4, titre: 'Examen' }])
+    expect(http.get).toHaveBeenCalledWith('/espaces/7/annonces')
+  })
+
+  it('publie une annonce en JSON sans pièce jointe (SCRUM-124)', async () => {
+    http.post.mockResolvedValue({ data: { data: { id: 5, titre: 'Examen' } } })
+
+    await expect(
+      publierAnnonce(7, {
+        titre: 'Examen',
+        contenu: 'Mardi prochain.',
+        notifier_email: true,
+      }),
+    ).resolves.toEqual({ id: 5, titre: 'Examen' })
+
+    expect(http.post).toHaveBeenCalledWith('/espaces/7/annonces', {
+      titre: 'Examen',
+      contenu: 'Mardi prochain.',
+      notifier_email: true,
+    })
+  })
+
+  it('publie une annonce en multipart quand des fichiers sont joints (SCRUM-124)', async () => {
+    http.post.mockResolvedValue({ data: { data: { id: 6 } } })
+    const fichier = new File(['contenu'], 'notes.pdf', { type: 'application/pdf' })
+
+    await publierAnnonce(7, {
+      titre: 'Planning',
+      contenu: 'Voir la pièce jointe.',
+      notifier_email: false,
+      fichiers: [fichier],
+    })
+
+    const corps = http.post.mock.calls[0][1]
+
+    expect(corps).toBeInstanceOf(FormData)
+    expect(corps.get('titre')).toBe('Planning')
+    expect(corps.get('contenu')).toBe('Voir la pièce jointe.')
+    expect(corps.get('notifier_email')).toBe('0')
+    expect(corps.getAll('fichiers[]')).toEqual([fichier])
   })
 })
