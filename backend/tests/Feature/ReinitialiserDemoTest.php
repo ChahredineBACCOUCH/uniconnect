@@ -52,5 +52,10 @@ class ReinitialiserDemoTest extends TestCase
             Storage::assertExists($ressource->chemin_fichier);
             $this->assertTrue($ressource->indexee_ia);
         }
+
+        // Base vide avant le rollback de DatabaseMigrations : sous PostgreSQL, le down() de
+        // la migration 2026_11_12_120000 remet une contrainte que les groupes de matière
+        // de la démo (sans classe) violeraient.
+        $this->artisan('migrate:fresh');
     }
 }
