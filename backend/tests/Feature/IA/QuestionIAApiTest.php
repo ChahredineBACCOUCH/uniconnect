@@ -48,8 +48,8 @@ class QuestionIAApiTest extends TestCase
         $chapitre = Chapitre::create(['espace_id' => $this->espace->id, 'titre' => 'Curseurs', 'ordre' => 1]);
         $ressource = Ressource::create([
             'chapitre_id' => $chapitre->id,
-            'titre' => 'Cours',
-            'chemin_fichier' => 'ressources/chap03.pdf',
+            'titre' => 'Chapitre 3 – Curseurs',
+            'chemin_fichier' => 'ressources/3A39xAJTQZlNtxT4xPwArRxYjyvQUf5M78rz6yMg.pdf',
             'mime' => 'application/pdf',
         ]);
         foreach ([
@@ -98,7 +98,7 @@ class QuestionIAApiTest extends TestCase
             ->assertJsonPath('quota_restant', 19)
             ->assertJsonCount(2, 'sources')
             ->assertJsonPath('sources.0.n', 1)
-            ->assertJsonPath('sources.0.fichier', 'chap03.pdf')
+            ->assertJsonPath('sources.0.fichier', 'Chapitre 3 – Curseurs')
             ->assertJsonStructure(['conversation_id', 'echange_id', 'reponse', 'statut', 'sources' => [['n', 'fichier', 'page', 'ressource_id']], 'quota_restant']);
 
         $this->assertSame(1, $faux->appels);
