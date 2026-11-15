@@ -471,8 +471,8 @@ async function telecharger(ressource) {
               <thead>
                 <tr>
                   <th scope="col">Ressource</th>
-                  <th scope="col">Type</th>
-                  <th scope="col">Ajoutée le</th>
+                  <th scope="col" class="ressources__col-detail">Type</th>
+                  <th scope="col" class="ressources__col-detail">Ajoutée le</th>
                   <th scope="col" class="text-right">Actions</th>
                 </tr>
               </thead>
@@ -507,15 +507,21 @@ async function telecharger(ressource) {
                         <div v-if="ressource.description" class="text-caption text-medium-emphasis">
                           {{ ressource.description }}
                         </div>
+                        <!-- SCRUM-172 : sur téléphone, type et date passent sous le titre. -->
+                        <div class="ressources__meta-mobile text-caption text-medium-emphasis">
+                          {{ detailType(ressource) }} · {{ formaterDate(ressource.cree_le) }}
+                        </div>
                       </div>
                     </div>
                   </td>
 
-                  <td class="text-medium-emphasis">
+                  <td class="text-medium-emphasis ressources__col-detail">
                     {{ detailType(ressource) }}
                   </td>
 
-                  <td class="text-medium-emphasis">{{ formaterDate(ressource.cree_le) }}</td>
+                  <td class="text-medium-emphasis ressources__col-detail">
+                    {{ formaterDate(ressource.cree_le) }}
+                  </td>
 
                   <td class="text-right ressources__actions">
                     <v-btn
@@ -834,5 +840,20 @@ async function telecharger(ressource) {
   padding: 24px 0;
   text-align: center;
   color: rgb(var(--v-theme-on-surface-variant));
+}
+
+/* SCRUM-172 : tableau compact sur téléphone (2 colonnes au lieu de 4). */
+.ressources__meta-mobile {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .ressources__col-detail {
+    display: none;
+  }
+
+  .ressources__meta-mobile {
+    display: block;
+  }
 }
 </style>

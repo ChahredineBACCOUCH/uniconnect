@@ -212,7 +212,9 @@ async function confirmerActivation() {
         </p>
       </div>
 
-      <v-btn color="primary" prepend-icon="mdi-plus" @click="ouvrirAjout"> Ajouter une année </v-btn>
+      <v-btn color="primary" prepend-icon="mdi-plus" @click="ouvrirAjout">
+        Ajouter une année
+      </v-btn>
     </header>
 
     <v-alert v-if="erreurChargement" type="error" variant="tonal" density="compact">
@@ -302,7 +304,7 @@ async function confirmerActivation() {
     </v-alert>
 
     <!-- Dialogue d'ajout / modification -->
-    <v-dialog v-model="dialogue" max-width="520" persistent>
+    <v-dialog :fullscreen="xs" v-model="dialogue" max-width="520" persistent>
       <v-card>
         <v-card-title class="text-h6 font-weight-medium">{{ titreDialogue }}</v-card-title>
 

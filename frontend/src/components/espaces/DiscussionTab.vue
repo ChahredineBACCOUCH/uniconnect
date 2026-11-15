@@ -1,12 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
 
-import {
-  envoyerMessage,
-  modifierMessage,
-  recupererMessages,
-  supprimerMessage,
-} from '@/api/espaces'
+import { envoyerMessage, modifierMessage, recupererMessages, supprimerMessage } from '@/api/espaces'
 import { usePolling } from '@/composables/usePolling'
 import { useAuthStore } from '@/stores/auth'
 import {
@@ -288,7 +283,11 @@ function notifier(texte) {
       />
     </div>
 
-    <v-dialog :model-value="suppressionOuverte" max-width="430" @update:model-value="fermerSuppression">
+    <v-dialog
+      :model-value="suppressionOuverte"
+      max-width="430"
+      @update:model-value="fermerSuppression"
+    >
       <v-card>
         <v-card-title class="text-h6">Supprimer ce message ?</v-card-title>
         <v-card-text>
@@ -311,7 +310,11 @@ function notifier(texte) {
       </v-card>
     </v-dialog>
 
-    <v-dialog :model-value="signalementOuvert" max-width="580" @update:model-value="fermerSignalement">
+    <v-dialog
+      :model-value="signalementOuvert"
+      max-width="580"
+      @update:model-value="fermerSignalement"
+    >
       <v-card>
         <v-card-title class="d-flex align-center ga-2 text-h6">
           <v-icon icon="mdi-flag-outline" color="error" />
@@ -322,7 +325,11 @@ function notifier(texte) {
           <div v-if="signalementCible" class="signalement__citation">
             <span class="signalement__auteur">
               {{ nomAuteur(signalementCible.auteur, utilisateurId) }} ·
-              {{ signalementCible.cree_le ? new Date(signalementCible.cree_le).toLocaleString('fr-FR') : '' }}
+              {{
+                signalementCible.cree_le
+                  ? new Date(signalementCible.cree_le).toLocaleString('fr-FR')
+                  : ''
+              }}
             </span>
             <span>{{ extrait(signalementCible.contenu, 220) }}</span>
           </div>
@@ -493,6 +500,19 @@ function notifier(texte) {
 @media (max-width: 760px) {
   .discussion__messages {
     height: calc(100vh - 460px);
+  }
+}
+
+/*
+ * SCRUM-172 : sur téléphone, la barre de navigation du bas (64 px) et le titre
+ * sur deux lignes cachaient le champ de saisie à l'ouverture. dvh suit la
+ * hauteur réellement visible (barre d'adresse du navigateur mobile).
+ */
+@media (max-width: 599px) {
+  .discussion__messages {
+    height: calc(100vh - 540px);
+    height: calc(100dvh - 540px);
+    min-height: 220px;
   }
 }
 </style>

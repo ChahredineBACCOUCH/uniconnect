@@ -363,11 +363,7 @@ async function confirmerArchivage() {
         </template>
 
         <template #[`item.etat`]="{ item }">
-          <v-chip
-            :color="detailEtatGroupe(item).color ?? undefined"
-            variant="tonal"
-            size="small"
-          >
+          <v-chip :color="detailEtatGroupe(item).color ?? undefined" variant="tonal" size="small">
             {{ detailEtatGroupe(item).libelle }}
           </v-chip>
         </template>
@@ -397,7 +393,7 @@ async function confirmerArchivage() {
     </v-card>
 
     <!-- Génération en deux temps : aperçu puis confirmation -->
-    <v-dialog v-model="dialogueGeneration" max-width="560" persistent>
+    <v-dialog :fullscreen="xs" v-model="dialogueGeneration" max-width="560" persistent>
       <v-card>
         <v-card-title class="text-h6 font-weight-medium">{{ titreDialogue }}</v-card-title>
 
@@ -454,7 +450,11 @@ async function confirmerArchivage() {
             {{ texteBoutonGeneration(apercu) }}
           </v-btn>
 
-          <v-btn v-else-if="!chargementApercu && erreurGeneration" color="primary" @click="ouvrirGeneration">
+          <v-btn
+            v-else-if="!chargementApercu && erreurGeneration"
+            color="primary"
+            @click="ouvrirGeneration"
+          >
             Réessayer
           </v-btn>
         </v-card-actions>
