@@ -14,10 +14,9 @@ import {
 const props = defineProps({
   message: { type: Object, required: true },
   utilisateurId: { type: Number, default: null },
-  signale: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['repondre', 'modifier', 'supprimer', 'signaler', 'notifier'])
+const emit = defineEmits(['repondre', 'modifier', 'supprimer', 'notifier'])
 
 const menuOuvert = ref(false)
 const editionEnCours = ref(false)
@@ -89,11 +88,6 @@ function supprimer() {
   menuOuvert.value = false
   emit('supprimer', props.message)
 }
-
-function signaler() {
-  menuOuvert.value = false
-  emit('signaler', props.message)
-}
 </script>
 
 <template>
@@ -109,9 +103,6 @@ function signaler() {
           {{ badge }}
         </v-chip>
         <span class="message__heure">{{ heure }}</span>
-        <v-chip v-if="signale" size="x-small" color="warning" variant="tonal" label>
-          Signalé par vous
-        </v-chip>
         <span v-if="message.modifie" class="message__modifie">(modifié)</span>
       </div>
 
@@ -179,15 +170,6 @@ function signaler() {
             title="Supprimer"
             base-color="error"
             @click="supprimer"
-          />
-        </template>
-        <template v-else>
-          <v-divider />
-          <v-list-item
-            prepend-icon="mdi-flag-outline"
-            title="Signaler le message"
-            base-color="error"
-            @click="signaler"
           />
         </template>
       </v-list>

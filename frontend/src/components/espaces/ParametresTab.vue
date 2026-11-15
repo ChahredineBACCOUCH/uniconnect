@@ -4,7 +4,6 @@ import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { estGestionnaire } from '@/utils/espaces'
 
-import OngletIndisponible from './OngletIndisponible.vue'
 import ReglageAssistantIA from './ReglageAssistantIA.vue'
 
 const props = defineProps({
@@ -29,13 +28,6 @@ const peutReglerAssistant = computed(
       v-if="peutReglerAssistant"
       :espace="espace"
       @actualiser="emit('actualiser')"
-    />
-
-    <OngletIndisponible
-      titre="Paramètres"
-      description="Le nom, la description, la visibilité des messages et les membres se géreront ici."
-      icone="mdi-cog-outline"
-      ticket="SCRUM-87"
     />
   </div>
 </template>

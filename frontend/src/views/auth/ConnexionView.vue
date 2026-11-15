@@ -24,7 +24,6 @@ const resterConnecte = ref(true)
 
 const envoi = ref(false)
 const erreur = ref(null)
-const information = ref('')
 
 /* Message affiché à l'utilisateur, selon la réponse de l'API. */
 function messageErreur(e) {
@@ -108,25 +107,12 @@ async function seConnecter() {
           density="compact"
           hide-details
         />
-        <v-btn
-          variant="text"
-          class="text-none"
-          @click="
-            information = 'La procédure de réinitialisation du mot de passe arrive prochainement.'
-          "
-        >
-          Mot de passe oublié ?
-        </v-btn>
       </div>
 
       <v-btn type="submit" color="primary" block class="text-none" :loading="envoi">
         Se connecter
       </v-btn>
     </v-form>
-
-    <v-alert v-if="information" type="info" variant="tonal" density="comfortable" role="note">
-      {{ information }}
-    </v-alert>
 
     <v-divider />
 

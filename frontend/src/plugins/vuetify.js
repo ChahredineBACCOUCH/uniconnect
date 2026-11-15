@@ -54,8 +54,18 @@ export default createVuetify({
   defaults: {
     VBtn: { variant: 'flat', rounded: 'sm' },
     VTextField: { variant: 'outlined', density: 'comfortable' },
+    // Même style pour tous les champs de formulaire (sinon listes, zones de texte et
+    // choix de fichier apparaissaient en gris « filled » à côté des champs texte).
+    VTextarea: { variant: 'outlined', density: 'comfortable' },
+    VSelect: { variant: 'outlined', density: 'comfortable' },
+    VAutocomplete: { variant: 'outlined', density: 'comfortable' },
+    VCombobox: { variant: 'outlined', density: 'comfortable' },
+    VFileInput: { variant: 'outlined', density: 'comfortable' },
     VChip: { size: 'small', variant: 'tonal' },
     VCard: { rounded: 'lg', variant: 'outlined' },
     VListItem: { rounded: 'lg' },
+    // Une carte « outlined » a un fond transparent : dans une boîte de dialogue, la page
+    // se voyait au travers. Les cartes des dialogues sont donc pleines (fond + ombre).
+    VDialog: { VCard: { variant: 'elevated' } },
   },
 })

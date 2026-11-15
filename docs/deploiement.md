@@ -148,15 +148,22 @@ Utile pour relancer un build après une erreur intermittente, ou pour appliquer 
 
 ### 3.5 Données de démonstration
 
-Depuis le **Shell** de Render (SCRUM-188) :
+`DemoProductionSeeder` (SCRUM-188) crée les comptes de démo (via `DemoSeeder`) **et** le contenu de la démonstration : groupes générés, cours « Bases de données » avec 3 PDF indexés pour l'Assistant IA, discussion, annonces, groupe privé, channel et invitation. Détail dans [demo.md](demo.md).
+
+Depuis le **Shell** de Render (offres payantes) :
 
 ```sh
-su -s /bin/sh www-data -c "php artisan db:seed --class=DemoSeeder --force"
+su -s /bin/sh www-data -c "php artisan db:seed --class=DemoProductionSeeder --force"
 ```
 
 Le Shell s'ouvre en `root` : passez par `www-data` pour ne pas créer de fichiers appartenant à `root` dans `storage/`.
 
-**Sans Shell (offre gratuite de Render)** : ajoutez la variable `SEED_DEMO=true` (Environment), laissez Render redéployer, vérifiez dans les logs que `DemoSeeder` s'est exécuté, puis **supprimez la variable**. Le seeder est idempotent : il met à jour les comptes de démo sans créer de doublons. Les comptes de démo ont un mot de passe public (README) : ne les gardez pas après la soutenance.
+**Sans Shell (offre gratuite de Render)** :
+1. Ajoutez la variable `SEED_DEMO=true` (Environment) et laissez Render redéployer : `start.sh` lance alors le seeder.
+2. Vérifiez dans les logs que `DemoProductionSeeder` s'est exécuté.
+3. **Supprimez la variable.**
+
+Le seeder est idempotent : il ne crée aucun doublon et ne supprime rien. Les PDF sont envoyés sur le disque par défaut (Supabase Storage en production). Les comptes de démo ont un mot de passe public (README) : ne les gardez pas après la soutenance.
 
 ### 3.6 Stockage des fichiers (Supabase Storage)
 

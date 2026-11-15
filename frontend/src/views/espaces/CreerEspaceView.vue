@@ -28,7 +28,7 @@ const ETAPES = [
   { n: 5, label: 'Récapitulatif' },
 ]
 
-// Seul le groupe privé est créable dans la v1.0 ; les autres types sont expliqués.
+// Seul le groupe privé est créable dans la v1.0 (la création de channels arrive en v1.1).
 const TYPES = computed(() => [
   {
     valeur: 'PRIVE',
@@ -37,14 +37,6 @@ const TYPES = computed(() => [
     icone: 'mdi-lock-outline',
     disponible: auth.hasDroit('CREER_GROUPE_PRIVE'),
     raison: "Vous n'avez pas le droit de créer un groupe privé.",
-  },
-  {
-    valeur: 'CHANNEL',
-    titre: 'Channel communautaire',
-    description: "Réservé aux enseignants et à l'administration.",
-    icone: 'mdi-pound',
-    disponible: false,
-    raison: 'Disponible dans une prochaine version.',
   },
   {
     valeur: 'ORGANISATIONNEL',

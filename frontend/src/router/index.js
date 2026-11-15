@@ -4,7 +4,6 @@ import AppLayout from '../layouts/AppLayout.vue'
 import AuthLayout from '../layouts/AuthLayout.vue'
 import HomeView from '../views/HomeView.vue'
 import EspaceView from '../views/espaces/EspaceView.vue'
-import PlaceholderView from '../views/PlaceholderView.vue'
 import { authGuard } from './guards'
 
 /*
@@ -29,8 +28,8 @@ const router = createRouter({
         {
           path: 'espaces',
           name: 'espaces',
-          component: PlaceholderView,
-          meta: { title: 'Espaces' },
+          component: () => import('../views/EspacesView.vue'),
+          meta: { title: 'Mes espaces' },
         },
         {
           path: 'espaces/nouveau',
@@ -50,25 +49,11 @@ const router = createRouter({
           component: () => import('../views/NotificationsView.vue'),
           meta: { title: 'Notifications' },
         },
-        // Pages v1.1 (après le 19/11) : gardées pour que les liens du menu ne cassent pas.
-        {
-          path: 'channels',
-          name: 'channels',
-          component: PlaceholderView,
-          meta: { title: 'Channels' },
-        },
-        {
-          path: 'recherche',
-          name: 'recherche',
-          component: PlaceholderView,
-          meta: { title: 'Recherche' },
-        },
-        {
-          path: 'profil',
-          name: 'profil',
-          component: PlaceholderView,
-          meta: { title: 'Mon profil' },
-        },
+        // Annuaire des channels, recherche et profil arrivent en v1.1 : ils ne sont pas
+        // affichés en v1.0. Un ancien lien renvoie simplement à l'accueil.
+        { path: 'channels', redirect: { name: 'home' } },
+        { path: 'recherche', redirect: { name: 'home' } },
+        { path: 'profil', redirect: { name: 'home' } },
         // Administration : profil ADMINISTRATION + droit demandé (voir docs/api.md, section 9).
         {
           path: 'admin/annees',

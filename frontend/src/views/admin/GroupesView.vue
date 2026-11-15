@@ -223,14 +223,6 @@ async function confirmerArchivage() {
         </p>
       </div>
 
-      <v-tooltip text="La création manuelle sera disponible dans une prochaine version.">
-        <template #activator="{ props }">
-          <span v-bind="props">
-            <v-btn variant="outlined" prepend-icon="mdi-plus" disabled>Créer manuellement</v-btn>
-          </span>
-        </template>
-      </v-tooltip>
-
       <v-btn color="primary" prepend-icon="mdi-sync" @click="ouvrirGeneration">
         Générer les groupes
       </v-btn>

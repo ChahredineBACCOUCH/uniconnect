@@ -1,42 +1,98 @@
-# Scénario de démonstration — jeudi 19/11/2026
+# Scénario de démonstration : jeudi 19/11/2026
 
-**Durée : 15 minutes maximum** (12 min de démo + 3 min de questions) · en production · un seul ordinateur relié au projecteur.
+**Durée : 15 minutes maximum** (12 min de démo + 3 min de questions), en production, sur un seul ordinateur relié au projecteur. Ticket : SCRUM-187.
+
+- Application : https://uniconnect-six-lake.vercel.app
+- État de l'API : https://uniconnect-api-qov1.onrender.com/api/health
+- Dépôt et documentation : https://github.com/ChahredineBACCOUCH/uniconnect
+
+## Comptes de démonstration
+
+Ces comptes sont créés par `DemoProductionSeeder` (SCRUM-188, voir « Charger les données » plus bas).
+
+| Fenêtre | Personne | E-mail | Mot de passe |
+|---|---|---|---|
+| Étudiant (L2 Informatique A) | Amine Benali | `etudiant@demo.uniconnect` | `Demo1234!` |
+| Enseignante (Bases de données) | Sophie Martin | `enseignant@demo.uniconnect` | `Demo1234!` |
+| Administration | Fatou Diallo | `admin@demo.uniconnect` | `Demo1234!` |
+| Visiteur | (déconnecté) | — | — |
+
+**Données prêtes pour la démo :**
+- Groupe de matière **« Bases de données »** (Sophie Martin, Amine et 4 camarades) :
+  - 3 PDF indexés pour l'Assistant IA :
+    - Chapitre 1 : le modèle relationnel ;
+    - Chapitre 2 : normalisation ;
+    - Chapitre 3 : curseurs PL/SQL ;
+  - un lien d'exercices ;
+  - une discussion de 20 messages, dont une fiche de révision en PDF ;
+  - 2 annonces, dont « TP noté jeudi 20/11 ».
+- Groupe privé **« Projet intégration – Équipe 4 »** et channel **« Club Développement web »**.
+- **Invitation en attente** pour Amine (« Révisions BD – soutien », de Sophie Martin) et des notifications non lues.
 
 ## Avant la démo (J-1 et le matin)
 
-- [ ] 18/11 : répétition chronométrée avec toute l'équipe (SCRUM-189)
+- [ ] Données de démo chargées en production (une seule fois, voir plus bas)
+- [ ] 18/11 : répétition chronométrée avec toute l'équipe (SCRUM-189), avec `ETU2026-002` pour l'inscription (voir étape 2)
 - [ ] 18/11 : enregistrement de la **vidéo du plan B** (tout le scénario, en cas de panne réseau)
-- [ ] Le matin : ouvrir `/api/health` pour réveiller Render, puis vérifier `db: ok`
-- [ ] 4 fenêtres prêtes, chacune connectée, en navigation privée : **Visiteur**, **Yassine** (étudiant), **Mme Ben Ali** (enseignante), **Leila** (administration)
-- [ ] Téléphone prêt avec Yassine connecté, pour montrer la version mobile
-- [ ] Données de démo chargées (SCRUM-188) : classe L2 Info A, cours « Bases de données », PDF « Chapitre 3 – Normalisation » indexé
-- [ ] Compte `rania.gharbi@univ.tn` présent dans les comptes autorisés, mais **pas encore créé**
+- [ ] Le matin : ouvrir `/api/health` pour réveiller Render (environ 1 min ; l'application affiche « Le serveur se réveille »), puis vérifier `db: ok`
+- [ ] 4 fenêtres prêtes (navigation privée ou profils séparés) : **Visiteur**, **Amine**, **Sophie Martin**, **Fatou Diallo**
+- [ ] Téléphone prêt avec Amine connecté, pour la version mobile
+- [ ] Un petit PDF sur le bureau, à joindre à un message
+- [ ] Si la répétition a fait accepter l'invitation « Révisions BD – soutien » : Sophie invite Amine dans un autre groupe privé, pour en avoir une en attente
 
 ## Déroulé
 
-| Temps | Qui présente | Écran | Ce qu'on montre | Phrase clé |
+| Temps | Qui présente | Fenêtre | Ce qu'on montre | Phrase clé |
 |---|---|---|---|---|
-| 0:00 – 1:00 | Chahredine | — | Le problème : la communication d'une université est dispersée (e-mails, WhatsApp, plateformes) | « UniConnect réunit les échanges de chaque classe et de chaque cours, avec un assistant qui répond à partir des supports des enseignants. » |
-| 1:00 – 3:00 | Mansour | Admin | Années → **import Excel** des comptes autorisés (montrer une erreur détectée à l'aperçu) → **génération des groupes** | « Les espaces de classe et de matière sont créés automatiquement à partir des données de la scolarité. » |
-| 3:00 – 4:30 | Moataz | Visiteur | Inscription de Rania : e-mail vérifié → lien d'activation → mot de passe → elle retrouve **automatiquement** ses groupes | « Seules les personnes autorisées peuvent créer un compte. » |
-| 4:30 – 6:30 | Mouetez | Étudiant | Accueil (non-lus) → discussion « Bases de données » → message + **PDF joint** → reçu en direct chez un autre compte → groupe privé + invitation | « Un non-membre ne peut ni lire ni télécharger, même avec le lien direct. » (montrer la 403) |
-| 6:30 – 8:00 | Hayder | Enseignant | Annonce publiée (notification) → Ressources : ajout d'un PDF dans un chapitre → puce « Indexée pour l'IA » → activation de l'assistant | « Le cours devient la base de connaissances de l'assistant. » |
-| 8:00 – 11:00 | **Ayoub** | Étudiant | **Assistant IA** : « Quelle est la différence entre la 2FN et la 3FN ? » → réponse + **sources cliquables** (page du PDF) → question hors sujet → refus → 👍 | « L'IA ne répond qu'à partir du cours, cite ses sources, et dit quand elle ne sait pas. Elle utilise des services gratuits (Gemini, Groq en secours). » |
-| 11:00 – 12:00 | Chahredine | Téléphone | Même parcours sur mobile, puis bilan : organisation Scrum (Jira, 4 sprints, PR relues) et suite **v1.1** (modération, tableau de bord, recherche…) | « Ce qui n'est pas encore livré est planifié, pas oublié. » |
+| 0:00 – 1:00 | Chahredine | — | Le problème : la communication d'une université est dispersée (e-mails, WhatsApp, plateformes). | « UniConnect réunit les échanges de chaque classe et de chaque cours, avec un assistant qui répond à partir des supports des enseignants. » |
+| 1:00 – 2:30 | Mansour | Administration | **Années universitaires** (une seule active). **Comptes autorisés** : liste, recherche, **import Excel** avec aperçu des erreurs (modèle téléchargeable). **Groupes organisationnels** : génération automatique. | « Les espaces de classe et de matière sont créés automatiquement à partir des données de la scolarité. » |
+| 2:30 – 3:30 | Moataz | Visiteur | **Inscription** avec `ETU2026-999` / `test@uniconnect.test` : refusée (matricule non autorisé). Puis `ETU2026-003` / `etu2026-003@uniconnect.test` : acceptée, compte en attente d'activation par e-mail. | « Seules les personnes déclarées par la scolarité peuvent créer un compte : le couple matricule + e-mail est vérifié. » |
+| 3:30 – 6:00 | Mouetez | Étudiant | Accueil (non-lus, cloche) → **accepter l'invitation** (confirmation affichée) → « Bases de données » → Discussion → télécharger la fiche de révision → envoyer un message **avec un PDF** → « Messages visibles 30 jours » → **créer un groupe privé** en invitant Yasmine Trabelsi. | « Les messages expirent selon la règle du groupe. Un non-membre ne peut ni lire ni télécharger, même avec le lien direct : c'est vérifié à chaque téléchargement. » |
+| 6:00 – 7:30 | Hayder | Enseignante | **Publier une annonce** (« Salle changée : B14 ») → la notification arrive chez Amine. **Ressources** : chapitres, PDF, badge « Indexé pour l'IA ». **Paramètres** : réglage de l'Assistant IA. | « Le cours devient la base de connaissances de l'assistant. L'enseignant garde la main. » |
+| 7:30 – 10:30 | **Ayoub** | Étudiant | **Assistant IA** : « Quels sont les attributs d'un curseur explicite ? » → réponse avec `[1] Chapitre 3 – Les curseurs PL/SQL · p. 3` → **clic sur la source** : Ressources avec le document en évidence. « Quelle est la différence entre la 3FN et la BCNF ? ». Question hors sujet (« Qui a gagné la Coupe du monde 2022 ? ») : l'assistant dit que le cours n'en parle pas. Vote 👍, quota restant. | « L'IA ne répond qu'à partir du cours, cite la page, et dit quand elle ne sait pas. Elle utilise des services gratuits (Gemini, Groq en secours). » |
+| 10:30 – 12:00 | Chahredine | Téléphone | Même parcours sur mobile (barre de navigation du bas, Discussion), puis bilan : Scrum (Jira, sprints, PR relues), qualité (CI, ~350 tests backend et ~275 frontend, Lighthouse accessibilité 100), suite **v1.1**. | « Ce qui n'est pas encore livré est planifié, pas oublié. » |
 | 12:00 – 15:00 | Toute l'équipe | — | Questions | — |
+
+### Périmètre affiché : seulement la v1.0
+
+L'interface n'affiche que ce qui est livré. Ces fonctionnalités prévues en v1.1 sont **masquées**, pas présentées comme « bientôt disponibles » :
+- recherche globale, profil, annuaire des channels, création de channel ;
+- onglets Fichiers et Épinglés ;
+- demandes d'adhésion, signalement et modération ;
+- mot de passe oublié, création manuelle de groupe ;
+- tableau de bord d'administration et résumé de discussion par l'IA.
+
+Si le jury pose la question, répondre avec la feuille de route v1.1 (Jira).
+
+### Inscription : à savoir
+
+- Un matricule ne s'inscrit **qu'une fois** : `ETU2026-002` pour la répétition, **`ETU2026-003` le jour J**.
+- Sans serveur SMTP configuré sur Render (`MAIL_*`), le compte est créé mais l'application indique que l'e-mail d'activation n'a pas pu être envoyé. Ce message est prévu ; on ne montre pas la suite de l'activation.
+
+## Charger les données de démo en production (une seule fois)
+
+Le Shell Render n'existe pas en offre gratuite. Le chargement se fait donc au démarrage du conteneur (`backend/docker/start.sh`) :
+
+1. Render → service **uniconnect-api** → **Environment** → ajouter `SEED_DEMO` = `true` → *Save, rebuild and deploy*.
+2. Attendre « Your service is live », puis vérifier qu'Amine voit « Bases de données » et ses 3 PDF.
+3. **Retirer** la variable `SEED_DEMO` (sinon le seeder s'exécute à chaque redémarrage, sans doublon mais inutilement).
+
+Le seeder est **idempotent** (relancé, il ne crée aucun doublon) et ne supprime rien. Les PDF de démo sont dans `backend/database/seeders/demo/` (générés par `generer_pdf.py`).
 
 ## Si quelque chose ne marche pas
 
 | Problème | Réaction immédiate |
 |---|---|
-| Render ne répond pas (service endormi) | Recharger la page après 30 secondes, en parlant du parcours en attendant |
-| L'IA répond 503 (quota épuisé) | Montrer le message « momentanément indisponible » (prévu), puis passer à la vidéo du plan B pour cette partie |
-| Pas de réseau | Vidéo du plan B, en commentant en direct |
-| Bug inattendu | Ne pas déboguer en direct : « on le note » et passer à l'étape suivante |
+| Render ne répond pas (service endormi) | L'application affiche « Le serveur se réveille » : attendre 30 à 60 secondes en parlant du parcours. |
+| L'IA répond « momentanément indisponible » | Expliquer la bascule automatique Gemini → Groq, réessayer une fois, puis passer à la vidéo du plan B pour cette partie. |
+| Quota de questions atteint (20 par jour) | Montrer le message (comportement prévu), puis la vidéo. |
+| Pas de réseau | Vidéo du plan B, en commentant en direct. |
+| Bug inattendu | Ne pas déboguer en direct : « on le note » et passer à l'étape suivante. |
 
 ## Questions probables du jury (réponses préparées)
 
 - **Pourquoi pas de temps réel (WebSocket) ?** L'offre gratuite de Render ne permet pas de serveur temps réel. Un rafraîchissement toutes les 5 secondes suffit pour une messagerie de cours.
-- **Que se passe-t-il si l'IA invente ?** La consigne lui impose de répondre uniquement à partir des extraits fournis et de citer leurs numéros. S'il n'y a aucun extrait pertinent, on n'appelle même pas l'IA. Les 10 questions de test (SCRUM-180) mesurent la justesse des sources.
+- **Que se passe-t-il si l'IA invente ?** La consigne lui impose de répondre uniquement à partir des extraits fournis et de citer leurs numéros. S'il n'y a aucun extrait pertinent, on n'appelle même pas l'IA. Les questions de test (`docs/ia-evaluation.md`) mesurent la justesse des sources.
 - **Et les données personnelles ?** On n'envoie à l'IA que des extraits de cours. Les clés sont dans les variables d'environnement, jamais dans Git. Les droits sont vérifiés côté serveur.
+- **Où sont stockés les fichiers ?** Dans un stockage objet privé compatible S3 (Supabase Storage). Ils ne sont jamais publics : chaque téléchargement passe par l'API, qui vérifie l'appartenance au groupe.
 - **Pourquoi certaines fonctions manquent ?** La livraison a été avancée d'une semaine. Nous avons choisi de livrer un cœur complet et testé plutôt que tout à moitié. La v1.1 est déjà planifiée dans Jira.

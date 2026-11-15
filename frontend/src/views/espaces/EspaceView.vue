@@ -3,7 +3,9 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { recupererEspace } from '@/api/espaces'
+import { useAuthStore } from '@/stores/auth'
 import {
+  estGestionnaire,
   iconeEspace,
   libelleRole,
   libelleType,
@@ -14,8 +16,6 @@ import {
 import AnnoncesTab from '@/components/espaces/AnnoncesTab.vue'
 import AssistantIATab from '@/components/espaces/AssistantIATab.vue'
 import DiscussionTab from '@/components/espaces/DiscussionTab.vue'
-import EpinglesTab from '@/components/espaces/EpinglesTab.vue'
-import FichiersTab from '@/components/espaces/FichiersTab.vue'
 import MembresTab from '@/components/espaces/MembresTab.vue'
 import ParametresTab from '@/components/espaces/ParametresTab.vue'
 import RessourcesTab from '@/components/espaces/RessourcesTab.vue'
@@ -31,8 +31,6 @@ const ONGLETS = [
   { valeur: 'discussion', libelle: 'Discussion', composant: DiscussionTab },
   { valeur: 'annonces', libelle: 'Annonces', composant: AnnoncesTab },
   { valeur: 'ressources', libelle: 'Ressources', composant: RessourcesTab },
-  { valeur: 'fichiers', libelle: 'Fichiers', composant: FichiersTab },
-  { valeur: 'epingles', libelle: 'Épinglés', composant: EpinglesTab },
   { valeur: 'membres', libelle: 'Membres', composant: MembresTab },
   {
     valeur: 'assistant',
@@ -58,12 +56,32 @@ const onglet = ref(ongletValide(route.params.onglet))
  */
 const SIMULATION_IA = import.meta.env.DEV && import.meta.env.VITE_IA_SIMULATION === 'true'
 const assistantVisible = computed(() => SIMULATION_IA || espace.value?.assistant?.actif === true)
+/*
+ * v1.0 : l'onglet Paramètres ne contient que le réglage de l'Assistant IA, réservé à
+ * l'enseignant gestionnaire (SCRUM-147). Les autres réglages de l'espace arrivent en v1.1.
+ */
+const auth = useAuthStore()
+const parametresVisibles = computed(
+  () =>
+    auth.user?.profil === 'ENSEIGNANT' &&
+    estGestionnaire(espace.value?.role) &&
+    espace.value?.etat !== 'ARCHIVE',
+)
+
 const ongletsVisibles = computed(() =>
-  ONGLETS.filter((element) => element.valeur !== 'assistant' || assistantVisible.value),
+  ONGLETS.filter(
+    (element) =>
+      (element.valeur !== 'assistant' || assistantVisible.value) &&
+      (element.valeur !== 'parametres' || parametresVisibles.value),
+  ),
 )
 
 watch([espace, onglet], () => {
-  if (espace.value && onglet.value === 'assistant' && !assistantVisible.value) {
+  if (!espace.value) return
+  if (
+    (onglet.value === 'assistant' && !assistantVisible.value) ||
+    (onglet.value === 'parametres' && !parametresVisibles.value)
+  ) {
     onglet.value = 'discussion'
   }
 })
@@ -197,6 +215,7 @@ function changerOnglet(valeur) {
         </div>
 
         <v-btn
+          v-if="parametresVisibles"
           icon
           variant="text"
           color="on-surface-variant"

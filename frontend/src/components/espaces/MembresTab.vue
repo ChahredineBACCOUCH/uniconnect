@@ -272,7 +272,6 @@ async function envoyerInvitations() {
           Invitations en attente
           <v-chip size="x-small" class="ml-2" variant="tonal">{{ invitations.length }}</v-chip>
         </v-tab>
-        <v-tab v-if="gestionnaire" value="demandes" class="text-none">Demandes</v-tab>
       </v-tabs>
 
       <v-spacer />
@@ -426,14 +425,6 @@ async function envoyerInvitations() {
           </v-list-item>
         </v-list>
         <p v-else class="membres__vide">Aucune invitation en attente.</p>
-      </v-window-item>
-
-      <!-- Demandes d'adhésion : channels « sur demande », v1.1 -->
-      <v-window-item value="demandes">
-        <p class="membres__vide">
-          Aucune demande d'adhésion. Les demandes concernent uniquement les channels en mode « sur
-          demande ».
-        </p>
       </v-window-item>
     </v-window>
 
