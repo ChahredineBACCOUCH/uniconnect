@@ -69,7 +69,9 @@ class AssistantService
                 'n' => $i + 1,
                 'fragment_id' => (int) $l->id,
                 'ressource_id' => (int) $l->ressource_id,
-                'fichier' => $l->chemin_fichier ? basename($l->chemin_fichier) : $l->titre,
+                // Titre de la ressource (celui affiché dans l'onglet Ressources), pas le nom
+                // du fichier stocké : à l'envoi, Laravel le remplace par un nom aléatoire.
+                'fichier' => $l->titre,
                 'page' => $l->page !== null ? (int) $l->page : null,
                 'extrait' => $l->contenu,
                 'score' => (float) $l->score,

@@ -38,14 +38,15 @@ class AssistantServiceTest extends TestCase
         ]);
     }
 
-    private function espaceAvecCours(array $pages, string $fichier = 'chap03.pdf'): Espace
+    private function espaceAvecCours(array $pages, string $titre = 'Chapitre 3 – Curseurs'): Espace
     {
         $espace = Espace::create(['type' => 'PRIVE', 'nom' => 'Bases de données']);
         $chapitre = Chapitre::create(['espace_id' => $espace->id, 'titre' => 'Curseurs', 'ordre' => 1]);
         $ressource = Ressource::create([
             'chapitre_id' => $chapitre->id,
-            'titre' => 'Cours',
-            'chemin_fichier' => "ressources/{$fichier}",
+            'titre' => $titre,
+            // Nom aléatoire, comme celui que Laravel donne au fichier envoyé.
+            'chemin_fichier' => 'ressources/3A39xAJTQZlNtxT4xPwArRxYjyvQUf5M78rz6yMg.pdf',
             'mime' => 'application/pdf',
         ]);
         foreach ($pages as $page => $contenu) {
@@ -71,11 +72,11 @@ class AssistantServiceTest extends TestCase
         $this->assertSame(StatutEchangeIa::OK, $resultat->statut);
         $this->assertSame(1, $faux->appels);
         $this->assertStringContainsString('JE_NE_SAIS_PAS', $faux->dernierSysteme);
-        $this->assertStringContainsString('[1] (chap03.pdf, p. 3)', $faux->dernierMessage);
+        $this->assertStringContainsString('[1] (Chapitre 3 – Curseurs, p. 3)', $faux->dernierMessage);
         $this->assertStringEndsWith("Question : Quels sont les attributs d'un curseur explicite ?", $faux->dernierMessage);
 
         $this->assertSame([1, 2], array_column($resultat->sources, 'n'));
-        $this->assertSame(['n' => 1, 'fichier' => 'chap03.pdf', 'page' => 3], array_intersect_key($resultat->sourcesPourApi()[0], array_flip(['n', 'fichier', 'page'])));
+        $this->assertSame(['n' => 1, 'fichier' => 'Chapitre 3 – Curseurs', 'page' => 3], array_intersect_key($resultat->sourcesPourApi()[0], array_flip(['n', 'fichier', 'page'])));
         $this->assertSame('gemini', $resultat->ia->fournisseur);
         $this->assertGreaterThanOrEqual(0, $resultat->dureeMs);
     }
@@ -119,13 +120,13 @@ class AssistantServiceTest extends TestCase
 
     public function test_seules_les_ressources_de_l_espace_sont_utilisees(): void
     {
-        $autre = $this->espaceAvecCours([7 => 'Les attributs du curseur dans un autre cours.'], 'autre.pdf');
+        $autre = $this->espaceAvecCours([7 => 'Les attributs du curseur dans un autre cours.'], 'Autre cours');
 
         $extraits = app(AssistantService::class)->chercher($this->espace, 'attributs curseur');
 
         $this->assertNotEmpty($extraits);
-        $this->assertNotContains('autre.pdf', array_column($extraits, 'fichier'));
-        $this->assertSame('autre.pdf', app(AssistantService::class)->chercher($autre, 'attributs curseur')[0]['fichier']);
+        $this->assertNotContains('Autre cours', array_column($extraits, 'fichier'));
+        $this->assertSame('Autre cours', app(AssistantService::class)->chercher($autre, 'attributs curseur')[0]['fichier']);
     }
 
     public function test_au_plus_six_extraits_le_plus_pertinent_en_premier(): void
@@ -135,7 +136,7 @@ class AssistantServiceTest extends TestCase
             $pages[$p] = "Page {$p} : le curseur est utilisé ici.";
         }
         $pages[10] = "Les attributs d'un curseur explicite : %FOUND et %ROWCOUNT.";
-        $espace = $this->espaceAvecCours($pages, 'long.pdf');
+        $espace = $this->espaceAvecCours($pages, 'Cours long');
 
         $extraits = app(AssistantService::class)->chercher($espace, "attributs d'un curseur explicite");
 
