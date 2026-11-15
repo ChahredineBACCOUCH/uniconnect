@@ -21,3 +21,14 @@ body {
 #app {
   min-height: 100vh;
 }
+
+/*
+ * SCRUM-173 (accessibilité) : Vuetify affiche les libellés de champ au repos avec
+ * une opacité réduite (contraste 4,1:1, sous le minimum de 4,5:1). On utilise la
+ * couleur secondaire du thème, sans transparence (≈ 5,9:1). Les états focus,
+ * erreur et désactivé gardent le style Vuetify.
+ */
+.v-field:not(.v-field--focused):not(.v-field--error):not(.v-field--disabled) .v-field-label {
+  color: rgb(var(--v-theme-on-surface-variant));
+  opacity: 1;
+}
