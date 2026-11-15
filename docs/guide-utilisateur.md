@@ -4,9 +4,13 @@ UniConnect est la messagerie de votre université. Vous y retrouvez automatiquem
 
 Il fonctionne sur ordinateur et sur téléphone. Sur téléphone, le menu est en bas de l'écran.
 
+> Les captures d'écran viennent de l'application lancée en local avec les données de démonstration (`DemoSeeder` et quelques messages d'exemple) : l'interface est celle de la production, seules les données diffèrent. Elles sont rangées dans `docs/images/guide/`.
+
 ---
 
 ## 1. Créer et activer son compte (tout le monde)
+
+![Écran de connexion](images/guide/01-connexion.png)
 
 1. Ouvrez UniConnect, puis cliquez sur **Créer mon compte**.
 2. Saisissez votre **matricule**, votre nom, votre prénom et votre **adresse e-mail de l'université** (`…@univ.tn`). Cochez la charte, puis validez.
@@ -22,11 +26,19 @@ Il fonctionne sur ordinateur et sur téléphone. Sur téléphone, le menu est en
 ## 2. Étudiant
 
 ### Retrouver ses espaces
+
+![Accueil d'un étudiant : menu des espaces, compteurs, invitation en attente](images/guide/02-accueil-etudiant.png)
+
 Le **menu de gauche** classe vos espaces en trois rubriques : **Mes classes et matières**, **Mes groupes privés** et **Mes channels**. Le chiffre bleu à côté d'un espace indique le nombre de messages non lus ; il revient à zéro quand vous ouvrez la discussion.
 
 L'**accueil** résume votre journée : messages non lus, invitations en attente et nombre d'espaces, puis la liste de vos invitations et de vos espaces (pratique sur téléphone, où le menu est replié).
 
 ### Discuter
+
+![Discussion d'un espace avec une pièce jointe](images/guide/03-discussion.png)
+
+![La même discussion sur téléphone : menu replié et barre de navigation en bas](images/guide/10-mobile-discussion.png)
+
 1. Ouvrez un espace : l'onglet **Discussion** s'affiche.
 2. Écrivez en bas, puis cliquez sur **Envoyer** (ou appuyez sur Entrée).
 3. Pour joindre un fichier, cliquez sur le trombone 📎 ou faites glisser le fichier dans la zone d'écriture (« Déposez vos fichiers ici »). On peut envoyer un fichier seul, sans texte.
@@ -38,19 +50,33 @@ L'**accueil** résume votre journée : messages non lus, invitations en attente 
 - Les fichiers sont **réservés aux membres** de l'espace : quelqu'un qui quitte l'espace, ou qui en est retiré, ne peut plus les ouvrir, même avec un lien copié auparavant.
 
 ### Annonces
+
+![Onglet Annonces avec une annonce récente](images/guide/04-annonces.png)
+
 L'onglet **Annonces** regroupe les informations officielles de l'enseignant, séparées de la discussion (dates d'examen, consignes…). Une annonce publiée depuis moins de 3 jours porte la mention **Nouveau** ; ses pièces jointes se téléchargent comme les fichiers des messages. Chaque nouvelle annonce vous envoie une notification.
 
 ### Ressources
+
+![Onglet Ressources : supports classés par chapitre](images/guide/05-ressources.png)
+
 L'onglet **Ressources** présente les supports de cours **classés par chapitre**.
 - Le champ **Rechercher une ressource** et les filtres par type (PDF, documents, liens) aident à retrouver un support.
 - Cliquez sur l'icône de téléchargement pour enregistrer un fichier, ou sur l'icône d'ouverture pour suivre un lien.
 
 ### Notifications
+
+![Page Invitations et notifications](images/guide/08-notifications.png)
+
 La cloche 🔔 en haut de l'écran affiche le nombre de notifications **non lues** ; le compteur se met à jour tout seul toutes les 30 secondes. La page **Invitations et notifications** a deux onglets :
 - **Invitations** : accepter ou refuser une invitation à rejoindre un espace ;
 - **Notifications** : nouvelle annonce, nouvelle ressource, retrait d'un espace… Un point bleu signale une notification non lue ; un clic la marque comme lue et ouvre la page concernée. **Tout marquer comme lu** les marque toutes d'un coup.
 
 ### Poser une question à l'Assistant IA
+
+![Réponse de l'Assistant IA avec ses sources et le panneau Sources de l'assistant](images/guide/06-assistant-ia.png)
+
+![Après un clic sur une source : le document est surligné dans l'onglet Ressources](images/guide/07-source-mise-en-evidence.png)
+
 1. Dans l'espace d'une matière, ouvrez l'onglet **Assistant IA** (visible si l'enseignant l'a activé).
 2. Posez votre question en français, par exemple : « Quelle est la différence entre la 2FN et la 3FN ? »
 3. La réponse indique ses **sources** (« [1] Chapitre 3 – Normalisation.pdf · p. 14 »). Dans le texte, cliquez sur un numéro comme **[1]** pour mettre en évidence la source correspondante, puis cliquez sur la source : l'onglet **Ressources** s'ouvre, le document est **surligné** dans son chapitre et prêt à être téléchargé.
@@ -64,6 +90,9 @@ La cloche 🔔 en haut de l'écran affiche le nombre de notifications **non lues
 - l'IA peut se tromper : **vérifiez toujours dans les sources**.
 
 ### Groupes privés
+
+![Création d'un espace, étape 1 sur 5](images/guide/09-creer-un-espace.png)
+
 1. Cliquez sur **Créer un espace** (en haut du menu), puis suivez les 5 étapes : type, informations (nom, description), visibilité des messages (24 h, 7 jours ou 30 jours), invitations, récapitulatif.
 2. Pour inviter quelqu'un, tapez au moins 2 lettres de son **nom ou prénom** (la recherche ne se fait pas par adresse e-mail).
 3. Les invités voient l'invitation sur leur **accueil** (et un chiffre sur la cloche 🔔) et choisissent **Accepter** ou **Refuser**. Une invitation expire au bout de 14 jours.
@@ -81,6 +110,10 @@ La cloche 🔔 en haut de l'écran affiche le nombre de notifications **non lues
 
 ## 3. Enseignant
 
+![Paramètres de l'espace : activation de l'Assistant IA et consigne](images/guide/11-parametres-assistant.png)
+
+![Onglet Membres vu par le propriétaire](images/guide/12-membres.png)
+
 Vous avez accès à tout ce que fait un étudiant, et en plus :
 
 | Action | Où | Comment |
@@ -95,6 +128,12 @@ Conseil : l'assistant n'est utile que si vos PDF sont **en texte** (pas des scan
 ---
 
 ## 4. Membre de l'administration
+
+![Années universitaires](images/guide/13-annees.png)
+
+![Comptes autorisés : import Excel, modèle, filtres](images/guide/14-comptes-autorises.png)
+
+![Groupes organisationnels de l'année active](images/guide/15-groupes.png)
 
 Menu **ADMINISTRATION** (visible seulement avec les droits correspondants) :
 
