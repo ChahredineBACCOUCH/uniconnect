@@ -165,6 +165,13 @@ Le Shell s'ouvre en `root` : passez par `www-data` pour ne pas créer de fichier
 
 Le seeder est idempotent : il ne crée aucun doublon et ne supprime rien. Les PDF sont envoyés sur le disque par défaut (Supabase Storage en production). Les comptes de démo ont un mot de passe public (README) : ne les gardez pas après la soutenance.
 
+**Remise à zéro complète (irréversible)** : `RESET_DEMO=EFFACER-TOUT` (valeur exacte) lance `php artisan demo:reinitialiser --confirmer=EFFACER-TOUT` au démarrage. La commande :
+1. efface **toutes** les tables (`migrate:fresh`) ;
+2. supprime les fichiers envoyés (`espaces/`, `ia-eval/`) ;
+3. ne recharge que `DemoProductionSeeder`.
+
+Comptes et données de l'équipe disparaissent, et les sessions sont déconnectées. Retirez la variable **aussitôt** le redéploiement terminé, sinon la base est effacée à chaque redémarrage.
+
 ### 3.6 Stockage des fichiers (Supabase Storage)
 
 SCRUM-138. Le disque de Render est effacé à chaque déploiement : en production, les fichiers vont dans un bucket **privé** de Supabase Storage, par son API compatible S3 (disque `s3` de Laravel, paquet `league/flysystem-aws-s3-v3`). Le navigateur ne reçoit **jamais** d'URL du bucket : chaque téléchargement passe par l'API, qui vérifie les droits puis relit le fichier.

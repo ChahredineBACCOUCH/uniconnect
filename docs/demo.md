@@ -79,6 +79,8 @@ Le Shell Render n'existe pas en offre gratuite. Le chargement se fait donc au d�
 
 Le seeder est **idempotent** (relancé, il ne crée aucun doublon) et ne supprime rien. Les PDF de démo sont dans `backend/database/seeders/demo/` (générés par `generer_pdf.py`).
 
+**Repartir d'une base propre** (irréversible, efface aussi les données de l'équipe) : `RESET_DEMO` = `EFFACER-TOUT` sur Render, redéployer, vérifier, puis **retirer la variable**. Seules les données de démo restent. Pratique après la répétition du 18/11 pour retrouver l'invitation en attente, les non-lus et un quota IA neuf.
+
 ## Si quelque chose ne marche pas
 
 | Problème | Réaction immédiate |
