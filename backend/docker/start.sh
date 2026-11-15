@@ -26,5 +26,12 @@ if [ "${SEED_DEMO:-false}" = "true" ]; then
     php artisan db:seed --class=DemoProductionSeeder --force
 fi
 
+# Remise à zéro COMPLÈTE (irréversible) : efface toutes les tables et les fichiers
+# envoyés, puis ne recharge que les données de démo. Valeur exacte exigée pour éviter
+# un déclenchement accidentel. Retirer RESET_DEMO aussitôt après le redéploiement.
+if [ "${RESET_DEMO:-}" = "EFFACER-TOUT" ]; then
+    php artisan demo:reinitialiser --confirmer=EFFACER-TOUT
+fi
+
 php artisan config:cache \
     && exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
