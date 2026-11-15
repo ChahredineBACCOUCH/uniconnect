@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router'
 import { useEspacesStore } from '@/stores/espaces'
 import { useNotificationsStore } from '@/stores/notifications'
 import { formaterDate, formaterHeure, formaterJour, messageErreur } from '@/utils/espaces'
+import EmptyState from '@/components/EmptyState.vue'
+import { useNotify } from '@/composables/useNotify'
 
 /*
  * SCRUM-122 : invitations et notifications (E09).
@@ -16,6 +18,7 @@ import { formaterDate, formaterHeure, formaterJour, messageErreur } from '@/util
 const router = useRouter()
 const espaces = useEspacesStore()
 const notifications = useNotificationsStore()
+const notify = useNotify()
 
 const onglet = ref('notifications')
 
@@ -113,6 +116,7 @@ async function accepter(invitation) {
   try {
     const espace = await espaces.accepter(invitation.id)
     await notifications.charger({ discret: true })
+    notify.succes(`Vous avez rejoint « ${invitation.espace?.nom ?? "l'espace"} ».`)
     router.push({ name: 'espace', params: { id: espace?.id ?? invitation.espace?.id } })
   } catch (error) {
     erreurInvitation.value = messageErreur(error, "L'invitation n'a pas pu être acceptée.")
@@ -129,6 +133,7 @@ async function refuser(invitation) {
   try {
     await espaces.refuser(invitation.id)
     await notifications.charger({ discret: true })
+    notify.info('Invitation refusée.')
   } catch (error) {
     erreurInvitation.value = messageErreur(error, "L'invitation n'a pas pu être refusée.")
     await espaces.charger({ discret: true })
@@ -245,10 +250,12 @@ async function toutLire() {
             type="list-item-two-line, list-item-two-line"
           />
 
-          <div v-else-if="espaces.invitations.length === 0" class="notifications__vide">
-            <v-icon icon="mdi-email-open-outline" size="36" />
-            <p>Aucune invitation pour l'instant.</p>
-          </div>
+          <EmptyState
+            v-else-if="espaces.invitations.length === 0"
+            icone="mdi-email-open-outline"
+            titre="Aucune invitation pour l'instant."
+            texte="Quand quelqu'un vous invite dans un espace, l'invitation apparaît ici."
+          />
 
           <ul v-else class="notifications__liste">
             <li
@@ -315,10 +322,12 @@ async function toutLire() {
             type="list-item-two-line, list-item-two-line, list-item-two-line"
           />
 
-          <div v-else-if="notifications.estVide" class="notifications__vide">
-            <v-icon icon="mdi-bell-off-outline" size="36" />
-            <p>Aucune notification pour l'instant.</p>
-          </div>
+          <EmptyState
+            v-else-if="notifications.estVide"
+            icone="mdi-bell-off-outline"
+            titre="Aucune notification pour l'instant."
+            texte="Nouvelles annonces et nouvelles ressources de vos espaces s'afficheront ici."
+          />
 
           <ul v-else class="notifications__liste">
             <li v-for="notification in notifications.liste" :key="notification.id">
@@ -464,20 +473,6 @@ async function toutLire() {
   height: 10px;
   border-radius: 50%;
   background: rgb(var(--v-theme-primary));
-}
-
-.notifications__vide {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 48px 24px;
-  color: rgb(var(--v-theme-on-surface-variant));
-  text-align: center;
-}
-
-.notifications__vide p {
-  margin: 0;
 }
 
 @media (max-width: 600px) {

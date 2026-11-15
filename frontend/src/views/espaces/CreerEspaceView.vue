@@ -7,6 +7,7 @@ import { creerEspace, inviter } from '@/api/espaces'
 import RecherchePersonnes from '@/components/espaces/RecherchePersonnes.vue'
 import { useAuthStore } from '@/stores/auth'
 import { DUREES_CREATION, messageErreur } from '@/utils/espaces'
+import { useNotify } from '@/composables/useNotify'
 
 /*
  * SCRUM-89 · E06 « Créer un espace » : assistant en étapes.
@@ -14,6 +15,7 @@ import { DUREES_CREATION, messageErreur } from '@/utils/espaces'
  * puis redirection vers le nouvel espace.
  */
 const router = useRouter()
+const notify = useNotify()
 const auth = useAuthStore()
 // Sur téléphone, les 5 libellés ne tiennent pas : numéros seuls + « Étape n sur 5 ».
 const { smAndDown } = useDisplay()
@@ -141,6 +143,13 @@ async function creer() {
   }
 
   envoi.value = false
+  if (!avertissement) {
+    notify.succes(
+      invites.value.length
+        ? `Espace « ${espace.nom} » créé, invitations envoyées.`
+        : `Espace « ${espace.nom} » créé.`,
+    )
+  }
   router.push({
     name: 'espace',
     params: { id: espace.id, onglet: invites.value.length ? 'membres' : 'discussion' },
