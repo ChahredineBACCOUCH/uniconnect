@@ -2,6 +2,9 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+import EmptyState from '@/components/EmptyState.vue'
+
+/* Pages prévues dans la prochaine version (channels, recherche, profil). */
 const route = useRoute()
 const title = computed(() => route.meta.title ?? 'Page')
 </script>
@@ -11,12 +14,15 @@ const title = computed(() => route.meta.title ?? 'Page')
     <h1 class="text-h5 font-weight-medium">{{ title }}</h1>
 
     <v-card variant="outlined">
-      <v-card-text>
-        <div class="placeholder-page__empty">
-          <v-icon icon="mdi-progress-wrench" size="36" />
-          <p>Le contenu de cette page sera développé dans son ticket dédié.</p>
-        </div>
-      </v-card-text>
+      <EmptyState
+        icone="mdi-progress-wrench"
+        titre="Bientôt disponible"
+        texte="Cette fonctionnalité arrive dans la prochaine version d'UniConnect."
+      >
+        <v-btn variant="text" color="primary" class="mt-2" :to="{ name: 'home' }">
+          Retour à l'accueil
+        </v-btn>
+      </EmptyState>
     </v-card>
   </div>
 </template>
@@ -29,20 +35,6 @@ const title = computed(() => route.meta.title ?? 'Page')
 }
 
 .placeholder-page h1 {
-  margin: 0;
-}
-
-.placeholder-page__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 32px 0;
-  text-align: center;
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-
-.placeholder-page__empty p {
   margin: 0;
 }
 </style>

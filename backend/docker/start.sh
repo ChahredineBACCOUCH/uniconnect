@@ -18,11 +18,12 @@ chown -R www-data:www-data storage bootstrap/cache
 
 php artisan migrate --force
 
-# Comptes de démonstration (SCRUM-89) : le Shell Render n'existe pas en offre gratuite.
-# Mettre SEED_DEMO=true dans les variables Render, redéployer, puis retirer la variable.
-# DemoSeeder est idempotent (updateOrCreate) : le relancer ne crée pas de doublons.
+# Données de démonstration (SCRUM-89, SCRUM-188) : le Shell Render n'existe pas en
+# offre gratuite. Mettre SEED_DEMO=true dans les variables Render, redéployer, puis
+# retirer la variable. DemoProductionSeeder (comptes de démo + cours, PDF indexés,
+# discussion, annonces…) est idempotent : le relancer ne crée pas de doublons.
 if [ "${SEED_DEMO:-false}" = "true" ]; then
-    php artisan db:seed --class=DemoSeeder --force
+    php artisan db:seed --class=DemoProductionSeeder --force
 fi
 
 php artisan config:cache \

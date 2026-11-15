@@ -29,8 +29,8 @@ const router = createRouter({
         {
           path: 'espaces',
           name: 'espaces',
-          component: PlaceholderView,
-          meta: { title: 'Espaces' },
+          component: () => import('../views/EspacesView.vue'),
+          meta: { title: 'Mes espaces' },
         },
         {
           path: 'espaces/nouveau',
