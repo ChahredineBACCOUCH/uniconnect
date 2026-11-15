@@ -707,7 +707,7 @@ const nombrePages = computed(() => Math.max(Math.ceil(total.value / parPage.valu
     </v-card>
 
     <!-- Dialogue d'ajout / modification -->
-    <v-dialog v-model="dialogue" max-width="640" persistent>
+    <v-dialog :fullscreen="xs" v-model="dialogue" max-width="640" persistent>
       <v-card>
         <v-card-title class="text-h6 font-weight-medium">{{ titreDialogue }}</v-card-title>
 
@@ -826,7 +826,7 @@ const nombrePages = computed(() => Math.max(Math.ceil(total.value / parPage.valu
     </v-dialog>
 
     <!-- Import Excel en deux étapes -->
-    <v-dialog v-model="importDialogue" max-width="720" persistent>
+    <v-dialog :fullscreen="xs" v-model="importDialogue" max-width="720" persistent>
       <v-card>
         <v-card-title class="text-h6 font-weight-medium">
           Importer des comptes autorisés

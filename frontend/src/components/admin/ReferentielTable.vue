@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { useDisplay } from 'vuetify'
 
 import {
   creerReferentiel,
@@ -17,6 +18,9 @@ import { messageErreur } from '@/utils/espaces'
  * champs du formulaire. La recherche, la pagination, le dialogue d'ajout /
  * modification, la désactivation et la suppression sont gérés ici.
  */
+// SCRUM-172 : sur téléphone, chaque ligne devient une carte (aucun défilement horizontal).
+const { xs } = useDisplay()
+
 const props = defineProps({
   endpoint: { type: String, required: true },
   colonnes: { type: Array, required: true },
@@ -376,6 +380,7 @@ async function confirmerAction() {
       density="comfortable"
       hover
       no-data-text="Aucun élément ne correspond à cette recherche."
+      :mobile="xs"
       class="referentiel__table"
     >
       <template #[`item.etat`]="{ item }">
@@ -426,7 +431,7 @@ async function confirmerAction() {
     </v-data-table-server>
 
     <!-- Dialogue d'ajout / modification, généré à partir des champs. -->
-    <v-dialog v-model="dialogue" max-width="640" persistent>
+    <v-dialog :fullscreen="xs" v-model="dialogue" max-width="640" persistent>
       <v-card>
         <v-card-title class="text-h6 font-weight-medium">{{ titreDialogue }}</v-card-title>
 

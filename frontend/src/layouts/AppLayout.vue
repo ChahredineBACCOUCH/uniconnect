@@ -457,8 +457,16 @@ function onBottomNavChange(value) {
   background: rgb(var(--v-theme-surface));
 }
 
-.bottom-nav-btn {
+/*
+ * SCRUM-172 : Vuetify impose 80 px minimum par bouton (5 × 80 = 400 px), ce qui
+ * dépassait sur un téléphone de 390 px. Les boutons se partagent la largeur.
+ */
+.app-bottom-nav :deep(.v-bottom-navigation__content > .v-btn.bottom-nav-btn) {
   min-width: 0;
+  flex: 1 1 0;
+}
+
+.bottom-nav-btn {
   flex-direction: column;
   gap: 2px;
   font-size: 12px;

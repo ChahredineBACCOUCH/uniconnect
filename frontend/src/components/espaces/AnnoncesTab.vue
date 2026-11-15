@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useDisplay } from 'vuetify'
 
 import { publierAnnonce, recupererAnnonces } from '@/api/espaces'
 import PieceJointeItem from './PieceJointeItem.vue'
@@ -13,6 +14,9 @@ import {
   messageErreur,
   nomAuteur,
 } from '@/utils/espaces'
+
+// SCRUM-172 : dialogue de publication en plein écran sur téléphone.
+const { xs } = useDisplay()
 
 const props = defineProps({
   espace: { type: Object, required: true },
@@ -213,7 +217,12 @@ function notifier(texte) {
       </v-card>
     </div>
 
-    <v-dialog v-model="dialogueOuvert" max-width="600" @update:model-value="fermerDialogue">
+    <v-dialog
+      :fullscreen="xs"
+      v-model="dialogueOuvert"
+      max-width="600"
+      @update:model-value="fermerDialogue"
+    >
       <v-card>
         <form @submit.prevent="publier">
           <v-card-title class="text-h6">Nouvelle annonce</v-card-title>

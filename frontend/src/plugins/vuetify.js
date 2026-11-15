@@ -2,10 +2,17 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import { fr } from 'vuetify/locale'
 
 export default createVuetify({
   components,
   directives,
+  // SCRUM-172 : textes internes de Vuetify en français (pagination des tableaux…).
+  locale: {
+    locale: 'fr',
+    fallback: 'fr',
+    messages: { fr },
+  },
   icons: {
     defaultSet: 'mdi',
     aliases,
