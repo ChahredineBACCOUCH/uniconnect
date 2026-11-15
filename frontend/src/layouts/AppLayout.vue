@@ -30,7 +30,6 @@ watch(
   { immediate: true },
 )
 
-const search = ref('')
 // Utilisateur connecté (GET /me), et non plus le personnage de la maquette.
 const user = computed(() => ({
   initials: initiales(auth.user),
@@ -53,12 +52,6 @@ const navHaut = computed(() => [
     badge: nbNonLues.value,
   },
 ])
-
-const navBas = [
-  { title: 'Explorer les channels', icon: 'mdi-compass-outline', to: '/channels' },
-  { title: 'Recherche', icon: 'mdi-magnify', to: '/recherche' },
-  { title: 'Mon profil', icon: 'mdi-account-circle-outline', to: '/profil' },
-]
 
 /*
  * Section ADMINISTRATION : chaque entrée n'apparaît que si la personne a le
@@ -130,21 +123,13 @@ watch(
 const bottomNavItems = [
   { label: 'Accueil', icon: 'mdi-home-outline', to: '/' },
   { label: 'Espaces', icon: 'mdi-account-group-outline', to: '/espaces' },
-  { label: 'Channels', icon: 'mdi-compass-outline', to: '/channels' },
   { label: 'Notifs', icon: 'mdi-bell-outline', to: '/notifications' },
-  { label: 'Profil', icon: 'mdi-account-circle-outline', to: '/profil' },
 ]
 
 const activeBottomNav = computed(() => {
   if (route.path === '/') return '/'
   return bottomNavItems.find((item) => item.to !== '/' && route.path.startsWith(item.to))?.to ?? ''
 })
-
-function submitSearch() {
-  const query = search.value.trim()
-  if (query.length < 2) return
-  router.push({ path: '/recherche', query: { q: query } })
-}
 
 async function logout() {
   await auth.logout()
@@ -173,22 +158,6 @@ function onBottomNavChange(value) {
         <span class="brand-name">UniConnect</span>
       </router-link>
 
-      <v-text-field
-        v-if="!xs"
-        v-model="search"
-        class="app-bar-search"
-        variant="solo-filled"
-        density="compact"
-        flat
-        rounded="pill"
-        hide-details
-        bg-color="surface-variant"
-        prepend-inner-icon="mdi-magnify"
-        placeholder="Rechercher un espace, une personne, un fichier…"
-        aria-label="Rechercher un espace, une personne, un fichier"
-        @keyup.enter="submitSearch"
-      />
-
       <v-spacer />
 
       <v-btn
@@ -213,22 +182,15 @@ function onBottomNavChange(value) {
         </v-badge>
       </v-btn>
 
-      <v-btn
-        variant="text"
-        color="on-surface"
-        class="app-bar-user text-none"
-        height="48"
-        rounded="pill"
-        to="/profil"
-      >
-        <v-avatar color="primary" size="40">
-          <span class="text-caption font-weight-bold">{{ user.initials }}</span>
+      <div class="app-bar-user">
+        <v-avatar color="primary" size="40" :aria-label="user.name">
+          <span class="text-caption font-weight-bold" aria-hidden="true">{{ user.initials }}</span>
         </v-avatar>
         <span v-if="mdAndUp" class="user-text">
           <span class="user-name">{{ user.name }}</span>
           <span class="user-role">{{ user.role }}</span>
         </span>
-      </v-btn>
+      </div>
 
       <v-btn
         v-if="!xs"
@@ -279,19 +241,10 @@ function onBottomNavChange(value) {
 
           <EspaceList />
 
-          <v-divider class="my-2" />
-          <v-list-item
-            v-for="item in navBas"
-            :key="item.to"
-            :to="item.to"
-            :exact="item.exact"
-            :prepend-icon="item.icon"
-            :title="item.title"
-          >
-            <template v-if="item.badge" #append>
-              <span class="nav-badge">{{ item.badge }}</span>
-            </template>
-          </v-list-item>
+          <template v-if="xs">
+            <v-divider class="my-2" />
+            <v-list-item prepend-icon="mdi-logout" title="Se déconnecter" @click="logout" />
+          </template>
 
           <template v-if="navAdmin.length">
             <v-divider class="my-2" />
@@ -394,14 +347,11 @@ function onBottomNavChange(value) {
   color: #fff;
 }
 
-.app-bar-search {
-  flex: 0 1 520px;
-  max-width: 520px;
-  margin-inline-start: 16px;
-}
-
-.app-bar-search :deep(.v-field) {
-  border-radius: 999px;
+.app-bar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 4px 8px;
 }
 
 .user-text {

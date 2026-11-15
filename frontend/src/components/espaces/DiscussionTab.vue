@@ -4,13 +4,7 @@ import { computed, nextTick, onMounted, ref } from 'vue'
 import { envoyerMessage, modifierMessage, recupererMessages, supprimerMessage } from '@/api/espaces'
 import { usePolling } from '@/composables/usePolling'
 import { useAuthStore } from '@/stores/auth'
-import {
-  extrait,
-  fusionnerMessages,
-  grouperMessagesParJour,
-  messageErreur,
-  nomAuteur,
-} from '@/utils/espaces'
+import { fusionnerMessages, grouperMessagesParJour, messageErreur } from '@/utils/espaces'
 
 import Composer from './Composer.vue'
 import MessageItem from './MessageItem.vue'
@@ -29,30 +23,16 @@ const pret = ref(false)
 const conteneur = ref(null)
 const reponseA = ref(null)
 const nouveauxNonLus = ref(0)
-const signales = ref([])
 
 const suppressionCible = ref(null)
 const suppressionEnCours = ref(false)
 
-const signalementCible = ref(null)
-const motif = ref('')
-const precisions = ref('')
-
 const snackbar = ref({ actif: false, texte: '' })
-
-const motifs = [
-  { label: 'Contenu inapproprié', description: 'Propos choquants, vulgaires ou hors sujet' },
-  { label: 'Harcèlement', description: 'Attaque ou intimidation envers une personne' },
-  { label: 'Spam', description: 'Publicité, messages répétés ou liens suspects' },
-  { label: 'Information erronée', description: 'Information fausse pouvant induire en erreur' },
-  { label: 'Autre', description: 'Précisez dans le champ ci-dessous' },
-]
 
 const utilisateurId = computed(() => auth.user?.id ?? null)
 const entrees = computed(() => grouperMessagesParJour(messages.value))
 const dernierId = computed(() => messages.value.at(-1)?.id ?? 0)
 const suppressionOuverte = computed(() => suppressionCible.value !== null)
-const signalementOuvert = computed(() => signalementCible.value !== null)
 
 onMounted(chargerMessages)
 
@@ -149,32 +129,6 @@ function fermerSuppression(valeur) {
   if (!valeur && !suppressionEnCours.value) suppressionCible.value = null
 }
 
-function ouvrirSignalement(message) {
-  signalementCible.value = message
-  motif.value = ''
-  precisions.value = ''
-}
-
-function fermerSignalement(valeur) {
-  if (!valeur) signalementCible.value = null
-}
-
-function envoyerSignalement() {
-  if (!signalementCible.value || !motif.value) return
-
-  // Les signalements arrivent avec la modération (v1.1) : on garde l'état
-  // localement pour que l'utilisateur voie que son signalement est pris en compte.
-  signales.value = [...signales.value, signalementCible.value.id]
-  signalementCible.value = null
-  motif.value = ''
-  precisions.value = ''
-  notifier('Signalement envoyé. Vous serez notifié de la décision.')
-}
-
-function estSignale(message) {
-  return signales.value.includes(message.id)
-}
-
 function estProcheDuBas() {
   const element = conteneur.value
   if (!element) return true
@@ -248,11 +202,9 @@ function notifier(texte) {
               v-else
               :message="entree.message"
               :utilisateur-id="utilisateurId"
-              :signale="estSignale(entree.message)"
               @repondre="reponseA = $event"
               @modifier="modifier"
               @supprimer="demanderSuppression"
-              @signaler="ouvrirSignalement"
               @notifier="notifier"
             />
           </template>
@@ -305,64 +257,6 @@ function notifier(texte) {
             @click="confirmerSuppression"
           >
             Supprimer
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog
-      :model-value="signalementOuvert"
-      max-width="580"
-      @update:model-value="fermerSignalement"
-    >
-      <v-card>
-        <v-card-title class="d-flex align-center ga-2 text-h6">
-          <v-icon icon="mdi-flag-outline" color="error" />
-          Signaler ce message
-        </v-card-title>
-
-        <v-card-text class="signalement">
-          <div v-if="signalementCible" class="signalement__citation">
-            <span class="signalement__auteur">
-              {{ nomAuteur(signalementCible.auteur, utilisateurId) }} ·
-              {{
-                signalementCible.cree_le
-                  ? new Date(signalementCible.cree_le).toLocaleString('fr-FR')
-                  : ''
-              }}
-            </span>
-            <span>{{ extrait(signalementCible.contenu, 220) }}</span>
-          </div>
-
-          <v-radio-group v-model="motif" label="Motif du signalement" hide-details>
-            <v-radio
-              v-for="item in motifs"
-              :key="item.label"
-              :value="item.label"
-              :label="`${item.label} — ${item.description}`"
-            />
-          </v-radio-group>
-
-          <v-textarea
-            v-model="precisions"
-            label="Précisions (facultatif)"
-            rows="2"
-            variant="outlined"
-            density="compact"
-            hide-details
-          />
-
-          <p class="signalement__note">
-            Votre signalement est anonyme pour l'auteur du message. Il est transmis à la
-            propriétaire de l'espace et aux modérateurs ; vous serez notifié de la décision.
-          </p>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer />
-          <v-btn variant="text" @click="signalementCible = null">Annuler</v-btn>
-          <v-btn color="primary" variant="flat" :disabled="!motif" @click="envoyerSignalement">
-            Envoyer le signalement
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -466,35 +360,6 @@ function notifier(texte) {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
-}
-
-.signalement {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.signalement__citation {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
-  border-left: 3px solid rgb(var(--v-theme-outline));
-  border-radius: 6px;
-  background: rgb(var(--v-theme-surface-variant));
-  white-space: pre-line;
-}
-
-.signalement__auteur {
-  font-size: 12px;
-  font-weight: 500;
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-
-.signalement__note {
-  margin: 0;
-  font-size: 12px;
-  color: rgb(var(--v-theme-on-surface-variant));
 }
 
 @media (max-width: 760px) {

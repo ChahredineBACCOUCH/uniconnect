@@ -106,11 +106,11 @@ function invitePar(invitation) {
       <v-btn
         variant="outlined"
         color="primary"
-        prepend-icon="mdi-compass-outline"
-        to="/channels"
+        prepend-icon="mdi-view-grid-outline"
+        :to="{ name: 'espaces' }"
         height="40"
       >
-        Explorer les channels
+        Mes espaces
       </v-btn>
     </header>
 

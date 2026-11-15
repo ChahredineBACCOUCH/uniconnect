@@ -53,10 +53,16 @@ Ces comptes sont créés par `DemoProductionSeeder` (SCRUM-188, voir « Charger 
 | 10:30 – 12:00 | Chahredine | Téléphone | Même parcours sur mobile (barre de navigation du bas, Discussion), puis bilan : Scrum (Jira, sprints, PR relues), qualité (CI, ~350 tests backend et ~275 frontend, Lighthouse accessibilité 100), suite **v1.1**. | « Ce qui n'est pas encore livré est planifié, pas oublié. » |
 | 12:00 – 15:00 | Toute l'équipe | — | Questions | — |
 
-### À ne pas ouvrir pendant la démo (prévu en v1.1)
+### Périmètre affiché : seulement la v1.0
 
-- **Recherche**, **Mon profil** et **Explorer les channels** affichent « Bientôt disponible ».
-- La modération (signalements), le tableau de bord d'administration et le résumé de discussion par l'IA ne sont pas livrés : c'est la v1.1 dans Jira.
+L'interface n'affiche que ce qui est livré. Ces fonctionnalités prévues en v1.1 sont **masquées**, pas présentées comme « bientôt disponibles » :
+- recherche globale, profil, annuaire des channels, création de channel ;
+- onglets Fichiers et Épinglés ;
+- demandes d'adhésion, signalement et modération ;
+- mot de passe oublié, création manuelle de groupe ;
+- tableau de bord d'administration et résumé de discussion par l'IA.
+
+Si le jury pose la question, répondre avec la feuille de route v1.1 (Jira).
 
 ### Inscription : à savoir
 
