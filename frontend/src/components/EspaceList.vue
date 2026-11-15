@@ -11,7 +11,7 @@ const espaces = useEspacesStore()
 <template>
   <div class="espace-list">
     <v-skeleton-loader
-      v-if="espaces.chargement && !espaces.charge"
+      v-if="!espaces.charge && !espaces.erreur"
       type="list-item, list-item, list-item"
       class="espace-list__squelette"
     />
@@ -23,7 +23,9 @@ const espaces = useEspacesStore()
       </v-btn>
     </div>
 
-    <p v-else-if="espaces.estVide" class="espace-list__message">Vous n'avez encore aucun espace.</p>
+    <p v-else-if="espaces.charge && espaces.estVide" class="espace-list__message">
+      Vous n'avez encore aucun espace.
+    </p>
 
     <template v-for="rubrique in RUBRIQUES" v-else :key="rubrique.cle">
       <template v-if="espaces.liste[rubrique.cle]?.length">

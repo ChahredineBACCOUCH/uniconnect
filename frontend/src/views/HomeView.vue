@@ -2,6 +2,9 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import EmptyState from '@/components/EmptyState.vue'
+import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import { useNotify } from '@/composables/useNotify'
 import { useAuthStore } from '@/stores/auth'
 import { useEspacesStore } from '@/stores/espaces'
 import { formaterDate, libelleProfil, messageErreur } from '@/utils/espaces'
@@ -13,6 +16,8 @@ import { formaterDate, libelleProfil, messageErreur } from '@/utils/espaces'
 const router = useRouter()
 const auth = useAuthStore()
 const espaces = useEspacesStore()
+const notify = useNotify()
+const peutCreer = computed(() => auth.hasDroit('CREER_GROUPE_PRIVE'))
 
 const salutation = computed(() => (auth.user?.prenom ? `Bonjour ${auth.user.prenom}` : 'Bonjour'))
 const dateDuJour = new Intl.DateTimeFormat('fr-FR', {
@@ -22,7 +27,10 @@ const dateDuJour = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
 }).format(new Date())
 
-const chargementInitial = computed(() => espaces.chargement && !espaces.charge)
+// SCRUM-184 : tant que les espaces ne sont ni chargés ni en erreur (ex. serveur
+// injoignable avant même le profil), on affiche des squelettes plutôt qu'un
+// « aucun espace » trompeur.
+const chargementInitial = computed(() => !espaces.charge && !espaces.erreur)
 
 const stats = computed(() => [
   {
@@ -57,6 +65,7 @@ async function accepter(invitation) {
   erreurInvitation.value = null
   try {
     const espace = await espaces.accepter(invitation.id)
+    notify.succes(`Vous avez rejoint « ${invitation.espace?.nom ?? "l'espace"} ».`)
     router.push({ name: 'espace', params: { id: espace?.id ?? invitation.espace.id } })
   } catch (error) {
     erreurInvitation.value = messageErreur(error, "L'invitation n'a pas pu être acceptée.")
@@ -71,6 +80,7 @@ async function refuser(invitation) {
   erreurInvitation.value = null
   try {
     await espaces.refuser(invitation.id)
+    notify.info('Invitation refusée.')
   } catch (error) {
     erreurInvitation.value = messageErreur(error, "L'invitation n'a pas pu être refusée.")
     await espaces.charger({ discret: true })
@@ -142,12 +152,14 @@ function invitePar(invitation) {
           {{ erreurInvitation }}
         </v-alert>
 
-        <v-skeleton-loader v-if="chargementInitial" type="list-item-two-line" />
+        <LoadingSkeleton v-if="chargementInitial" type="liste" :lignes="1" />
 
-        <div v-else-if="espaces.invitations.length === 0" class="home-empty">
-          <v-icon icon="mdi-inbox-outline" size="32" />
-          <p>Aucune invitation en attente.</p>
-        </div>
+        <EmptyState
+          v-else-if="espaces.charge && espaces.invitations.length === 0"
+          icone="mdi-inbox-outline"
+          titre="Aucune invitation en attente."
+          compact
+        />
 
         <ul v-else class="invitations">
           <li v-for="invitation in espaces.invitations" :key="invitation.id" class="invitation">
@@ -186,12 +198,21 @@ function invitePar(invitation) {
         <span class="text-h6 font-weight-medium">Mes espaces</span>
       </v-card-title>
       <v-card-text>
-        <v-skeleton-loader v-if="chargementInitial" type="list-item" />
+        <LoadingSkeleton v-if="chargementInitial" type="liste" :lignes="2" />
 
-        <div v-else-if="espaces.estVide" class="home-empty">
-          <v-icon icon="mdi-account-group-outline" size="32" />
-          <p>Vous n'avez encore aucun espace.</p>
-        </div>
+        <EmptyState
+          v-else-if="espaces.charge && espaces.estVide"
+          icone="mdi-account-group-outline"
+          titre="Vous n'avez encore aucun espace."
+          :texte="
+            peutCreer
+              ? 'Créez un groupe privé ou attendez d’être ajouté au groupe de votre classe.'
+              : 'Vous serez ajouté automatiquement au groupe de votre classe.'
+          "
+          :action-label="peutCreer ? 'Créer un espace' : ''"
+          compact
+          @action="router.push({ name: 'espace-nouveau' })"
+        />
 
         <v-list v-else density="comfortable" class="pa-0">
           <v-list-item
@@ -275,20 +296,6 @@ function invitePar(invitation) {
   font-size: 12px;
   line-height: 16px;
   color: rgb(var(--v-theme-on-surface-variant));
-}
-
-.home-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 24px 0;
-  text-align: center;
-  color: rgb(var(--v-theme-on-surface-variant));
-}
-
-.home-empty p {
-  margin: 0;
 }
 
 .invitations {

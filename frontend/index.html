@@ -11,9 +11,30 @@
       rel="stylesheet"
     >
     <title>UniConnect</title>
+    <!--
+      SCRUM-184 : écran d'attente affiché pendant le téléchargement du JavaScript
+      (réseau lent). Vue le remplace dès que l'application est montée.
+    -->
+    <style>
+      .demarrage { min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 12px; font-family: Roboto, system-ui, sans-serif;
+        background: #f4f6fb; color: #5b6478; }
+      .demarrage__logo { width: 56px; height: 56px; border-radius: 14px; background: #1e4fb8; }
+      .demarrage__titre { margin: 0; font-size: 22px; font-weight: 700; color: #1e4fb8; }
+      .demarrage__roue { width: 28px; height: 28px; border: 3px solid #e3ebfb; border-top-color: #1e4fb8;
+        border-radius: 50%; animation: tourner 0.9s linear infinite; }
+      @keyframes tourner { to { transform: rotate(360deg); } }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="demarrage" role="status" aria-live="polite">
+        <span class="demarrage__logo" aria-hidden="true"></span>
+        <p class="demarrage__titre">UniConnect</p>
+        <span class="demarrage__roue" aria-hidden="true"></span>
+        <p>Chargement de l'application…</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

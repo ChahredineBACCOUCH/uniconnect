@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
 import http, { ValidationError } from '@/api/http'
+import { useNotify } from '@/composables/useNotify'
 import { useAuthStore } from '@/stores/auth'
 
 // Le router n'est chargé qu'en cas de 401 : on le simule pour vérifier la redirection.
@@ -71,5 +72,38 @@ describe('client http', () => {
     )
 
     await expect(rejet).rejects.toMatchObject({ code: 'PLATEFORME_FERMEE' })
+  })
+})
+
+describe('client http : erreur réseau (SCRUM-184)', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    useNotify().fermer()
+  })
+
+  it('affiche un seul message clair avec « Réessayer » quand le serveur ne répond pas', async () => {
+    await expect(
+      onResponseError({ message: 'Network Error', code: 'ERR_NETWORK' }),
+    ).rejects.toBeTruthy()
+
+    const { etat } = useNotify()
+    expect(etat.value.visible).toBe(true)
+    expect(etat.value.type).toBe('erreur')
+    expect(etat.value.texte).toContain('Problème de connexion au serveur')
+    expect(etat.value.actionLabel).toBe('Réessayer')
+  })
+
+  it('ne dit rien pour une requête annulée volontairement', async () => {
+    await expect(
+      onResponseError({ message: 'canceled', code: 'ERR_CANCELED' }),
+    ).rejects.toBeTruthy()
+
+    expect(useNotify().etat.value.visible).toBe(false)
+  })
+
+  it('ne dit rien quand le serveur a répondu (erreur gérée par l’écran)', async () => {
+    await expect(onResponseError(erreurHttp(500, { message: 'Erreur' }))).rejects.toBeTruthy()
+
+    expect(useNotify().etat.value.visible).toBe(false)
   })
 })

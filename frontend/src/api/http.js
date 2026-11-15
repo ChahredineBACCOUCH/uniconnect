@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import { useNotify } from '@/composables/useNotify'
 import { useAuthStore } from '@/stores/auth'
 
 /*
@@ -65,6 +66,16 @@ http.interceptors.response.use(
           data.code ?? null,
         ),
       )
+    }
+
+    // SCRUM-184 : pas de réponse du tout (réseau coupé, serveur injoignable) : un
+    // seul message clair pour toute l'application, avec « Réessayer ». Les requêtes
+    // annulées volontairement (navigation, polling arrêté) ne déclenchent rien.
+    if (!error.response && !axios.isCancel(error) && error.code !== 'ERR_CANCELED') {
+      useNotify().erreur('Problème de connexion au serveur. Vérifiez votre connexion internet.', {
+        actionLabel: 'Réessayer',
+        action: () => window.location.reload(),
+      })
     }
 
     return Promise.reject(error)
