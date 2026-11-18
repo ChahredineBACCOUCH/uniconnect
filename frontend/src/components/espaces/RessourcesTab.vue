@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 import {
   creerChapitre,
@@ -35,6 +36,9 @@ const props = defineProps({
   espace: { type: Object, required: true },
 })
 const emit = defineEmits(['actualiser'])
+
+// SCRUM-172 : les cinq dialogues passent en plein écran sur téléphone.
+const { xs } = useDisplay()
 
 const chapitres = ref([])
 const chargement = ref(true)
@@ -586,7 +590,7 @@ async function telecharger(ressource) {
     </template>
 
     <!-- Nouveau chapitre -->
-    <v-dialog v-model="dialogueChapitre" max-width="460">
+    <v-dialog v-model="dialogueChapitre" max-width="460" :fullscreen="xs">
       <v-card title="Nouveau chapitre">
         <v-card-text>
           <v-text-field
@@ -616,7 +620,7 @@ async function telecharger(ressource) {
     </v-dialog>
 
     <!-- Ajouter une ressource -->
-    <v-dialog v-model="dialogueRessource" max-width="620">
+    <v-dialog v-model="dialogueRessource" max-width="620" :fullscreen="xs">
       <v-card title="Ajouter une ressource">
         <v-card-text>
           <v-text-field
@@ -686,7 +690,7 @@ async function telecharger(ressource) {
     </v-dialog>
 
     <!-- Renommer une ressource -->
-    <v-dialog v-model="dialogueRenommer" max-width="460">
+    <v-dialog v-model="dialogueRenommer" max-width="460" :fullscreen="xs">
       <v-card title="Renommer la ressource">
         <v-card-text>
           <v-text-field
@@ -716,7 +720,7 @@ async function telecharger(ressource) {
     </v-dialog>
 
     <!-- Déplacer une ressource -->
-    <v-dialog v-model="dialogueDeplacer" max-width="520">
+    <v-dialog v-model="dialogueDeplacer" max-width="520" :fullscreen="xs">
       <v-card :title="`Déplacer « ${ressourceADeplacer?.titre ?? ''} »`">
         <v-card-text>
           <p v-if="!chapitresDestination.length" class="text-body-2 text-medium-emphasis">
@@ -754,7 +758,7 @@ async function telecharger(ressource) {
     </v-dialog>
 
     <!-- Supprimer une ressource -->
-    <v-dialog v-model="dialogueSupprimer" max-width="460">
+    <v-dialog v-model="dialogueSupprimer" max-width="460" :fullscreen="xs">
       <v-card :title="`Supprimer « ${ressourceASupprimer?.titre ?? ''} » ?`">
         <v-card-text>
           Les étudiants ne pourront plus consulter ni télécharger cette ressource. Les réponses de

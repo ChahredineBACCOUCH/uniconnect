@@ -457,6 +457,7 @@ async function confirmerArchivage() {
     <v-dialog
       :model-value="groupeAArchiver !== null"
       max-width="480"
+      :fullscreen="xs"
       @update:model-value="(ouverte) => !ouverte && (groupeAArchiver = null)"
     >
       <v-card v-if="groupeAArchiver">
