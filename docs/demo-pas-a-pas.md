@@ -8,6 +8,28 @@ Les valeurs ci-dessous ont été jouées en production le 18/11/2026 lors de l'e
 - Mot de passe des comptes de démo : **`Demo1234!`**
 - Notation : **« Bouton »** = bouton à cliquer · `valeur` = texte à saisir · ✅ = ce qui doit s'afficher
 
+## Fichiers de test
+
+Ils sont dans le dépôt, dossier [`docs/demo/fichiers/`](demo/fichiers/). **Copiez-les sur le bureau** de l'ordinateur de démonstration.
+
+| Fichier | Sert à | Contenu |
+|---|---|---|
+| [`import-comptes-demo.xlsx`](demo/fichiers/import-comptes-demo.xlsx) | Étape 1.3 : import Excel des comptes autorisés | 6 lignes : 3 valides et 3 erreurs volontaires (voir ci-dessous) |
+| [`synthese-chapitre-1.pdf`](demo/fichiers/synthese-chapitre-1.pdf) | Étape 3.4 : pièce jointe du message | Fiche de révision d'une page sur le modèle relationnel |
+
+Contenu de `import-comptes-demo.xlsx` (première feuille, colonnes du modèle d'import) :
+
+| Ligne | matricule | nom | prenom | email | profil | classe_code | Résultat attendu |
+|---|---|---|---|---|---|---|---|
+| 2 | ETU2026-201 | Mejri | Hiba | etu2026-201@uniconnect.test | ETUDIANT | L2-INFO-A | ✅ valide |
+| 3 | ETU2026-202 | Saidi | Walid | etu2026-202@uniconnect.test | ETUDIANT | L2-INFO-B | ✅ valide |
+| 4 | ENS2026-010 | Karray | Leila | ens2026-010@uniconnect.test | ENSEIGNANT | (vide) | ✅ valide |
+| 5 | ETU2026-203 | Zribi | Omar | etu2026-203@uniconnect.test | ETUDIANT | M1-INEXISTANTE | ❌ classe inconnue |
+| 6 | ETU2026-204 | Hamdi | Sana | adresse-invalide | ETUDIANT | L2-INFO-A | ❌ e-mail invalide |
+| 7 | ETU2026-021 | Ayari | Ines | etu2026-021@uniconnect.test | ETUDIANT | L2-INFO-A | ❌ doublon (déjà autorisé) |
+
+> Le fichier s'importe **une seule fois** : après la répétition, la remise à zéro de la base le rend de nouveau importable.
+
 > Avant de commencer :
 > - la base a été **remise à zéro** (voir demo.md) ;
 > - le site a été ouvert 10 minutes avant, pour réveiller Render ;
@@ -44,7 +66,7 @@ Phrase : « Une seule année est active : c'est elle qui ouvre les inscriptions 
 
 ### 1.3 Comptes autorisés : recherche et import
 Menu → **« Comptes autorisés »**
-✅ La liste des 40 comptes autorisés.
+✅ La liste des **40** comptes autorisés.
 
 | Champ | Valeur |
 |---|---|
@@ -53,11 +75,25 @@ Menu → **« Comptes autorisés »**
 ✅ La liste est filtrée (Ines, Mehdi, Youssef Ayari). Effacer ensuite la recherche.
 
 → **« Importer »**
-✅ Dialogue « Importer des comptes autorisés » : étape 1 « Fichier », bouton « Télécharger le modèle ».
+✅ Dialogue « Importer des comptes autorisés », étape **1 · Fichier** : « Choisir le fichier » et le bouton « Télécharger le modèle ».
 
-Phrase : « La scolarité importe la liste depuis Excel ; chaque ligne est contrôlée avant validation. »
+| Champ | Valeur |
+|---|---|
+| Fichier Excel | sur le bureau : **`import-comptes-demo.xlsx`** |
 
-→ **« Annuler »** : on n'importe rien.
+→ **« Analyser le fichier »**
+✅ Compteurs : **3** lignes valides · **1** doublon ignoré · **2** lignes en erreur. « Détail des erreurs » :
+- Ligne 5 : « La classe « M1-INEXISTANTE » n'existe pas pour l'année universitaire active. »
+- Ligne 6 : « L'adresse e-mail est invalide. »
+- Ligne 7 : « Ce matricule figure déjà dans la liste des comptes autorisés. Cette adresse e-mail figure déjà dans la liste des comptes autorisés. »
+
+Phrase : « La scolarité importe la liste depuis Excel. Chaque ligne est contrôlée avant d'écrire quoi que ce soit : les erreurs sont expliquées ligne par ligne, et les doublons sont ignorés. »
+
+→ **« Continuer »**
+✅ Étape **2 · Validation** : « **3** comptes seront importés. 3 lignes du fichier seront ignorées (doublons ou erreurs). » Récapitulatif : Fichier `import-comptes-demo.xlsx`, Lignes lues 6, Lignes valides 3, Lignes ignorées 3.
+
+→ **« Importer 3 comptes »**
+✅ Message : « 3 comptes importés. 3 lignes ignorées. ». La liste compte maintenant **43** entrées (Hiba Mejri, Walid Saidi et Leila Karray en « Non créé »).
 
 ### 1.4 Ajouter le compte qui servira à l'inscription
 → **« Ajouter »** (dialogue « Ajouter un compte autorisé »)
@@ -172,11 +208,11 @@ Faire défiler jusqu'au message de **Yasmine Trabelsi** → carte **fiche-revisi
 |---|---|
 | Votre message (« Écrire un message à Bases de données… ») | `Voici ma synthèse du chapitre 1 pour réviser le TP.` |
 
-→ Trombone **📎** (« Joindre des fichiers ») → choisir le PDF préparé sur le bureau (ex. `synthese-chapitre-1.pdf`)
-✅ Le fichier apparaît sous le champ.
+→ Trombone **📎** (« Joindre des fichiers ») → sur le bureau, choisir **`synthese-chapitre-1.pdf`** (fichier de test)
+✅ Le fichier apparaît sous le champ : « synthese-chapitre-1.pdf ».
 
 → **« Envoyer »**
-✅ Le message apparaît en bas (« Vous »), avec la carte du PDF (nom, « PDF · taille ») et « Expire le … ».
+✅ Le message apparaît en bas (« Vous »), avec la carte **synthese-chapitre-1.pdf** (« PDF · 2,4 Ko ») et « Expire le … ».
 
 Phrase : « Les fichiers restent privés : chaque téléchargement vérifie que la personne est membre, même avec un lien direct. »
 
@@ -301,10 +337,11 @@ Phrase : « Ce qui n'est pas encore livré est planifié, pas oublié. »
 | Administration | `admin@demo.uniconnect` / `Demo1234!` |
 | Enseignante | `enseignant@demo.uniconnect` / `Demo1234!` |
 | Étudiant | `etudiant@demo.uniconnect` / `Demo1234!` |
+| Import Excel | fichier **`docs/demo/fichiers/import-comptes-demo.xlsx`** → 3 valides, 1 doublon, 2 erreurs → « Importer 3 comptes » |
 | Inscription refusée | `ETU2026-999` · `Test` · `Visiteur` · `test@uniconnect.test` |
 | Inscription acceptée | `ETU2026-100` · nom · `Moataz` · adresse du compte Resend |
 | Mot de passe choisi à l'activation | `Uniconnect2026` |
-| Message de discussion | `Voici ma synthèse du chapitre 1 pour réviser le TP.` + un PDF |
+| Message de discussion | `Voici ma synthèse du chapitre 1 pour réviser le TP.` + **`docs/demo/fichiers/synthese-chapitre-1.pdf`** |
 | Groupe privé | `Révisions TP noté` · 7 jours · invitation `Yas` → Yasmine Trabelsi |
 | Annonce | `Salle changée : B14` / `Le TP noté de jeudi aura lieu en salle B14, à 10 h comme prévu.` |
 | Questions IA | `Quels sont les attributs d'un curseur explicite ?` · `Quelle est la différence entre la 3FN et la BCNF ?` · `Qui a gagné la Coupe du monde 2022 ?` |
