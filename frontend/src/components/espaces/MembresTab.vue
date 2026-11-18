@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 import {
   annulerInvitation,
@@ -35,6 +36,9 @@ const props = defineProps({
   espace: { type: Object, required: true },
 })
 const emit = defineEmits(['actualiser'])
+
+// SCRUM-172 : dialogues et sous-onglets adaptés au téléphone.
+const { xs } = useDisplay()
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -263,7 +267,7 @@ async function envoyerInvitations() {
 <template>
   <div class="membres">
     <div class="membres__barre">
-      <v-tabs v-model="sousOnglet" density="compact" color="primary">
+      <v-tabs v-model="sousOnglet" density="compact" color="primary" show-arrows>
         <v-tab value="membres" class="text-none">
           Membres
           <v-chip size="x-small" class="ml-2" variant="tonal">{{ membres.length }}</v-chip>
@@ -429,7 +433,7 @@ async function envoyerInvitations() {
     </v-window>
 
     <!-- Dialogue « Inviter des membres » -->
-    <v-dialog v-model="dialogueInviter" max-width="560">
+    <v-dialog v-model="dialogueInviter" max-width="560" :fullscreen="xs">
       <v-card title="Inviter des membres">
         <v-card-text>
           <p class="text-body-2 text-medium-emphasis mb-4">
@@ -455,7 +459,7 @@ async function envoyerInvitations() {
     </v-dialog>
 
     <!-- Confirmation des actions destructives -->
-    <v-dialog v-model="confirmation.ouvert" max-width="460">
+    <v-dialog v-model="confirmation.ouvert" max-width="460" :fullscreen="xs">
       <v-card :title="confirmation.titre">
         <v-card-text>{{ confirmation.texte }}</v-card-text>
         <v-card-actions>

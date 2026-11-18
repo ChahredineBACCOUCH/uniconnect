@@ -506,6 +506,7 @@ async function confirmerAction() {
     <v-dialog
       :model-value="confirmation !== null"
       max-width="480"
+      :fullscreen="xs"
       @update:model-value="fermerConfirmation"
     >
       <v-card v-if="confirmation">

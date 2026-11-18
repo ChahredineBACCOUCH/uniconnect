@@ -804,6 +804,7 @@ const nombrePages = computed(() => Math.max(Math.ceil(total.value / parPage.valu
     <v-dialog
       :model-value="confirmation !== null"
       max-width="480"
+      :fullscreen="xs"
       @update:model-value="(ouverte) => !ouverte && (confirmation = null)"
     >
       <v-card v-if="confirmation">
