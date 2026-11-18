@@ -62,6 +62,31 @@ describe('écran d’inscription', () => {
     expect(wrapper.find('form').exists()).toBe(false)
   })
 
+  it('dit que l’e-mail n’est pas parti et permet de le renvoyer', async () => {
+    http.post.mockResolvedValueOnce({
+      data: { message: "Votre compte a été créé, mais l'e-mail…", email_envoye: false },
+    })
+
+    const wrapper = monter()
+    await remplir(wrapper)
+    await envoyer(wrapper)
+
+    // Pas de faux « e-mail envoyé ».
+    expect(wrapper.text()).toContain('Compte créé')
+    expect(wrapper.text()).toContain("L'e-mail d'activation n'a pas pu être envoyé")
+    expect(wrapper.text()).not.toContain('Vérifie ta boîte mail')
+
+    http.post.mockResolvedValueOnce({ data: { message: 'ok' } })
+    const bouton = wrapper.findAll('button').find((b) => b.text().includes('Renvoyer'))
+    await bouton.trigger('click')
+    await flushPromises()
+
+    expect(http.post).toHaveBeenLastCalledWith('/auth/activate/renvoyer', {
+      email: 'yassine.bensalah@univ.tn',
+    })
+    expect(wrapper.text()).toContain('Vérifie ta boîte mail')
+  })
+
   it('affiche chaque erreur renvoyée par l’API sous son champ', async () => {
     http.post.mockRejectedValue({
       message: 'Données invalides.',
