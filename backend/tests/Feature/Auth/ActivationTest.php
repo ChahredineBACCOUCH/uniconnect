@@ -187,6 +187,16 @@ class ActivationTest extends TestCase
     }
 
     /** Compte créé par l'inscription : en attente d'activation, sans mot de passe. */
+    public function test_le_renvoi_du_lien_repond_503_si_l_envoi_echoue(): void
+    {
+        $compte = $this->compteEnAttente();
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('Service e-mail injoignable'));
+
+        $this->postJson('/api/auth/activate/renvoyer', ['email' => $compte->email])
+            ->assertStatus(503)
+            ->assertJsonPath('message', "L'e-mail n'a pas pu être envoyé pour le moment. Réessayez dans quelques minutes.");
+    }
+
     private function compteEnAttente(array $attributs = []): User
     {
         return User::factory()->create(array_merge([

@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 /**
  * SCRUM-66 : activation du compte (choix du mot de passe) et renvoi du lien.
@@ -88,7 +89,16 @@ class ActivationController extends Controller
         $compte = User::where('email', $donnees['email'])->first();
 
         if ($compte && $compte->etat === EtatCompte::EN_ATTENTE) {
-            Mail::to($compte->email)->send(new ActivationCompte($compte, LienActivation::pour($compte)));
+            // Service d'e-mail indisponible : message clair plutôt qu'une erreur 500.
+            try {
+                Mail::to($compte->email)->send(new ActivationCompte($compte, LienActivation::pour($compte)));
+            } catch (Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'message' => "L'e-mail n'a pas pu être envoyé pour le moment. Réessayez dans quelques minutes.",
+                ], 503);
+            }
         }
 
         return response()->json([
