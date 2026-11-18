@@ -25,6 +25,11 @@ const erreursChamps = ref({})
 const erreurGenerale = ref('')
 const plateformeFermee = ref(false)
 const envoye = ref(false)
+// L'API crée le compte même si l'e-mail n'a pas pu partir (email_envoye: false) :
+// on le dit clairement et on propose de renvoyer le lien.
+const emailNonEnvoye = ref(false)
+const renvoiEnCours = ref(false)
+const erreurRenvoi = ref('')
 
 /*
  * Étapes « 1 Éligibilité — 2 Activation par e-mail » (maquette E02).
@@ -72,7 +77,7 @@ async function envoyer() {
   plateformeFermee.value = false
 
   try {
-    await http.post('/auth/register', {
+    const { data } = await http.post('/auth/register', {
       matricule: matricule.value.trim(),
       nom: nom.value.trim() || null,
       prenom: prenom.value.trim() || null,
@@ -80,7 +85,8 @@ async function envoyer() {
       charte: charte.value,
     })
 
-    // Le compte existe : on remplace le formulaire par l'écran « e-mail envoyé ».
+    // Le compte existe : on remplace le formulaire par l'écran de confirmation.
+    emailNonEnvoye.value = data?.email_envoye === false
     envoye.value = true
   } catch (erreur) {
     // 422 : chaque message est affiché sous le champ concerné.
@@ -95,6 +101,22 @@ async function envoyer() {
     }
   } finally {
     envoi.value = false
+  }
+}
+
+/* Nouvel essai d'envoi du lien d'activation (compte déjà créé, en attente). */
+async function renvoyerLien() {
+  renvoiEnCours.value = true
+  erreurRenvoi.value = ''
+
+  try {
+    await http.post('/auth/activate/renvoyer', { email: email.value.trim() })
+    emailNonEnvoye.value = false
+  } catch {
+    erreurRenvoi.value =
+      "L'e-mail n'a toujours pas pu être envoyé. Réessayez dans quelques minutes."
+  } finally {
+    renvoiEnCours.value = false
   }
 }
 </script>
@@ -117,13 +139,32 @@ async function envoyer() {
         <v-icon icon="mdi-email-outline" size="32" />
       </span>
 
-      <h1 class="text-h6 font-weight-medium">Vérifie ta boîte mail</h1>
+      <template v-if="emailNonEnvoye">
+        <h1 class="text-h6 font-weight-medium">Compte créé</h1>
 
-      <p class="text-body-2 text-medium-emphasis inscription__texte">
-        Un e-mail d'activation a été envoyé à <strong>{{ email.trim() }}</strong
-        >. Clique sur le lien qu'il contient pour choisir ton mot de passe. Le lien est valable 48
-        heures.
-      </p>
+        <v-alert type="warning" variant="tonal" density="comfortable" class="text-left">
+          L'e-mail d'activation n'a pas pu être envoyé à <strong>{{ email.trim() }}</strong> pour le
+          moment.
+        </v-alert>
+
+        <v-alert v-if="erreurRenvoi" type="error" variant="tonal" density="compact">
+          {{ erreurRenvoi }}
+        </v-alert>
+
+        <v-btn color="primary" class="text-none" :loading="renvoiEnCours" @click="renvoyerLien">
+          Renvoyer l'e-mail d'activation
+        </v-btn>
+      </template>
+
+      <template v-else>
+        <h1 class="text-h6 font-weight-medium">Vérifie ta boîte mail</h1>
+
+        <p class="text-body-2 text-medium-emphasis inscription__texte">
+          Un e-mail d'activation a été envoyé à <strong>{{ email.trim() }}</strong
+          >. Clique sur le lien qu'il contient pour choisir ton mot de passe. Le lien est valable 48
+          heures.
+        </p>
+      </template>
 
       <v-btn variant="text" color="primary" class="text-none" to="/connexion"> Se connecter </v-btn>
     </div>
