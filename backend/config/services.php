@@ -19,7 +19,9 @@ return [
     ],
 
     'resend' => [
-        'key' => env('RESEND_API_KEY'),
+        // La clé API Resend sert aussi de mot de passe SMTP chez Resend : si
+        // RESEND_API_KEY n'est pas définie, on reprend MAIL_PASSWORD (production Render).
+        'key' => env('RESEND_API_KEY', env('MAIL_PASSWORD')),
     ],
 
     'ses' => [
