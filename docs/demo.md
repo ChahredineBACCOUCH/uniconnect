@@ -2,6 +2,8 @@
 
 **Durée : 15 minutes maximum** (12 min de démo + 3 min de questions), en production, sur un seul ordinateur relié au projecteur. Ticket : SCRUM-187.
 
+> **Version détaillée** (chaque clic et la valeur exacte de chaque champ) : [demo-pas-a-pas.md](demo-pas-a-pas.md).
+
 - Application : https://uniconnect-six-lake.vercel.app
 - État de l'API : https://uniconnect-api-qov1.onrender.com/api/health
 - Dépôt et documentation : https://github.com/ChahredineBACCOUCH/uniconnect

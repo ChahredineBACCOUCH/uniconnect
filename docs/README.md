@@ -16,6 +16,7 @@ Livraison : **jeudi 19/11/2026** · gel du code : **mardi 17/11 à 18 h**.
 | [tests.md](tests.md) | **Plan de tests de la recette finale** : tableau parcours × profils, règles bloquantes et test automatique qui les couvre, procédure de recette croisée | SCRUM-174 |
 | [api/](api/) | Collection Bruno versionnée des routes de l'API (Auth, Espaces, Messages, Fichiers, IA, Admin) | SCRUM-175 |
 | [demo.md](demo.md) | Scénario de la démonstration du 19/11 (15 minutes) | SCRUM-187 |
+| [demo-pas-a-pas.md](demo-pas-a-pas.md) | Démonstration détaillée : chaque clic et la valeur exacte de chaque champ | SCRUM-187 |
 | [guide-utilisateur.md](guide-utilisateur.md) | Mode d'emploi pour l'étudiant, l'enseignant et l'administration | SCRUM-185 |
 
 Installation du projet en local : voir le [README principal](../README.md).
