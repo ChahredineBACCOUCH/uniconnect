@@ -9,3 +9,7 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Fichiers binaires (PDF de démo, modèles Excel) : aucune conversion.
+*.pdf binary
+*.xlsx binary

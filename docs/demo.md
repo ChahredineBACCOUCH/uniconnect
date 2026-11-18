@@ -2,6 +2,8 @@
 
 **Durée : 15 minutes maximum** (12 min de démo + 3 min de questions), en production, sur un seul ordinateur relié au projecteur. Ticket : SCRUM-187.
 
+> **Version détaillée** (chaque clic et la valeur exacte de chaque champ) : [demo-pas-a-pas.md](demo-pas-a-pas.md).
+
 - Application : https://uniconnect-six-lake.vercel.app
 - État de l'API : https://uniconnect-api-qov1.onrender.com/api/health
 - Dépôt et documentation : https://github.com/ChahredineBACCOUCH/uniconnect
@@ -32,12 +34,14 @@ Ces comptes sont créés par `DemoProductionSeeder` (SCRUM-188, voir « Charger 
 ## Avant la démo (J-1 et le matin)
 
 - [ ] Données de démo chargées en production (une seule fois, voir plus bas)
-- [ ] 18/11 : répétition chronométrée avec toute l'équipe (SCRUM-189), avec `ETU2026-002` pour l'inscription (voir étape 2)
+- [ ] 18/11 : répétition chronométrée avec toute l'équipe (SCRUM-189), inscription comprise (`ETU2026-100` + adresse du compte Resend, voir « Inscription avec e-mail »)
+- [ ] **Base remise à zéro** après la répétition (`RESET_DEMO=EFFACER-TOUT`, puis **retour à `non`** aussitôt, voir plus bas)
+- [ ] Boîte mail du **compte Resend** ouverte sur le téléphone de Moataz (ou dans un onglet) pour montrer l'e-mail d'activation
 - [ ] 18/11 : enregistrement de la **vidéo du plan B** (tout le scénario, en cas de panne réseau)
 - [ ] Le matin : ouvrir `/api/health` pour réveiller Render (environ 1 min ; l'application affiche « Le serveur se réveille »), puis vérifier `db: ok`
 - [ ] 4 fenêtres prêtes (navigation privée ou profils séparés) : **Visiteur**, **Amine**, **Sophie Martin**, **Fatou Diallo**
 - [ ] Téléphone prêt avec Amine connecté, pour la version mobile
-- [ ] Un petit PDF sur le bureau, à joindre à un message
+- [ ] Les **fichiers de test** copiés sur le bureau : `docs/demo/fichiers/import-comptes-demo.xlsx` (import) et `docs/demo/fichiers/synthese-chapitre-1.pdf` (pièce jointe)
 - [ ] Si la répétition a fait accepter l'invitation « Révisions BD – soutien » : Sophie invite Amine dans un autre groupe privé, pour en avoir une en attente
 
 ## Déroulé
@@ -45,9 +49,9 @@ Ces comptes sont créés par `DemoProductionSeeder` (SCRUM-188, voir « Charger 
 | Temps | Qui présente | Fenêtre | Ce qu'on montre | Phrase clé |
 |---|---|---|---|---|
 | 0:00 – 1:00 | Chahredine | — | Le problème : la communication d'une université est dispersée (e-mails, WhatsApp, plateformes). | « UniConnect réunit les échanges de chaque classe et de chaque cours, avec un assistant qui répond à partir des supports des enseignants. » |
-| 1:00 – 2:30 | Mansour | Administration | **Années universitaires** (une seule active). **Comptes autorisés** : liste, recherche, **import Excel** avec aperçu des erreurs (modèle téléchargeable). **Groupes organisationnels** : génération automatique. | « Les espaces de classe et de matière sont créés automatiquement à partir des données de la scolarité. » |
-| 2:30 – 3:30 | Moataz | Visiteur | **Inscription** avec `ETU2026-999` / `test@uniconnect.test` : refusée (matricule non autorisé). Puis `ETU2026-003` / `etu2026-003@uniconnect.test` : acceptée, compte en attente d'activation par e-mail. | « Seules les personnes déclarées par la scolarité peuvent créer un compte : le couple matricule + e-mail est vérifié. » |
-| 3:30 – 6:00 | Mouetez | Étudiant | Accueil (non-lus, cloche) → **accepter l'invitation** (confirmation affichée) → « Bases de données » → Discussion → télécharger la fiche de révision → envoyer un message **avec un PDF** → « Messages visibles 30 jours » → **créer un groupe privé** en invitant Yasmine Trabelsi. | « Les messages expirent selon la règle du groupe. Un non-membre ne peut ni lire ni télécharger, même avec le lien direct : c'est vérifié à chaque téléchargement. » |
+| 1:00 – 2:30 | Mansour | Administration | **Années universitaires** (une seule active). **Comptes autorisés** : liste, recherche, **import Excel** de `import-comptes-demo.xlsx` : aperçu (3 valides, 1 doublon, 2 erreurs expliquées), puis « Importer 3 comptes », puis **Ajouter** le compte de Moataz : matricule `ETU2026-100`, l'adresse du **compte Resend**, Étudiant, L2 Informatique A. **Groupes organisationnels** : génération automatique. | « Les espaces de classe et de matière sont créés automatiquement à partir des données de la scolarité. » |
+| 2:30 – 4:00 | Moataz | Visiteur + téléphone | **Inscription** avec `ETU2026-999` / `test@uniconnect.test` : refusée (matricule non autorisé). Puis `ETU2026-100` + l'adresse du compte Resend : « Vérifie ta boîte mail ». **L'e-mail « UniConnect » arrive** (téléphone ou onglet) → clic sur le lien → choix du mot de passe → connecté, déjà membre de « L2 Informatique A » et de ses matières. | « Seules les personnes déclarées par la scolarité peuvent créer un compte : le couple matricule + e-mail est vérifié, et le compte s'active par un lien envoyé à l'adresse institutionnelle. » |
+| 4:00 – 6:00 | Mouetez | Étudiant | Accueil (non-lus, cloche) → **accepter l'invitation** (confirmation affichée) → « Bases de données » → Discussion → télécharger la fiche de révision → envoyer un message **avec le PDF** `synthese-chapitre-1.pdf` → « Messages visibles 30 jours » → **créer un groupe privé** en invitant Yasmine Trabelsi. | « Les messages expirent selon la règle du groupe. Un non-membre ne peut ni lire ni télécharger, même avec le lien direct : c'est vérifié à chaque téléchargement. » |
 | 6:00 – 7:30 | Hayder | Enseignante | **Publier une annonce** (« Salle changée : B14 ») → la notification arrive chez Amine. **Ressources** : chapitres, PDF, badge « Indexé pour l'IA ». **Paramètres** : réglage de l'Assistant IA. | « Le cours devient la base de connaissances de l'assistant. L'enseignant garde la main. » |
 | 7:30 – 10:30 | **Ayoub** | Étudiant | **Assistant IA** : « Quels sont les attributs d'un curseur explicite ? » → réponse avec `[1] Chapitre 3 – Les curseurs PL/SQL · p. 3` → **clic sur la source** : Ressources avec le document en évidence. « Quelle est la différence entre la 3FN et la BCNF ? ». Question hors sujet (« Qui a gagné la Coupe du monde 2022 ? ») : l'assistant dit que le cours n'en parle pas. Vote 👍, quota restant. | « L'IA ne répond qu'à partir du cours, cite la page, et dit quand elle ne sait pas. Elle utilise des services gratuits (Gemini, Groq en secours). » |
 | 10:30 – 12:00 | Chahredine | Téléphone | Même parcours sur mobile (barre de navigation du bas, Discussion), puis bilan : Scrum (Jira, sprints, PR relues), qualité (CI, ~350 tests backend et ~275 frontend, Lighthouse accessibilité 100), suite **v1.1**. | « Ce qui n'est pas encore livré est planifié, pas oublié. » |
@@ -64,10 +68,14 @@ L'interface n'affiche que ce qui est livré. Ces fonctionnalités prévues en v1
 
 Si le jury pose la question, répondre avec la feuille de route v1.1 (Jira).
 
-### Inscription : à savoir
+### Inscription avec e-mail : à savoir
 
-- Un matricule ne s'inscrit **qu'une fois** : `ETU2026-002` pour la répétition, **`ETU2026-003` le jour J**.
-- Sans serveur SMTP configuré sur Render (`MAIL_*`), le compte est créé mais l'application indique que l'e-mail d'activation n'a pas pu être envoyé. Ce message est prévu ; on ne montre pas la suite de l'activation.
+Les e-mails partent par l'**API de Resend** (`MAIL_MAILER=resend`, clé dans `MAIL_PASSWORD`). L'offre gratuite de Render bloque le SMTP. Envoi vérifié en production le 18/11 : inscription, e-mail reçu, compte activé.
+
+- **Une seule adresse peut recevoir** : sans domaine vérifié dans Resend, l'expéditeur est `onboarding@resend.dev` et seule l'adresse du **compte Resend** reçoit les e-mails. Le compte ajouté en direct par l'administration doit donc utiliser cette adresse.
+- **Une adresse ne sert qu'une fois** : après la répétition, la base **doit** être remise à zéro. Sinon l'adresse du compte Resend est déjà utilisée, et comme c'est la seule qui reçoit les e-mails, l'inscription ne peut pas être refaite.
+- **L'e-mail met en général moins d'une minute.** Regarder aussi « Spam » ou « Promotions ». S'il n'arrive pas, l'écran propose « Renvoyer l'e-mail d'activation ». En dernier recours, continuer la démo avec le compte d'Amine (déjà actif).
+- Le lien est valable **48 heures** et ne sert qu'une fois.
 
 ## Charger les données de démo en production (une seule fois)
 
