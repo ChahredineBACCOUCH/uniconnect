@@ -70,13 +70,10 @@ Mise en place les 08/11 et 09/11 (SCRUM-31, SCRUM-32, SCRUM-33). État vérifié
 | `QUEUE_CONNECTION` | Render | `database` — les e-mails et traitements passent par la file | Non |
 | `LOG_CHANNEL` | Render | `stderr` — les logs s'affichent directement dans Render | Non |
 | `PORT` | Render | `80` — nginx écoute sur le port 80 dans le conteneur | Non |
-| `MAIL_MAILER` | Render | Pilote d'envoi des e-mails (`smtp`) | Non |
-| `MAIL_HOST` | Render | Hôte SMTP du service gratuit choisi | Non |
-| `MAIL_PORT` | Render | Port SMTP (`587` en général) | Non |
-| `MAIL_SCHEME` | Render | `smtp` ou `smtps` selon le fournisseur (Laravel 13 n'utilise plus `MAIL_ENCRYPTION`) | Non |
-| `MAIL_USERNAME` | Render | Identifiant SMTP | Non |
-| `MAIL_PASSWORD` | Render | Mot de passe SMTP | **Oui** |
-| `MAIL_FROM_ADDRESS` | Render | Adresse d'expéditeur des e-mails d'activation | Non |
+| `MAIL_MAILER` | Render | `resend` : API HTTP de Resend. L'offre gratuite de Render **bloque les ports SMTP sortants** (25, 465, 587), donc `smtp` échoue (« Connection timed out ») | Non |
+| `RESEND_API_KEY` | Render | Clé API Resend (`re_…`, permission *Sending access*) | **Oui** |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_SCHEME`, `MAIL_USERNAME`, `MAIL_PASSWORD` | Local | Uniquement pour un SMTP local (Mailpit…) ; inutiles avec `resend` | — |
+| `MAIL_FROM_ADDRESS` | Render | Adresse d'expéditeur. Sans domaine vérifié dans Resend : `onboarding@resend.dev`, et Resend n'envoie **qu'à l'adresse du compte Resend** (mode test) | Non |
 | `MAIL_FROM_NAME` | Render | Nom d'expéditeur (`UniConnect`) | Non |
 | `FILESYSTEM_DISK` | Render | `s3` (bucket Supabase). `local` n'est pas persistant sur Render | Non |
 | `AWS_ACCESS_KEY_ID` | Render | Access key ID S3 de Supabase (section 3.6) | **Oui** |

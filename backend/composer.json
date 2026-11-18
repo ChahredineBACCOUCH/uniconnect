@@ -12,6 +12,7 @@
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "maatwebsite/excel": "^4.0",
+        "resend/resend-php": "^1.18",
         "smalot/pdfparser": "^2.13"
     },
     "require-dev": {
