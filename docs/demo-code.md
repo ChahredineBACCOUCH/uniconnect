@@ -6,6 +6,8 @@ Pour répondre au jury quand il demande « montrez-moi le code de cette fonction
 - **comment** cela fonctionne, en quelques phrases ;
 - **la phrase** à dire si le jury creuse.
 
+**Pour le dérouler à l'oral, ligne par ligne** : [presenter-le-code.md](presenter-le-code.md).
+
 Les chemins partent de la racine du dépôt. Numéros de ligne relevés sur `main` le 26/11/2026.
 
 ## 0. Architecture en une minute
