@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
+import { useDisplay } from 'vuetify'
 
 import { envoyerMessage, modifierMessage, recupererMessages, supprimerMessage } from '@/api/espaces'
 import { usePolling } from '@/composables/usePolling'
@@ -14,6 +15,9 @@ const props = defineProps({
 })
 
 const auth = useAuthStore()
+
+// SCRUM-172 : le dialogue de suppression passe en plein écran sur téléphone.
+const { xs } = useDisplay()
 
 const messages = ref([])
 const chargement = ref(true)
@@ -238,6 +242,7 @@ function notifier(texte) {
     <v-dialog
       :model-value="suppressionOuverte"
       max-width="430"
+      :fullscreen="xs"
       @update:model-value="fermerSuppression"
     >
       <v-card>

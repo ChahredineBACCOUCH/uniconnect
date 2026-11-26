@@ -371,6 +371,7 @@ async function confirmerActivation() {
     <v-dialog
       :model-value="anneeAActiver !== null"
       max-width="520"
+      :fullscreen="xs"
       @update:model-value="(ouverte) => !ouverte && (anneeAActiver = null)"
     >
       <v-card v-if="anneeAActiver">
