@@ -29,7 +29,7 @@ Le backend expose une route de santé (`GET /api/health`) qui vérifie aussi la 
 
 ## Vidéo de démonstration
 
-▶️ **Vidéo (3 min 49)** : [uniconnect-demo-v1.0.webm](https://github.com/ChahredineBACCOUCH/uniconnect/releases/download/v1.0/uniconnect-demo-v1.0.webm) — à télécharger, se lit avec Chrome, Edge ou VLC.
+▶️ **Regarder la vidéo en ligne (3 min 49) : <https://chahredinebaccouch.github.io/uniconnect/>**
 
 Elle est publiée avec le cahier des charges dans la release [**v1.0**](https://github.com/ChahredineBACCOUCH/uniconnect/releases/tag/v1.0). Elle montre l'inscription contrôlée, l'administration (import Excel, génération des groupes), l'espace étudiant, l'enseignante et l'Assistant IA. Le scénario de la démonstration en direct est dans [`docs/demo.md`](docs/demo.md) et le pas à pas dans [`docs/demo-pas-a-pas.md`](docs/demo-pas-a-pas.md).
 
