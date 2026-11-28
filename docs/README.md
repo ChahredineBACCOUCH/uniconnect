@@ -5,6 +5,7 @@ Livraison : **jeudi 19/11/2026** · gel du code : **mardi 17/11 à 18 h**.
 
 | Document | À quoi il sert | Ticket Jira |
 |---|---|---|
+| [cahier-des-charges.md](cahier-des-charges.md) | **Cahier des charges de la version déployée (v1.0)** : objectifs, acteurs, exigences livrées, règles, technologies, liens (version PDF : [cahier-des-charges.pdf](cahier-des-charges.pdf)) | — |
 | [installation.md](installation.md) | Installer le projet de zéro (prérequis, Docker, backend, frontend, clés Gemini/Groq, dépannage) | SCRUM-186, SCRUM-26 |
 | [architecture.md](architecture.md) | Comment l'application est construite : schéma, dossiers, sécurité, fonctionnement de l'Assistant IA | SCRUM-186 |
 | [api.md](api.md) | **Contrat de l'API** : routes, données envoyées et reçues, codes d'erreur. Le backend et le frontend s'appuient dessus | SCRUM-186 |

@@ -1,8 +1,10 @@
 # UniConnect
 
-Application de communication universitaire : espaces de classe et de matière, groupes privés, channels, et un Assistant IA qui répond à partir des supports de cours.
+Application de communication universitaire : espaces de classe et de matière créés automatiquement, groupes privés, annonces, ressources de cours, et un **Assistant IA** qui répond uniquement à partir des supports des enseignants, en citant la page.
 
-Projet étudiant 2026/2027 · livraison le **19/11/2026** (gel du code le 17/11 à 18 h).
+Projet étudiant 2026/2027 · **v1.0 livrée et en production** (démonstration le 19/11/2026).
+
+📄 **Cahier des charges de la version déployée : [`docs/cahier-des-charges.md`](docs/cahier-des-charges.md)** (version PDF : [`docs/cahier-des-charges.pdf`](docs/cahier-des-charges.pdf)).
 
 📚 **Documentation complète : [`docs/`](docs/README.md)**. On y trouve l'architecture, le contrat d'API, le schéma SQL, les diagrammes, le déploiement, le plan de tests, la démo et le guide utilisateur. Ce README couvre seulement l'installation locale.
 
@@ -25,9 +27,52 @@ Le backend expose une route de santé (`GET /api/health`) qui vérifie aussi la 
 | API (Render) | <https://uniconnect-api-qov1.onrender.com> |
 | Santé de l'API | <https://uniconnect-api-qov1.onrender.com/api/health> (doit répondre `"db": "ok"`) |
 
+## Vidéo de démonstration
+
+▶️ **Vidéo** : lien ajouté après l'enregistrement (voir aussi le scénario [`docs/demo.md`](docs/demo.md) et le pas à pas [`docs/demo-pas-a-pas.md`](docs/demo-pas-a-pas.md)).
+
+## Fonctionnalités de la v1.0 (en production)
+
+| Profil | Fonctionnalités |
+|---|---|
+| **Visiteur** | Inscription contrôlée (matricule + e-mail de la liste de la scolarité), e-mail d'activation (lien signé 48 h), connexion (blocage 15 min après 5 échecs) |
+| **Étudiant** | Accueil avec non-lus, discussions de classe et de matière, pièces jointes, messages qui expirent selon la règle du groupe, annonces, notifications, ressources de cours, groupes privés et invitations, **Assistant IA** avec sources citées (20 questions/jour) |
+| **Enseignant** | Annonces (avec e-mail optionnel), chapitres et ressources, indexation automatique des PDF pour l'IA, activation et consigne de l'Assistant IA, gestion des membres |
+| **Administration** | Années universitaires (une seule active), référentiels, comptes autorisés avec **import Excel** (aperçu des erreurs), **génération automatique des groupes** de classe et de matière, synchronisation, archivage |
+
+Prévu en v1.1 (masqué en v1.0) : mot de passe oublié, recherche globale, profil, channels, modération, tableau de bord d'administration. Détail : [cahier des charges § 10](docs/cahier-des-charges.md).
+
+## Technologies et services
+
+| Partie | Technologies |
+|---|---|
+| Backend | PHP 8.4, Laravel 13, Sanctum, PostgreSQL 16 (recherche plein texte `tsvector`), maatwebsite/excel, smalot/pdfparser |
+| Frontend | Vue 3, Vuetify 3, Pinia, Vue Router, Axios, Vite |
+| Assistant IA | RAG : recherche PostgreSQL dans les PDF du cours, puis **Gemini** (Groq en secours) |
+| Tests et qualité | PHPUnit, Pint, Vitest, oxlint, ESLint, GitHub Actions (CI sur chaque pull request) |
+| Local | Docker Compose (PostgreSQL + Mailpit), Bruno |
+
+| Service (offres gratuites) | Rôle |
+|---|---|
+| [Vercel](https://vercel.com) | Hébergement du frontend |
+| [Render](https://render.com) | API Laravel en Docker |
+| [Neon](https://neon.tech) | Base PostgreSQL |
+| [Supabase Storage](https://supabase.com) | Fichiers (bucket privé compatible S3) |
+| [Resend](https://resend.com) | E-mails d'activation et d'annonce |
+| [Google AI Studio](https://aistudio.google.com) / [Groq](https://groq.com) | Modèles d'IA |
+| [Jira](https://uniconnectteam26.atlassian.net/jira/software/projects/SCRUM/boards/1) / GitHub | Scrum, code, revues, CI |
+
+Fonctionnement détaillé : [`docs/architecture.md`](docs/architecture.md) · déploiement : [`docs/deploiement.md`](docs/deploiement.md).
+
+## Équipe
+
+Chahredine Baccouche · Mansour Naili · Moataz Rabia · Mouetez Bouajila · Hayder Ramma · Ayoub Boussoukaya — encadrant : M. Rabii Mejai.
+
 ## Liens
 
+- **Code source** : <https://github.com/ChahredineBACCOUCH/uniconnect>
 - **Jira** : <https://uniconnectteam26.atlassian.net/jira/software/projects/SCRUM/boards/1>
+- **Cahier des charges** : [`docs/cahier-des-charges.md`](docs/cahier-des-charges.md)
 - **Maquette** : [`docs/maquette/`](docs/maquette/)
 - **Documentation complète** : [`docs/`](docs/README.md) (architecture, API, conception, déploiement, tests, démo, guide utilisateur)
 - **Collection Bruno** (tests manuels de l'API) : [`docs/api/`](docs/api/)
@@ -120,11 +165,39 @@ VITE_API_URL=http://localhost:8000/api
 
 Si vous changez le port du backend, mettez aussi à jour cette valeur puis relancez `npm run dev`.
 
-### 5. Vérifier que tout fonctionne
+### 5. (Optionnel) Données complètes de la démo et Assistant IA
+
+Pour retrouver en local les données de la démonstration (cours « Bases de données » avec 3 PDF indexés, discussion, annonces, groupe privé, invitation) :
+
+```bash
+cd backend
+php artisan db:seed --class=DemoProductionSeeder
+```
+
+Pour que l'**Assistant IA** réponde, ajoutez dans `backend/.env` une clé gratuite Gemini (et Groq en secours), puis `php artisan config:clear` :
+
+```dotenv
+GEMINI_API_KEY=votre_cle_gemini
+GROQ_API_KEY=votre_cle_groq
+```
+
+Les clés se créent sur <https://aistudio.google.com/apikey> et <https://console.groq.com/keys> (détails : [`docs/installation.md`](docs/installation.md) § 4.1). Sans clé, l'Assistant répond « momentanément indisponible ».
+
+Les PDF ajoutés depuis l'interface sont indexés en arrière-plan : lancez le worker dans un **troisième terminal** :
+
+```bash
+cd backend
+php artisan queue:work
+```
+
+### 6. Vérifier que tout fonctionne
 
 1. Ouvrez <http://localhost:8000/api/health> : la réponse doit contenir `"status": "ok"` et `"db": "ok"`.
 2. Ouvrez <http://localhost:5173> : l'application frontend doit s'afficher.
-3. Ouvrez <http://localhost:8025> : l'interface Mailpit doit être accessible.
+3. Ouvrez <http://localhost:8025> : l'interface Mailpit doit être accessible. En local, **tous les e-mails** (activation, annonces) arrivent ici.
+4. Connectez-vous sur <http://localhost:5173> avec un compte de démo (ci-dessous).
+
+**Résumé (3 terminaux)** : `docker compose up -d` → `cd backend && php artisan serve` → `cd frontend && npm run dev` (+ `php artisan queue:work` pour l'indexation des PDF).
 
 ## Comptes de démo
 
