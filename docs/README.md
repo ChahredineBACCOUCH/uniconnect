@@ -5,6 +5,7 @@ Livraison : **jeudi 19/11/2026** · gel du code : **mardi 17/11 à 18 h**.
 
 | Document | À quoi il sert | Ticket Jira |
 |---|---|---|
+| [cahier-des-charges.md](cahier-des-charges.md) | **Cahier des charges de la version déployée (v1.0)** : objectifs, acteurs, exigences livrées, règles, technologies, liens (version PDF : [cahier-des-charges.pdf](cahier-des-charges.pdf)) | — |
 | [installation.md](installation.md) | Installer le projet de zéro (prérequis, Docker, backend, frontend, clés Gemini/Groq, dépannage) | SCRUM-186, SCRUM-26 |
 | [architecture.md](architecture.md) | Comment l'application est construite : schéma, dossiers, sécurité, fonctionnement de l'Assistant IA | SCRUM-186 |
 | [api.md](api.md) | **Contrat de l'API** : routes, données envoyées et reçues, codes d'erreur. Le backend et le frontend s'appuient dessus | SCRUM-186 |
@@ -17,6 +18,8 @@ Livraison : **jeudi 19/11/2026** · gel du code : **mardi 17/11 à 18 h**.
 | [api/](api/) | Collection Bruno versionnée des routes de l'API (Auth, Espaces, Messages, Fichiers, IA, Admin) | SCRUM-175 |
 | [demo.md](demo.md) | Scénario de la démonstration du 19/11 (15 minutes) | SCRUM-187 |
 | [demo-pas-a-pas.md](demo-pas-a-pas.md) | Démonstration détaillée : chaque clic et la valeur exacte de chaque champ | SCRUM-187 |
+| [demo-code.md](demo-code.md) | Le code derrière chaque étape de la démo (fichier, ligne, fonctionnement) | SCRUM-187 |
+| [presenter-le-code.md](presenter-le-code.md) | Présenter le code au jury, ligne par ligne (11 fiches avec le test à lancer) | SCRUM-187 |
 | [guide-utilisateur.md](guide-utilisateur.md) | Mode d'emploi pour l'étudiant, l'enseignant et l'administration | SCRUM-185 |
 
 Installation du projet en local : voir le [README principal](../README.md).
