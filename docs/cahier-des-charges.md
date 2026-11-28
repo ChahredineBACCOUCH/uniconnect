@@ -1,247 +1,271 @@
-# Cahier des charges — UniConnect v1.0 (version déployée)
+# Application de communication universitaire : groupes, partage pédagogique et Assistant IA — version 1.0 déployée
 
-| Élément | Détail |
-|---|---|
-| **Projet** | UniConnect, plateforme de communication universitaire avec Assistant IA |
-| **Version décrite** | **v1.0**, version en production |
-| **Cadre** | Projet étudiant, année universitaire 2026/2027 |
-| **Encadrant** | M. Rabii Mejai |
-| **Équipe** | Chahredine Baccouche, Mansour Naili, Moataz Rabia, Mouetez Bouajila, Hayder Ramma, Ayoub Boussoukaya |
-| **Date du document** | 28/11/2026 |
+## 1. Contexte
 
-Ce document décrit **ce qui est livré et en ligne** : il sert de référence pour l'évaluation. Les fonctions prévues mais non livrées sont listées à part (§ 10, v1.1).
+Au sein d'une université, les étudiants, les enseignants et les membres de l'administration doivent échanger des informations, partager des documents et organiser des discussions autour des cours, des classes et des activités de l'établissement. Aujourd'hui, ces échanges sont dispersés : groupes de messagerie personnels non maîtrisés par l'établissement, courriers électroniques, affichage physique, plateformes pédagogiques multiples. Il en résulte une perte d'information, l'absence de contrôle sur la diffusion des contenus et un suivi difficile des échanges.
 
----
+**UniConnect** est l'application de communication universitaire réalisée pour répondre à ce besoin. Ce document décrit la **version 1.0, déployée en production** : ce qui est livré, les règles appliquées et ce qui est reporté à la version 1.1. La version 1.0 propose deux types d'espaces de communication :
 
-## 1. Liens du projet
+- les **groupes organisationnels**, liés à la structure de l'université (année, classe, matière, enseignant), créés automatiquement ;
+- les **groupes privés**, créés par un utilisateur autorisé et accessibles uniquement sur invitation.
 
-| Élément | Lien |
-|---|---|
-| Application en ligne | <https://uniconnect-six-lake.vercel.app> |
-| API (Render) | <https://uniconnect-api-qov1.onrender.com/api> |
-| État de l'API | <https://uniconnect-api-qov1.onrender.com/api/health> (réponse attendue : `"status": "ok"`, `"db": "ok"`) |
-| Code source (GitHub) | <https://github.com/ChahredineBACCOUCH/uniconnect> |
-| Gestion de projet (Jira) | <https://uniconnectteam26.atlassian.net/jira/software/projects/SCRUM/boards/1> |
-| Documentation | [`docs/`](README.md) dans le dépôt |
-| Installation en local | [`README.md`](../README.md) à la racine du dépôt |
-| Vidéo de démonstration | voir le [README](../README.md#vidéo-de-démonstration) |
+Les **channels communautaires** existent dans le modèle de données ; leur création et leur annuaire sont prévus en version 1.1.
 
-**Comptes de démonstration** (mot de passe `Demo1234!`) :
+La version 1.0 ajoute un **Assistant IA** dans les groupes de matière : il répond aux questions des étudiants **uniquement à partir des supports publiés par l'enseignant**, en citant le document et la page.
 
-| Profil | E-mail |
-|---|---|
-| Étudiant (Amine Benali, L2 Informatique A) | `etudiant@demo.uniconnect` |
-| Enseignante (Sophie Martin, Bases de données) | `enseignant@demo.uniconnect` |
-| Administration (Fatou Diallo) | `admin@demo.uniconnect` |
+Ce projet s'inscrit dans la matière « Projet d'intégration » et a été conduit selon une démarche Scrum (§16).
 
-> L'API est hébergée sur une offre gratuite : après 15 minutes sans visite, le serveur s'endort. La première requête prend alors environ une minute ; l'application affiche « Le serveur se réveille ».
+**Application en ligne** : <https://uniconnect-six-lake.vercel.app> · **Vidéo de démonstration** : <https://chahredinebaccouch.github.io/uniconnect/> · **Code source** : <https://github.com/ChahredineBACCOUCH/uniconnect>
 
----
+## 2. Objectifs du projet
 
-## 2. Contexte et problème
+La version 1.0 permet :
 
-Dans une université, la communication est dispersée : e-mails, groupes WhatsApp, plateformes pédagogiques, affichage. Les étudiants manquent des annonces, les supports de cours sont éparpillés, et rien ne garantit que seules les bonnes personnes ont accès aux échanges d'une classe.
+- la gestion des utilisateurs selon trois profils (étudiant, enseignant, administration), avec des droits adaptés à chaque profil ;
+- la création automatique des groupes par classe et par matière à partir des référentiels de la scolarité ;
+- la création de groupes privés sur invitation ;
+- l'envoi de messages contenant du texte, des images et des documents ;
+- la définition, par le propriétaire de l'espace, d'une durée de visibilité des messages limitée ou illimitée ;
+- la communication pédagogique autour des cours : annonces, ressources classées par chapitre ;
+- un **Assistant IA** qui répond à partir des supports du cours, avec citation des sources ;
+- le contrôle strict de l'accès aux conversations et aux documents, vérifié côté serveur ;
+- une utilisation sur ordinateur et sur téléphone.
 
-## 3. Objectifs
+## 3. Paramétrage administratif préalable
 
-1. **Réunir** les échanges de chaque classe et de chaque cours dans un espace unique.
-2. **Créer automatiquement** les espaces de classe et de matière à partir des données de la scolarité.
-3. **Contrôler l'accès** : seules les personnes déclarées par la scolarité peuvent créer un compte ; chaque espace n'est visible que par ses membres.
-4. **Aider les étudiants** avec un Assistant IA qui répond **uniquement à partir des supports de l'enseignant**, en citant la source et la page.
-5. Fonctionner **sur ordinateur et sur téléphone**, avec un hébergement **gratuit**.
+Le paramétrage est réalisé par les membres de l'administration disposant du droit **Gérer le paramétrage**, dans la section « Administration » du menu.
 
----
+### 3.1 Gestion des années universitaires
 
-## 4. Acteurs
+Un écran permet d'ajouter une année universitaire (ex. 2026/2027), de la modifier, de consulter la liste des années et d'activer une année. **Une seule année peut être active à la fois** : la règle est garantie par la base de données elle-même (index unique). À l'activation d'une nouvelle année, l'administration peut archiver les groupes de l'année précédente.
 
-| Acteur | Description | Droits principaux |
-|---|---|---|
-| **Visiteur** | Personne non connectée | Créer son compte (si autorisée), activer, se connecter |
-| **Étudiant** | Rattaché à une classe | Lire et écrire dans ses espaces, télécharger les supports, créer un groupe privé, poser des questions à l'Assistant IA |
-| **Enseignant** | Responsable d'une ou plusieurs matières | Comme l'étudiant, plus : publier des annonces, déposer des ressources, gérer les membres de ses espaces, activer l'Assistant IA |
-| **Administration** | Personnel de la scolarité | Années universitaires, référentiels, comptes autorisés (dont import Excel), génération des groupes organisationnels |
+**Règle bloquante :** si aucune année universitaire n'est active, la plateforme est fermée : l'inscription est refusée (« plateforme fermée ») et la génération des groupes organisationnels est impossible, avec un message explicite.
 
-Les droits sont **vérifiés côté serveur** (Policies et Gates Laravel), pas seulement dans l'interface.
+### 3.2 Gestion des référentiels académiques
 
----
+Des écrans dédiés permettent de saisir, modifier et désactiver :
 
-## 5. Besoins fonctionnels livrés (v1.0)
+- les départements ;
+- les filières (rattachées à un département) ;
+- les niveaux ;
+- les classes (rattachées à un niveau, à une filière et à l'année) ;
+- les matières, avec l'enseignant responsable et les classes concernées.
 
-Statut : ✅ livré et déployé.
+Un élément déjà utilisé ne peut pas être supprimé, seulement désactivé. Ces référentiels servent de base à la génération des groupes organisationnels (§6.1).
 
-### 5.1 Comptes et accès
+### 3.3 Gestion des comptes autorisés
 
-| Réf. | Exigence | Statut |
-|---|---|---|
-| F01 | **Inscription contrôlée** : matricule + e-mail doivent figurer dans la liste des comptes autorisés de l'année active ; un seul compte par matricule ; refus expliqué en français (plateforme fermée, non autorisé, déjà inscrit). | ✅ |
-| F02 | **E-mail d'activation** avec lien signé valable 48 h, utilisable une seule fois ; bouton « Renvoyer l'e-mail d'activation ». | ✅ |
-| F03 | **Activation** : choix du mot de passe (8 caractères minimum, une majuscule, un chiffre), connexion directe, rattachement automatique aux groupes de sa classe et de ses matières. | ✅ |
-| F04 | **Connexion / déconnexion** par e-mail et mot de passe ; blocage 15 minutes après 5 échecs ; compte suspendu ou désactivé refusé. | ✅ |
+Un utilisateur disposant du droit **Gérer les utilisateurs** constitue la liste des personnes autorisées à créer un compte : matricule, nom, prénom, adresse électronique institutionnelle, profil et, pour un étudiant, sa classe.
 
-### 5.2 Administration
+Fonctions livrées : liste paginée, recherche, filtres (profil, classe, état), ajout, modification, désactivation, suppression et **import Excel**. L'import se fait en deux temps : un **aperçu** vérifie chaque ligne sans rien enregistrer (lignes valides, doublons, erreurs expliquées ligne par ligne), puis seules les lignes valides sont importées. Un modèle Excel est téléchargeable.
 
-| Réf. | Exigence | Statut |
-|---|---|---|
-| F05 | **Années universitaires** : créer, modifier, activer ; **une seule année active** ; archivage optionnel des groupes de l'année précédente. | ✅ |
-| F06 | **Référentiels** : départements, filières, niveaux, classes, matières (création, modification, désactivation). | ✅ |
-| F07 | **Comptes autorisés** : liste paginée, recherche, filtres, ajout, modification, désactivation. | ✅ |
-| F08 | **Import Excel** des comptes autorisés : modèle téléchargeable, aperçu ligne par ligne (valides, doublons, erreurs expliquées) **sans rien écrire**, puis import des seules lignes valides. | ✅ |
-| F09 | **Génération automatique des groupes organisationnels** : un groupe par classe, un groupe par matière ; aperçu ; relance sans doublon ; **synchronisation** d'un groupe ; archivage. | ✅ |
+**Règle bloquante :** une personne ne peut créer un compte que si son matricule et son adresse électronique institutionnelle figurent ensemble dans la liste des comptes autorisés de l'année active. Dans le cas contraire, la création est refusée avec un message explicite.
 
-### 5.3 Espaces et membres
+### 3.4 Gestion des droits utilisateurs
 
-| Réf. | Exigence | Statut |
-|---|---|---|
-| F10 | **Accueil** : mes espaces (classe, matières, groupes privés) avec le nombre de messages non lus. | ✅ |
-| F11 | **Groupe privé** : création par un étudiant ou un enseignant, choix de la durée de visibilité des messages. | ✅ |
-| F12 | **Invitations** : inviter des personnes (recherche), accepter ou refuser ; expiration après 14 jours. | ✅ |
-| F13 | **Membres** : liste, rôles (propriétaire, co-gestionnaire, membre), retirer, transférer la propriété, quitter. Un retrait coupe l'accès immédiatement. | ✅ |
+Chaque profil reçoit des droits par défaut à l'activation de son compte (par exemple, **Créer des groupes privés** pour les étudiants et les enseignants). Le compte d'administration initial dispose de tous les droits : Gérer le paramétrage, Gérer les utilisateurs, Créer des groupes organisationnels, Créer des groupes privés, Créer des channels, Modérer, Consulter le tableau de bord.
 
-### 5.4 Communication
+Les droits sont **vérifiés côté serveur à chaque requête**. L'écran d'attribution individuelle des droits est prévu en version 1.1.
 
-| Réf. | Exigence | Statut |
-|---|---|---|
-| F14 | **Discussion** de groupe : envoyer, répondre, modifier et supprimer ses messages ; nouveaux messages affichés automatiquement (toutes les 5 s). | ✅ |
-| F15 | **Pièces jointes** : jusqu'à 5 fichiers de 25 Mo par message (PDF, images, Office, ZIP) ; aperçu des images. | ✅ |
-| F16 | **Expiration des messages** selon la règle du groupe (24 h, 7 jours, 30 jours ou illimitée), fixée à l'envoi. | ✅ |
-| F17 | **Annonces** officielles par les gestionnaires, avec pièces jointes et envoi optionnel par e-mail. | ✅ |
-| F18 | **Notifications** dans l'application (annonce, invitation, ressource…) avec compteur de non-lues. | ✅ |
+### 3.5 Règles de visibilité par défaut
 
-### 5.5 Ressources pédagogiques et Assistant IA
+Les durées proposées sont : **24 heures, 7 jours, 30 jours ou illimitée**. Une durée par défaut s'applique à chaque type d'espace : 30 jours pour les groupes organisationnels, 7 jours pour les groupes privés. En version 1.0, ces valeurs sont fixées dans la configuration de l'application ; leur écran d'administration est prévu en version 1.1.
 
-| Réf. | Exigence | Statut |
-|---|---|---|
-| F19 | **Ressources** : chapitres ordonnés, fichiers ou liens ; renommer, déplacer, supprimer ; téléchargement réservé aux membres. | ✅ |
-| F20 | **Indexation automatique** des PDF pour l'IA (en arrière-plan), badge « Indexé pour l'IA ». | ✅ |
-| F21 | **Activation de l'Assistant IA** par l'enseignant gestionnaire, avec une consigne optionnelle. | ✅ |
-| F22 | **Questions à l'Assistant IA** : réponse rédigée **uniquement** à partir des supports du groupe, avec **sources citées** (document et page) cliquables. | ✅ |
-| F23 | **Réponse honnête** : si le cours ne contient pas la réponse, l'assistant le dit au lieu d'inventer. | ✅ |
-| F24 | **Quota** de 20 questions par jour et par personne ; **avis** 👍/👎 sur chaque réponse. | ✅ |
-| F25 | **Continuité** : bascule automatique de Gemini vers Groq en cas de panne ou de quota atteint. | ✅ |
+## 4. Profils des utilisateurs
 
----
+### Étudiant
 
-## 6. Règles de gestion principales
+L'étudiant peut :
 
-| Réf. | Règle |
-|---|---|
-| R01 | Une seule année universitaire active à la fois (garantie par un index unique en base). |
-| R02 | Seules les personnes de la liste des comptes autorisés de l'année active peuvent s'inscrire. |
-| R03 | Un étudiant actif est toujours rattaché à une classe. |
-| R04 | Un espace n'est accessible (messages, fichiers, ressources, IA) qu'à ses membres, vérifié **en base à chaque requête**. |
-| R05 | On n'invite pas dans un groupe de classe ou de matière : ses membres viennent des référentiels. |
-| R06 | Un espace a toujours un propriétaire. |
-| R07 | La date d'expiration d'un message est fixée à l'envoi ; une pièce jointe expire avec son message. |
-| R08 | Un groupe archivé est en lecture seule. |
-| R09 | L'Assistant IA ne cherche que dans les ressources de l'espace et n'envoie à l'IA que des extraits de cours (aucune donnée personnelle). |
+- créer son compte et l'activer par le lien reçu par e-mail ;
+- accéder automatiquement aux groupes organisationnels de sa classe et de ses matières ;
+- accepter ou refuser une invitation à un groupe privé ;
+- créer un groupe privé (droit accordé par défaut) et inviter des membres ;
+- envoyer des messages, des images et des documents dans les espaces dont il est membre ;
+- consulter les annonces et télécharger les ressources partagées ;
+- poser des questions à l'Assistant IA du cours (20 questions par jour) et noter les réponses ;
+- consulter ses notifications.
 
----
+### Enseignant
 
-## 7. Besoins non fonctionnels
+En plus des fonctions de l'étudiant, l'enseignant peut :
 
-| Domaine | Exigence | Comment c'est respecté |
-|---|---|---|
-| **Sécurité** | Mots de passe protégés | Hachage bcrypt, jamais stockés en clair |
-| | Authentification | Jeton Sanctum dans l'en-tête `Authorization` |
-| | Contrôle d'accès | Policies et middleware côté serveur ; 403 même avec un lien direct |
-| | Anti-abus | Limitation des requêtes (inscription 10/min, renvoi d'e-mail 5/min), blocage après 5 échecs de connexion |
-| | Fichiers | Stockage objet **privé**, noms aléatoires, téléchargement uniquement via l'API |
-| | Secrets | Variables d'environnement (Render, Vercel), jamais dans Git |
-| **Ergonomie** | Interface en français, messages d'erreur clairs | Validation avec messages par champ |
-| **Mobile** | Utilisable sur téléphone | Mise en page responsive, navigation en bas d'écran, dialogues plein écran |
-| **Accessibilité** | Contrastes, navigation clavier | Lien « Aller au contenu », contrastes renforcés ; Lighthouse accessibilité 100 |
-| **Disponibilité** | Pas de coupure lors d'une mise à jour | Render ne bascule qu'après réponse de `/api/health` ; retour arrière en un clic |
-| **Qualité** | Code testé | ≈ 360 tests backend (PHPUnit) et ≈ 275 tests frontend (Vitest), lancés automatiquement à chaque pull request |
-| **Coût** | Hébergement gratuit | Offres gratuites de Vercel, Render, Neon, Supabase, Resend, Gemini et Groq |
+- être propriétaire des groupes des matières dont il est responsable ;
+- publier des annonces, avec pièces jointes et envoi optionnel par e-mail ;
+- classer ses supports de cours par chapitre (fichiers ou liens), les renommer, les déplacer, les supprimer ;
+- activer l'Assistant IA de son cours et lui donner une consigne ;
+- inviter, retirer des membres, nommer des co-gestionnaires et transférer la propriété dans les espaces qu'il gère.
 
----
+### Membre de l'administration
 
-## 8. Architecture technique
+Les actions du membre de l'administration découlent des droits qui lui sont accordés (§3.4) :
 
-```
-Navigateur (PC ou téléphone)
-   │ HTTPS
-   ▼
-Frontend Vue 3 + Vuetify ─── hébergé sur Vercel
-   │ API REST JSON + jeton Bearer (Sanctum)
-   ▼
-API Laravel 13 (PHP 8.4) ─── image Docker sur Render
-   ├── PostgreSQL 16 (Neon) : données + recherche plein texte française
-   ├── Supabase Storage (compatible S3, privé) : fichiers
-   ├── Gemini, puis Groq en secours : Assistant IA
-   └── Resend (API HTTP) : e-mails
-```
+- paramétrer la plateforme (années universitaires, référentiels) ;
+- gérer les comptes autorisés, y compris par import Excel ;
+- générer, synchroniser et archiver les groupes organisationnels.
 
-Dans le conteneur Render, Supervisor fait tourner : **nginx** (serveur web), **php-fpm** (Laravel), un **worker** de file d'attente (indexation des PDF, e-mails) et le **planificateur** (expiration des invitations chaque nuit).
+### Page profil (tout utilisateur)
 
----
+La page de profil (photo, informations de contact, mot de passe, préférences de notification) est prévue en version 1.1. En version 1.0, un utilisateur ne peut modifier ni son profil ni ses droits.
 
-## 9. Technologies et outils utilisés
+### Matrice des permissions (version 1.0)
 
-### 9.1 Développement
+| Action | Étudiant | Enseignant | Administration |
+|---|---|---|---|
+| Générer les groupes organisationnels | Non | Non | Oui |
+| Créer un groupe privé | Oui | Oui | Oui |
+| Inviter / retirer des membres | Gestionnaire | Gestionnaire | Gestionnaire |
+| Fixer la durée de visibilité (à la création) | Créateur | Créateur | Créateur |
+| Publier une annonce | Gestionnaire | Gestionnaire | Gestionnaire |
+| Déposer des ressources de cours | Gestionnaire | Gestionnaire | Gestionnaire |
+| Activer l'Assistant IA | Non | Gestionnaire | Non |
+| Modifier / supprimer un message | Ses messages | Ses messages | Ses messages |
+| Gérer les comptes autorisés et les référentiels | Non | Non | Oui (selon droits) |
 
-| Partie | Technologies |
-|---|---|
-| Backend | PHP 8.4, **Laravel 13**, Laravel Sanctum, Eloquent, Policies, files d'attente (driver `database`), maatwebsite/excel (import Excel), smalot/pdfparser (lecture des PDF), resend/resend-php |
-| Frontend | **Vue 3** (Composition API), **Vuetify 3**, Pinia, Vue Router, Axios, Vite |
-| Base de données | **PostgreSQL 16** (`tsvector` + index GIN pour la recherche, index uniques partiels) ; SQLite pour les tests locaux |
-| IA | **Gemini** (Google) en principal, **Groq** (modèle `gpt-oss`) en secours, technique **RAG** |
-| Tests et qualité | PHPUnit, Laravel Pint, **Vitest**, oxlint, ESLint, Prettier, Lighthouse |
-| Local | Docker Compose (PostgreSQL + Mailpit), Bruno (tests manuels de l'API) |
+« Gestionnaire » désigne le propriétaire ou un co-gestionnaire de l'espace.
 
-### 9.2 Hébergement et services (offres gratuites)
+## 5. Processus d'accès à la plateforme
 
-| Service | Usage |
-|---|---|
-| **Vercel** | Frontend (build Vite, CDN) |
-| **Render** | API Laravel dans une image Docker (région Francfort) |
-| **Neon** | Base PostgreSQL gérée |
-| **Supabase Storage** | Fichiers (bucket privé compatible S3) |
-| **Resend** | Envoi des e-mails (API HTTP, le SMTP étant bloqué par Render) |
-| **Google AI Studio (Gemini)** / **Groq** | Modèles d'IA |
+### Étape 0 : Prérequis
 
-### 9.3 Gestion de projet et collaboration
+- Une année universitaire doit être active (§3.1).
+- La personne doit figurer dans la liste des comptes autorisés (§3.3).
 
-| Outil | Usage |
-|---|---|
-| **Jira** (Scrum) | Backlog, epics, user stories, sprints, suivi des tickets `SCRUM-xx` |
-| **GitHub** | Code source, pull requests avec relecture obligatoire, fusion « Squash and merge » |
-| **GitHub Actions** | Intégration continue : formatage, tests backend sur PostgreSQL, lint, build et tests frontend, construction de l'image Docker |
-| PlantUML, Mermaid | Diagrammes de cas d'utilisation, de classes et d'architecture |
+### Étape 1 : Création du compte
 
----
+L'utilisateur renseigne son matricule, son nom, son prénom et son adresse électronique institutionnelle, puis accepte la charte. Le système effectue deux contrôles :
 
-## 10. Hors périmètre de la v1.0 (prévu en v1.1)
+- **Éligibilité** : le matricule et l'adresse électronique doivent correspondre à une entrée de la liste des comptes autorisés ;
+- **Unicité** : aucun compte ne doit déjà exister pour ce matricule.
 
-Ces fonctions sont **masquées** dans la version déployée et planifiées dans Jira :
+Si les contrôles sont satisfaits, le compte est créé en attente et un e-mail d'activation est envoyé. Pour éviter les abus, le formulaire est limité à 10 essais par minute.
 
-- mot de passe oublié ;
-- recherche globale, page de profil ;
-- annuaire et création de channels ;
-- onglets Fichiers et Épinglés ;
-- demandes d'adhésion, signalement et modération ;
-- création manuelle de groupe organisationnel ;
-- tableau de bord d'administration ;
-- résumé de discussion par l'IA.
+### Étape 2 : Activation
 
----
+Le lien reçu par e-mail est **signé et valable 48 heures**, et ne sert qu'une fois. L'utilisateur choisit son mot de passe (8 caractères minimum, avec une majuscule et un chiffre) ; son compte est activé avec le profil prévu dans la liste des comptes autorisés. Si l'e-mail n'arrive pas, un bouton permet de le renvoyer.
 
-## 11. Contraintes
+### Étape 3 : Rattachement automatique
 
-| Contrainte | Conséquence |
-|---|---|
-| Hébergement **gratuit** | Serveur qui s'endort après 15 min ; pas de WebSocket (rafraîchissement toutes les 5 s) ; quotas d'IA limités (20 questions/jour) |
-| SMTP bloqué par Render | Envoi des e-mails par l'API HTTP de Resend ; sans domaine vérifié, seule l'adresse du compte Resend reçoit les e-mails |
-| Délai | Livraison avancée d'une semaine : priorité à un cœur complet et testé |
-| Données personnelles | Seuls des extraits de cours sont envoyés à l'IA |
+À l'activation, l'étudiant est automatiquement ajouté aux groupes organisationnels de sa classe et de ses matières pour l'année active. L'enseignant devient propriétaire des groupes des matières dont il est responsable.
 
----
+### Étape 4 : Utilisation
 
-## 12. Organisation
+L'utilisateur est connecté directement. Son accueil présente ses espaces (groupes de classe et de matière, groupes privés) avec le nombre de messages non lus, ses invitations en attente et ses notifications.
 
-- **Méthode** : Scrum, sprints suivis dans Jira, revues de code croisées.
-- **Règles Git** : une branche par ticket, pull request obligatoire relue par un autre membre, CI verte avant fusion, aucun secret dans le dépôt.
-- **Déploiement** : automatique à chaque fusion dans `main` (Vercel pour le frontend, Render pour l'API ; migrations appliquées au démarrage).
+**Règle bloquante :** après 5 mots de passe incorrects, le compte est bloqué 15 minutes. Un compte inconnu et un mot de passe faux donnent le même message, pour ne rien révéler.
+
+## 6. Gestion des espaces de communication
+
+Chaque espace comporte : nom, description, type, propriétaire, date de création, membres et rôles, règle de visibilité des messages, mode de publication et état (actif, archivé).
+
+### 6.1 Groupes organisationnels
+
+Ils sont **générés automatiquement** par l'administration à partir des référentiels (§3.2) : un groupe par classe (propriétaire : l'administration) et un groupe par matière réunissant les étudiants de toutes les classes qui la suivent (propriétaire : l'enseignant responsable). Un aperçu indique ce qui sera créé. La génération peut être relancée **sans créer de doublon**, et le bouton **Synchroniser** ajoute à un groupe les membres manquants. Un étudiant ne peut pas quitter le groupe de sa classe.
+
+### 6.2 Groupes privés
+
+Un utilisateur disposant du droit **Créer des groupes privés** crée un groupe en cinq étapes (type, informations, visibilité des messages, invitations, récapitulatif) et en devient propriétaire. Il choisit qui peut publier (tous les membres, ou seulement les gestionnaires : mode annonce). Le groupe n'est visible que par ses membres.
+
+### 6.3 Channels communautaires
+
+Les channels existent dans le modèle de données et s'affichent pour leurs membres. Leur création, leur annuaire et les modes d'accès (ouvert, sur demande, restreint) sont prévus en version 1.1.
+
+### 6.4 Cycle de vie d'un espace
+
+États : Actif, Archivé (lecture seule : plus de messages ni de nouveaux membres). Les groupes organisationnels d'une année peuvent être archivés à l'activation de l'année suivante.
+
+**Règle bloquante :** un espace ne reste jamais sans propriétaire. Si le propriétaire quitte l'espace, la propriété passe au plus ancien co-gestionnaire ou, à défaut, à l'administration.
+
+## 7. Gestion des membres et des invitations
+
+Le propriétaire et les co-gestionnaires peuvent :
+
+- inviter un ou plusieurs utilisateurs (recherche par nom) ;
+- consulter les invitations en attente et les annuler ;
+- retirer un membre ;
+- désigner ou retirer un co-gestionnaire ;
+- transférer la propriété de l'espace.
+
+L'utilisateur invité reçoit une notification et peut accepter ou refuser l'invitation. Une invitation non traitée **expire après 14 jours** (traitement automatique chaque nuit). Les demandes d'adhésion aux channels sont prévues en version 1.1.
+
+**Règle bloquante :** un utilisateur retiré d'un espace perd immédiatement l'accès à ses messages et documents, y compris par lien direct : l'appartenance est vérifiée en base à chaque requête.
+
+## 8. Messagerie et partage de contenus
+
+Dans chaque espace dont il est membre, l'utilisateur peut :
+
+- envoyer un message texte ;
+- joindre des images (aperçu dans la conversation) ;
+- joindre des documents (PDF, Word, Excel, PowerPoint, archives ZIP) ;
+- répondre à un message précis ;
+- modifier ou supprimer ses propres messages.
+
+Chaque fichier affiche son nom, son format, sa taille et sa date d'expiration. Les nouveaux messages apparaissent automatiquement (rafraîchissement toutes les 5 secondes). **25 Mo maximum par fichier, 5 fichiers par message.** L'onglet Fichiers regroupant tous les documents d'un espace est prévu en version 1.1.
+
+**Règle bloquante :** un fichier n'est accessible qu'aux membres de l'espace dans lequel il a été partagé. Le stockage est privé : chaque téléchargement passe par l'API, qui vérifie les droits à chaque accès.
+
+## 9. Durée de visibilité des messages
+
+La durée de visibilité est choisie à la création de l'espace, parmi les valeurs du §3.5 :
+
+- **Illimitée** : les messages restent visibles tant que l'espace existe ;
+- **Limitée** : chaque message devient invisible après la durée choisie (24 heures, 7 jours ou 30 jours), calculée à partir de sa date d'envoi.
+
+Chaque message à durée limitée affiche sa date d'expiration (« Expire le … »), et l'espace affiche sa règle (ex. « Messages visibles 30 jours »).
+
+**Règle bloquante :** la date d'expiration est fixée à l'envoi : une modification de la règle ne s'applique pas rétroactivement. Une pièce jointe expire en même temps que son message ; un message expiré n'est plus renvoyé par l'API et son fichier n'est plus téléchargeable. La suppression physique des données expirées par un traitement automatique est prévue en version 1.1.
+
+## 10. Échanges pédagogiques
+
+Les groupes de matière proposent :
+
+- un **fil d'annonces** publié par l'enseignant, distinct de la discussion, avec notification des membres ;
+- un espace **Ressources** où l'enseignant classe ses supports par chapitre ;
+- un **Assistant IA** du cours, décrit ci-dessous.
+
+**Assistant IA.** Quand l'enseignant dépose un PDF, son texte est extrait et indexé automatiquement en arrière-plan (badge « Indexé pour l'IA »). Quand un étudiant pose une question, l'application cherche les passages les plus pertinents **dans les supports de ce cours uniquement**, puis l'IA (Gemini, avec Groq en secours) rédige une réponse qui **cite le document et la page** ; un clic sur la source ouvre le document. Si le cours ne contient pas la réponse, l'assistant le dit au lieu d'inventer. Seul l'enseignant active l'assistant et peut lui donner une consigne. Chaque étudiant dispose de 20 questions par jour et peut noter chaque réponse (👍/👎). Seuls des extraits de cours sont envoyés à l'IA, jamais de données personnelles.
+
+L'épinglage des messages est prévu en version 1.1.
+
+## 11. Protection des utilisateurs et modération
+
+**Confidentialité** (livrée) : les conversations, annonces, ressources et fichiers ne sont accessibles qu'aux membres de l'espace ; aucun utilisateur, y compris l'administration, ne consulte un groupe privé dont il n'est pas membre.
+
+Le signalement des contenus et les outils de modération (masquer, supprimer, avertir, suspendre) sont prévus en version 1.1.
+
+## 12. Notifications
+
+Notifications dans l'application, avec compteur sur la cloche : invitation reçue, nouvelle annonce, nouvelle ressource, retrait d'un espace. Par e-mail : activation du compte, et annonces quand l'enseignant coche l'envoi par e-mail. La page Notifications permet de tout marquer comme lu. Les préférences de notification par espace sont prévues en version 1.1.
+
+## 13. Historique et traçabilité
+
+En version 1.0 sont conservés : les imports de comptes autorisés (auteur, fichier, lignes importées et ignorées, erreurs), les dates de dernière connexion et de blocage des comptes, et chaque échange avec l'Assistant IA (question, réponse, sources citées, fournisseur utilisé, avis). L'historique général des opérations (avec ancienne et nouvelle valeur) est prévu en version 1.1.
+
+## 14. Tableau de bord
+
+Le tableau de bord d'administration est prévu en version 1.1. En version 1.0, la page Groupes organisationnels indique pour chaque groupe son type, sa classe, son propriétaire, son nombre de membres et son état.
+
+## 15. Fonctionnalités complémentaires
+
+Réalisées en version 1.0 :
+
+- **Assistant IA** du cours avec citation des sources (§10) ;
+- **accessibilité** : lien « Aller au contenu », contrastes renforcés, navigation clavier ; score Lighthouse accessibilité 100 ;
+- **interface responsive** : navigation en bas d'écran sur téléphone, dialogues en plein écran.
+
+Prévues pour la suite : recherche dans les messages et documents, réactions, messagerie directe, modération automatique, interface multilingue, application installable (PWA), export des ressources en fin d'année.
+
+## 16. Démarche de réalisation
+
+L'équipe a appliqué une démarche Scrum :
+
+- **Analyse des besoins et maquettes** : cas d'utilisation, maquette des écrans, matrice des permissions.
+- **Planification** : backlog Jira (epics, user stories et critères d'acceptation, tickets SCRUM-xx), estimations, sprints.
+- **Conception** : architecture, schéma de la base (32 tables), diagramme de classes, contrat d'API.
+- **Collaboration avec GitHub** : une branche par ticket, pull requests relues par un autre membre, fusion seulement si l'intégration continue est verte.
+- **Développement par itérations** et points d'équipe réguliers.
+- **Tests** : environ 360 tests automatiques backend et 275 tests frontend lancés à chaque pull request, plus une recette manuelle par profil (plan de tests).
+- **Documentation et démonstration** : README d'installation, guide utilisateur, guide de déploiement, scénario et vidéo de démonstration.
 
 | Membre | Domaine principal |
 |---|---|
@@ -252,32 +276,32 @@ Ces fonctions sont **masquées** dans la version déployée et planifiées dans 
 | Mansour Naili | Annonces et administration |
 | Ayoub Boussoukaya | Assistant IA |
 
----
+## 17. Contraintes techniques
 
-## 13. Livrables
+Comment la version 1.0 respecte les contraintes :
 
-| Livrable | Où |
+- **Responsive** : interface Vue 3 + Vuetify adaptée à l'ordinateur, la tablette et le téléphone.
+- **Sécurité** : jeton d'authentification (Laravel Sanctum), mots de passe hachés (bcrypt), droits vérifiés côté serveur sur chaque requête et chaque fichier, limitation des tentatives.
+- **Architecture moderne** : front-end Vue 3 (Vercel), API REST Laravel 13 dans une image Docker (Render), base PostgreSQL (Neon), stockage objet privé compatible S3 (Supabase Storage), e-mails par l'API Resend.
+- **Quasi temps réel** : les nouveaux messages et notifications sont récupérés automatiquement toutes les quelques secondes ; l'hébergement gratuit ne permet pas de serveur temps réel permanent.
+- **Confidentialité** : accès limité aux membres, données personnelles jamais envoyées à l'IA, clés secrètes hors du code.
+- **Extensibilité** : un seul modèle d'espace avec un type (organisationnel, privé, channel), services métier séparés, interface d'IA interchangeable.
+- **Déploiement continu** : chaque fusion dans la branche principale est testée puis déployée automatiquement.
+
+## 18. Résultat obtenu et livrables
+
+Les utilisateurs disposent d'une application en ligne leur permettant de communiquer dans des espaces adaptés à l'organisation de l'université, de partager des contenus de cours et de gérer des groupes privés selon leurs droits, dans le respect des règles de visibilité et d'accès, avec un Assistant IA fondé sur les supports des enseignants.
+
+| Livrable | Où le trouver |
 |---|---|
 | Application déployée | <https://uniconnect-six-lake.vercel.app> |
-| Code source | Dépôt GitHub |
-| Ce cahier des charges | `docs/cahier-des-charges.md` (et sa version PDF) |
-| Installation en local | `README.md` |
-| Architecture, API, conception (schéma SQL, diagrammes) | `docs/architecture.md`, `docs/api.md`, `docs/conception/` |
-| Déploiement et retour arrière | `docs/deploiement.md` |
-| Plans de tests | `docs/tests.md`, `docs/plan-de-tests.md` |
-| Guide utilisateur | `docs/guide-utilisateur.md` |
-| Scénario et vidéo de démonstration | `docs/demo.md`, `docs/demo-pas-a-pas.md`, vidéo (lien dans le README) |
-| Suivi Scrum | Tableau Jira |
+| Vidéo de démonstration | <https://chahredinebaccouch.github.io/uniconnect/> |
+| Dépôt GitHub (code, pull requests et revues) | <https://github.com/ChahredineBACCOUCH/uniconnect> |
+| Backlog Jira (user stories, sprints) | <https://uniconnectteam26.atlassian.net/jira/software/projects/SCRUM/boards/1> |
+| Analyse, conception (schéma SQL, diagrammes), maquettes | `docs/conception/`, `docs/maquette/`, `docs/architecture.md`, `docs/api.md` |
+| Plan et résultats de tests | `docs/tests.md`, `docs/plan-de-tests.md` |
+| Guide d'installation et d'utilisation | `README.md`, `docs/installation.md`, `docs/guide-utilisateur.md` |
+| Déploiement | `docs/deploiement.md` |
+| Démonstration | `docs/demo.md`, `docs/demo-pas-a-pas.md` |
 
----
-
-## 14. Critères d'acceptation
-
-La version est acceptée si :
-
-1. `/api/health` répond `"status": "ok"` et `"db": "ok"` ;
-2. les trois comptes de démonstration se connectent et voient leurs espaces ;
-3. une inscription non autorisée est refusée et une inscription autorisée reçoit l'e-mail d'activation ;
-4. un non-membre reçoit 403 sur les messages, fichiers et ressources d'un espace ;
-5. l'Assistant IA répond à une question du cours avec une source citée, et dit ne pas savoir pour une question hors sujet ;
-6. la CI GitHub est verte sur `main`.
+**Comptes de démonstration** (mot de passe `Demo1234!`) : `etudiant@demo.uniconnect`, `enseignant@demo.uniconnect`, `admin@demo.uniconnect`. L'API étant hébergée sur une offre gratuite, la première requête après 15 minutes d'inactivité peut prendre environ une minute.
