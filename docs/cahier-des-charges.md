@@ -24,7 +24,7 @@ Ce document décrit **ce qui est livré et en ligne** : il sert de référence p
 | Gestion de projet (Jira) | <https://uniconnectteam26.atlassian.net/jira/software/projects/SCRUM/boards/1> |
 | Documentation | [`docs/`](README.md) dans le dépôt |
 | Installation en local | [`README.md`](../README.md) à la racine du dépôt |
-| Vidéo de démonstration | voir le [README](../README.md#vidéo-de-démonstration) |
+| Vidéo de démonstration | <https://github.com/ChahredineBACCOUCH/uniconnect/releases/download/v1.0/uniconnect-demo-v1.0.webm> (release [v1.0](https://github.com/ChahredineBACCOUCH/uniconnect/releases/tag/v1.0)) |
 
 **Comptes de démonstration** (mot de passe `Demo1234!`) :
 
